@@ -10,7 +10,7 @@ libleveldb: leveldb/libleveldb.dylib
 
 test: leveldb/libleveldb.dylib
 	mkdir -p build/
-	$(RUSTC) $(RUSTFLAGS) --test src/libleveldb/lib.rs
+	$(RUSTC) $(RUSTFLAGS) --test src/libleveldb/test.rs
 	rm -rf testdbs
 	mkdir testdbs
 	LD_LIBRARY_PATH=leveldb build/leveldb

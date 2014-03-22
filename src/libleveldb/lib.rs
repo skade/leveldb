@@ -7,3 +7,4 @@ mod cbits;
 pub mod database;
 pub mod error;
 pub mod options;
+pub mod iterator;

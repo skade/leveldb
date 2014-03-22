@@ -95,7 +95,23 @@ pub mod leveldb {
     pub fn leveldb_readoptions_set_snapshot(options: *leveldb_readoptions_t,
                                             snapshot: *leveldb_snapshot_t);
                                         
-
+    pub fn leveldb_create_iterator(database: *leveldb_t,
+                                   options: *leveldb_readoptions_t) -> *leveldb_iterator_t;
+    pub fn leveldb_iter_destroy(iterator: *leveldb_iterator_t);
+    pub fn leveldb_iter_valid(iterator: *leveldb_iterator_t) -> c_char;
+    pub fn leveldb_iter_seek_to_first(iterator: *leveldb_iterator_t);
+    pub fn leveldb_iter_seek_to_last(iterator: *leveldb_iterator_t);
+    pub fn leveldb_iter_seek(iterator: *leveldb_iterator_t,
+                             key: *c_char,
+                             keylen: size_t);
+    pub fn leveldb_iter_next(iterator: *leveldb_iterator_t);
+    pub fn leveldb_iter_prev(iterator: *leveldb_iterator_t);
+    pub fn leveldb_iter_key(iterator: *leveldb_iterator_t,
+                            keylen: *size_t) -> *c_char;
+    pub fn leveldb_iter_value(iterator: *leveldb_iterator_t,
+                              vallen: *size_t) -> *c_char;
+    pub fn leveldb_iter_get_error(iterator: *leveldb_iterator_t,
+                                  errptr: **c_char);
     //pub fn leveldb_free(ptr: uint);
   }
 }

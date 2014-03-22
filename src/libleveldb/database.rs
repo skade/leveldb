@@ -9,7 +9,7 @@ use std::str::raw::*;
 use std::slice::*;
 
 pub struct Database {
-  priv database: *leveldb_t,
+  database: *leveldb_t,
 }
 
 impl Database {

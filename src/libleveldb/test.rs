@@ -1,8 +1,12 @@
+#[feature(globs,phase)];
+#[phase(syntax, link)] extern crate log;
+
 extern crate leveldb;
 
 #[cfg(test)]
 mod tests {
   use leveldb::database::Database;
+  use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
 
   #[test]
@@ -100,5 +104,28 @@ mod tests {
       },
       Err(_) => { fail!("failed reading data") }
     }
+  }
+
+  #[test]
+  fn test_iterator() {
+    let mut opts = Options::new();
+    opts.create_if_missing(true);
+    let mut database = match Database::open(~"testdbs/iter", opts) {
+      Ok(db) => { db },
+      Err(_) => { fail!("failed to open database") }
+    };
+    let write_opts = WriteOptions::new();
+    let result = database.put(write_opts,
+                              &[1],
+                              &[1]);
+    let write_opts2 = WriteOptions::new();
+    let result = database.put(write_opts2,
+                              &[2],
+                              &[2]);
+    let read_opts = ReadOptions::new();
+    let mut iter = database.iter(read_opts);
+    assert!(iter.valid());
+    assert!(iter.next().is_some());
+    assert!(iter.next().is_some());
   }
 }

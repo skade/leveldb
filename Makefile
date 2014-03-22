@@ -8,7 +8,7 @@ libleveldb: leveldb/libleveldb.dylib
 	mkdir -p build/
 	$(RUSTC) $(RUSTFLAGS) src/libleveldb/lib.rs
 
-test: leveldb/libleveldb.dylib
+test: leveldb/libleveldb.dylib libleveldb
 	mkdir -p build/
 	$(RUSTC) $(RUSTFLAGS) --test src/libleveldb/test.rs
 	rm -rf testdbs

@@ -242,7 +242,7 @@ mod tests {
   fn test_open_database() {
     let mut opts = Options::new();
     opts.create_if_missing(true);
-    let res = Database::open(~"testdb", opts);
+    let res = Database::open(~"testdbs/create_if_missing", opts);
     assert!(res.is_ok());
   }
 
@@ -250,7 +250,7 @@ mod tests {
   fn test_open_non_existant_database_without_create() {
     let mut opts = Options::new();
     opts.create_if_missing(false);
-    let res = Database::open(~"missing", opts);
+    let res = Database::open(~"testdbs/missing", opts);
     assert!(res.is_err());
   }
 
@@ -258,7 +258,7 @@ mod tests {
   fn test_write_to_database() {
     let mut opts = Options::new();
     opts.create_if_missing(true);
-    let mut database = match Database::open(~"put_simple", opts) {
+    let mut database = match Database::open(~"testdbs/put_simple", opts) {
       Ok(db) => { db },
       Err(_) => { fail!("failed to open database") }
     };
@@ -273,7 +273,7 @@ mod tests {
   fn test_delete_from_database() {
     let mut opts = Options::new();
     opts.create_if_missing(true);
-    let mut database = match Database::open(~"delete_simple", opts) {
+    let mut database = match Database::open(~"testdbs/delete_simple", opts) {
       Ok(db) => { db },
       Err(_) => { fail!("failed to open database") }
     };
@@ -292,7 +292,7 @@ mod tests {
   fn test_get_from_empty_database() {
     let mut opts = Options::new();
     opts.create_if_missing(true);
-    let mut database = match Database::open(~"get_simple", opts) {
+    let mut database = match Database::open(~"testdbs/get_simple", opts) {
       Ok(db) => { db },
       Err(_) => { fail!("failed to open database") }
     };
@@ -308,7 +308,7 @@ mod tests {
   fn test_get_from_filled_database() {
     let mut opts = Options::new();
     opts.create_if_missing(true);
-    let mut database = match Database::open(~"get_filled", opts) {
+    let mut database = match Database::open(~"testdbs/get_filled", opts) {
       Ok(db) => { db },
       Err(_) => { fail!("failed to open database") }
     };

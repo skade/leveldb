@@ -11,6 +11,8 @@ libleveldb: leveldb/libleveldb.dylib
 test: leveldb/libleveldb.dylib
 	mkdir -p build/
 	$(RUSTC) $(RUSTFLAGS) --test src/libleveldb/lib.rs
+	rm -rf testdbs
+	mkdir testdbs
 	build/leveldb
 
 leveldb/libleveldb.dylib:

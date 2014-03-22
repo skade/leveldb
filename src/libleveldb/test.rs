@@ -2,7 +2,8 @@ extern crate leveldb;
 
 #[cfg(test)]
 mod tests {
-  use leveldb::{Options,ReadOptions,WriteOptions,Database};
+  use leveldb::database::Database;
+  use leveldb::options::{Options,ReadOptions,WriteOptions};
 
   #[test]
   fn test_create_options() {

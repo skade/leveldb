@@ -14,6 +14,4 @@ test: leveldb/libleveldb.dylib
 	build/leveldb
 
 leveldb/libleveldb.dylib:
-	cd leveldb
-	make
-	cd ..
+	cd leveldb; make

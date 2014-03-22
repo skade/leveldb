@@ -13,7 +13,7 @@ test: leveldb/libleveldb.dylib
 	$(RUSTC) $(RUSTFLAGS) --test src/libleveldb/lib.rs
 	rm -rf testdbs
 	mkdir testdbs
-	build/leveldb
+	LD_LIBRARY_PATH=leveldb build/leveldb
 
 leveldb/libleveldb.dylib:
 	cd leveldb; make

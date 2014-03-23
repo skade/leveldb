@@ -125,7 +125,8 @@ mod json_tests {
   use super::utils::{open_database};
   use leveldb::database::json::Interface;
   use leveldb::options::{ReadOptions,WriteOptions};
-  use serialize::{Encodable};
+  use serialize::{Encodable,Decodable};
+  use serialize::json;
 
   #[deriving(Encodable,Decodable)]
   struct ToEncode {
@@ -162,6 +163,9 @@ mod json_tests {
         assert!(data.is_some())
         let data = data.unwrap();
         assert!(data.is_object());
+        let mut decoder = json::Decoder::new(data);
+        let decoded_object: ToEncode = Decodable::decode(&mut decoder);
+        assert_eq!(decoded_object.test, ~"string2" );
       },
       Err(_) => { fail!("failed reading data") }
     }

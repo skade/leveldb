@@ -19,7 +19,7 @@ pub trait Interface<'a, T:Encodable<json::Encoder<'a>>> {
            key: &T) -> Result<(), Error>;
   fn get(&mut self,
          options: ReadOptions,
-         key: &T) -> Result<Option<~Json>, Error>;
+         key: &T) -> Result<Option<Json>, Error>;
 }
 
 impl<'a, T: Encodable<json::Encoder<'a>>> Interface<'a, T> for Database {
@@ -39,7 +39,7 @@ impl<'a, T: Encodable<json::Encoder<'a>>> Interface<'a, T> for Database {
   }
   fn get(&mut self,
          options: ReadOptions,
-         key: &T) -> Result<Option<~Json>, Error> {
+         key: &T) -> Result<Option<Json>, Error> {
     let encoded_key = json::Encoder::buffer_encode(&key);
     let result = self.get_binary(options, encoded_key);
     match result {
@@ -50,7 +50,7 @@ impl<'a, T: Encodable<json::Encoder<'a>>> Interface<'a, T> for Database {
           Some(binary) => {
             let mut reader = BufReader::new(binary);
             match from_reader(&mut reader) {
-              Ok(json) => { Ok(Some(~json)) },
+              Ok(json) => { Ok(Some(json)) },
               Err(_) => { Err( Error { message: ~"json parsing failed" } ) }
             }
           }

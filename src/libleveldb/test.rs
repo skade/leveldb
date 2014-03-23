@@ -146,7 +146,7 @@ mod json_tests {
 
   #[test]
   fn test_read_from_database() {
-    let mut database = open_database(~"testdbs/json_put", true);
+    let mut database = open_database(~"testdbs/json_read", true);
     let write_opts = WriteOptions::new();
     let key = ToEncode { test: ~"string" };
     let val = ToEncode { test: ~"string2" };

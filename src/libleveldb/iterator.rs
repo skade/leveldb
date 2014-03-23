@@ -44,14 +44,14 @@ impl iter::Iterator<~[i8]> for Iterator {
   fn next(&mut self) -> Option<~[i8]> {
     unsafe {
       let length: size_t = 0;
-      let value = leveldb_iter_value(self.iter,
-                                     &length);
-      if value == ptr::null() {
-        None
-      } else {
+      if self.valid() {
+        let value = leveldb_iter_value(self.iter,
+                                       &length);
         let vec: ~[i8] = from_buf(value, length as uint);
         leveldb_iter_next(self.iter);
         Some(vec)
+      } else {
+        None
       }
     }
   }

@@ -115,13 +115,13 @@ mod tests {
       Err(_) => { fail!("failed to open database") }
     };
     let write_opts = WriteOptions::new();
-    let result = database.put(write_opts,
-                              &[1],
-                              &[1]);
+    database.put(write_opts,
+                 &[1],
+                 &[1]);
     let write_opts2 = WriteOptions::new();
-    let result = database.put(write_opts2,
-                              &[2],
-                              &[2]);
+    database.put(write_opts2,
+                 &[2],
+                 &[2]);
     let read_opts = ReadOptions::new();
     let mut iter = database.iter(read_opts);
     assert!(iter.valid());

@@ -2,7 +2,6 @@ use cbits::leveldb::*;
 use std::libc::{size_t};
 use std::slice::*;
 use std::iter;
-use std::ptr;
 use super::database::Database;
 use super::options::ReadOptions;
 
@@ -38,16 +37,22 @@ impl Iterator {
   pub fn seek_to_first(self) {
     unsafe { leveldb_iter_seek_to_first(self.iter) }
   }
+
+  pub fn current_value(self) -> ~[i8] {
+    unsafe {
+      let length: size_t = 0;
+      let value = leveldb_iter_value(self.iter,
+                                     &length);
+      from_buf(value, length as uint)
+    }
+  }
 }
 
 impl iter::Iterator<~[i8]> for Iterator {
   fn next(&mut self) -> Option<~[i8]> {
     unsafe {
-      let length: size_t = 0;
       if self.valid() {
-        let value = leveldb_iter_value(self.iter,
-                                       &length);
-        let vec: ~[i8] = from_buf(value, length as uint);
+        let vec = self.current_value();
         leveldb_iter_next(self.iter);
         Some(vec)
       } else {

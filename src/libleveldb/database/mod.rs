@@ -13,6 +13,7 @@ pub mod options;
 pub mod error;
 pub mod iterator;
 pub mod binary;
+pub mod json;
 
 pub struct Database {
   database: *leveldb_t,
@@ -79,7 +80,7 @@ impl Database {
 
   fn get_binary(&mut self,
                 options: ReadOptions,
-                key: &[u8]) -> Result<Option<~[i8]>, Error> {
+                key: &[u8]) -> Result<Option<~[u8]>, Error> {
     unsafe {
       let error = ptr::null();
       let length: size_t = 0;
@@ -94,7 +95,7 @@ impl Database {
          if result == ptr::null() {
            Ok(None)
          } else {
-           let vec: ~[i8] = from_buf(result, length as uint);
+           let vec: ~[u8] = from_buf(result, length as uint);
            Ok(Some(vec))
          }
        } else {

@@ -13,7 +13,7 @@ pub trait Interface {
            key: &[u8]) -> Result<(), Error>;
   fn get(&mut self,
          options: ReadOptions,
-         key: &[u8]) -> Result<Option<~[i8]>, Error>;
+         key: &[u8]) -> Result<Option<~[u8]>, Error>;
 }
 
 impl Interface for Database {
@@ -30,7 +30,7 @@ impl Interface for Database {
   }
   fn get(&mut self,
          options: ReadOptions,
-         key: &[u8]) -> Result<Option<~[i8]>, Error> {
+         key: &[u8]) -> Result<Option<~[u8]>, Error> {
     self.get_binary(options, key)
   }
 }

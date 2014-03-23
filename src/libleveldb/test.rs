@@ -2,15 +2,13 @@
 #[phase(syntax, link)] extern crate log;
 
 extern crate leveldb;
+extern crate serialize;
 
-#[cfg(test)]
-mod tests {
+pub mod utils {
   use leveldb::database::Database;
-  use leveldb::database::binary::Interface;
-  use leveldb::iterator::Iterable;
-  use leveldb::options::{Options,ReadOptions,WriteOptions};
+  use leveldb::options::{Options};
 
-  fn open_database(name: ~str, create_if_missing: bool) -> Database {
+  pub fn open_database(name: ~str, create_if_missing: bool) -> Database {
     let mut opts = Options::new();
     opts.create_if_missing(create_if_missing);
     match Database::open(name, opts) {
@@ -18,6 +16,15 @@ mod tests {
       Err(_) => { fail!("failed to open database") }
     }
   }
+}
+
+#[cfg(test)]
+mod binary_tests {
+  use super::utils::{open_database};
+  use leveldb::database::Database;
+  use leveldb::database::binary::Interface;
+  use leveldb::iterator::Iterable;
+  use leveldb::options::{Options,ReadOptions,WriteOptions};
 
   fn db_put_simple(database: &mut Database, key: &[u8], val: &[u8]) {
     let write_opts = WriteOptions::new();
@@ -111,4 +118,57 @@ mod tests {
     assert!(iter.next().is_some());
     assert!(iter.next().is_none());
   }
+}
+
+#[cfg(test)]
+mod json_tests {
+  use super::utils::{open_database};
+  use leveldb::database::Database;
+  use leveldb::database::json::Interface;
+  use leveldb::iterator::Iterable;
+  use leveldb::options::{Options,ReadOptions,WriteOptions};
+  use serialize::{json, Encodable, Decodable};
+  use serialize::json::Json;
+  use serialize::json::Encoder;
+
+  #[deriving(Encodable,Decodable)]
+  struct ToEncode {
+    test: ~str,
+  }
+
+  #[test]
+  fn test_write_to_database() {
+    let mut database = open_database(~"testdbs/json_put", true);
+    let write_opts = WriteOptions::new();
+    let key = ToEncode { test: ~"string" };
+    let val = ToEncode { test: ~"string2" };
+    let result = database.put(write_opts,
+                              &key,
+                              &val);
+    assert!(result.is_ok());
+  }
+
+  #[test]
+  fn test_read_from_database() {
+    let mut database = open_database(~"testdbs/json_put", true);
+    let write_opts = WriteOptions::new();
+    let key = ToEncode { test: ~"string" };
+    let val = ToEncode { test: ~"string2" };
+    let result = database.put(write_opts,
+                              &key,
+                              &val);
+    assert!(result.is_ok());
+    let read_opts = ReadOptions::new();
+    let read = database.get(read_opts,
+                            &key);
+    match read {
+      Ok(data) => {
+        assert!(data.is_some())
+        let data = data.unwrap();
+        assert!(data.is_object());
+      },
+      Err(_) => { fail!("failed reading data") }
+    }
+  }
+
 }

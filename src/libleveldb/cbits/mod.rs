@@ -50,7 +50,7 @@ pub mod leveldb {
                        key: *c_char,
                        keylen: size_t,
                        vallen: *size_t,
-                       errptr: **c_char) -> *c_char;
+                       errptr: **c_char) -> *u8;
 
     pub fn leveldb_options_create() -> *leveldb_options_t;
     pub fn leveldb_options_destroy(options: *leveldb_options_t);

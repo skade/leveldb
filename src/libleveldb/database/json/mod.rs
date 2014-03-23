@@ -2,7 +2,7 @@
 use super::Database;
 use super::options::{ReadOptions,WriteOptions};
 use super::error::Error;
-use serialize::{json, Encodable, Decodable};
+use serialize::{json, Encodable};
 use serialize::json::Json;
 use serialize::json::Encoder;
 use serialize::json::from_reader;

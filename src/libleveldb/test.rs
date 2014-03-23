@@ -123,13 +123,9 @@ mod binary_tests {
 #[cfg(test)]
 mod json_tests {
   use super::utils::{open_database};
-  use leveldb::database::Database;
   use leveldb::database::json::Interface;
-  use leveldb::iterator::Iterable;
-  use leveldb::options::{Options,ReadOptions,WriteOptions};
-  use serialize::{json, Encodable, Decodable};
-  use serialize::json::Json;
-  use serialize::json::Encoder;
+  use leveldb::options::{ReadOptions,WriteOptions};
+  use serialize::{Encodable};
 
   #[deriving(Encodable,Decodable)]
   struct ToEncode {

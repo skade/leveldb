@@ -9,6 +9,23 @@ mod tests {
   use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
 
+  fn open_database(name: ~str, create_if_missing: bool) -> Database {
+    let mut opts = Options::new();
+    opts.create_if_missing(create_if_missing);
+    match Database::open(name, opts) {
+      Ok(db) => { db },
+      Err(_) => { fail!("failed to open database") }
+    }
+  }
+
+  fn db_put_simple(database: &mut Database, key: &[u8], val: &[u8]) {
+    let write_opts = WriteOptions::new();
+    match database.put(write_opts, key, val) {
+      Ok(_) => { () },
+      Err(_) => { fail!("failed to write to database") }
+    }
+  }
+
   #[test]
   fn test_create_options() {
     Options::new();
@@ -32,12 +49,7 @@ mod tests {
 
   #[test]
   fn test_write_to_database() {
-    let mut opts = Options::new();
-    opts.create_if_missing(true);
-    let mut database = match Database::open(~"testdbs/put_simple", opts) {
-      Ok(db) => { db },
-      Err(_) => { fail!("failed to open database") }
-    };
+    let mut database = open_database(~"testdbs/put_simple", true);
     let write_opts = WriteOptions::new();
     let result = database.put(write_opts,
                               &[1],
@@ -47,17 +59,9 @@ mod tests {
 
   #[test]
   fn test_delete_from_database() {
-    let mut opts = Options::new();
-    opts.create_if_missing(true);
-    let mut database = match Database::open(~"testdbs/delete_simple", opts) {
-      Ok(db) => { db },
-      Err(_) => { fail!("failed to open database") }
-    };
-    let write_opts = WriteOptions::new();
-    let result = database.put(write_opts,
-                              &[1],
-                              &[1]);
-    assert!(result.is_ok());
+    let mut database = open_database(~"testdbs/delete_simple", true);
+    db_put_simple(&mut database, &[1], &[1]);
+
     let write2 = WriteOptions::new();
     let res2 = database.delete(write2,
                                &[1]);
@@ -66,12 +70,7 @@ mod tests {
 
   #[test]
   fn test_get_from_empty_database() {
-    let mut opts = Options::new();
-    opts.create_if_missing(true);
-    let mut database = match Database::open(~"testdbs/get_simple", opts) {
-      Ok(db) => { db },
-      Err(_) => { fail!("failed to open database") }
-    };
+    let mut database = open_database(~"testdbs/get_simple", true);
     let read_opts = ReadOptions::new();
     let res = database.get(read_opts, [1,2,3]);
     match res {
@@ -82,17 +81,9 @@ mod tests {
 
   #[test]
   fn test_get_from_filled_database() {
-    let mut opts = Options::new();
-    opts.create_if_missing(true);
-    let mut database = match Database::open(~"testdbs/get_filled", opts) {
-      Ok(db) => { db },
-      Err(_) => { fail!("failed to open database") }
-    };
-    let write_opts = WriteOptions::new();
-    let result = database.put(write_opts,
-                              &[1],
-                              &[1]);
-    assert!(result.is_ok());
+    let mut database = open_database(~"testdbs/get_filled", true);
+    db_put_simple(&mut database, &[1], &[1]);
+
     let read_opts = ReadOptions::new();
     let res = database.get(read_opts,
                             &[1]);
@@ -108,20 +99,10 @@ mod tests {
 
   #[test]
   fn test_iterator() {
-    let mut opts = Options::new();
-    opts.create_if_missing(true);
-    let mut database = match Database::open(~"testdbs/iter", opts) {
-      Ok(db) => { db },
-      Err(_) => { fail!("failed to open database") }
-    };
-    let write_opts = WriteOptions::new();
-    database.put(write_opts,
-                 &[1],
-                 &[1]);
-    let write_opts2 = WriteOptions::new();
-    database.put(write_opts2,
-                 &[2],
-                 &[2]);
+    let mut database = open_database(~"testdbs/iter", true);
+    db_put_simple(&mut database, &[1], &[1]);
+    db_put_simple(&mut database, &[2], &[2]);
+
     let read_opts = ReadOptions::new();
     let mut iter = database.iter(read_opts);
     assert!(iter.valid());

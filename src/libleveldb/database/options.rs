@@ -4,54 +4,54 @@ use std::libc::{size_t, c_int};
 use std::bool::to_bit;
 
 pub struct Options {
-  opts: *leveldb_options_t,
+  options: *leveldb_options_t,
 }
 
 impl Options {
   pub fn new() -> Options {
     unsafe {
-      let opts = leveldb_options_create();
-      Options { opts: opts }
+      let options = leveldb_options_create();
+      Options { options: options }
     }
   }
 
   pub fn create_if_missing(&mut self, create: bool) {
-    unsafe { leveldb_options_set_create_if_missing(self.opts, to_bit::<i8>(create)) }
+    unsafe { leveldb_options_set_create_if_missing(self.options, to_bit::<i8>(create)) }
   }
 
   pub fn error_if_exists(&mut self, error: bool) {
-    unsafe { leveldb_options_set_error_if_exists(self.opts, to_bit::<i8>(error)) }
+    unsafe { leveldb_options_set_error_if_exists(self.options, to_bit::<i8>(error)) }
   }
 
   pub fn paranoid_checks(&mut self, paranoid: bool) {
-    unsafe { leveldb_options_set_paranoid_checks(self.opts, to_bit::<i8>(paranoid)) }
+    unsafe { leveldb_options_set_paranoid_checks(self.options, to_bit::<i8>(paranoid)) }
   }
 
   pub fn write_buffer_size(&mut self, buffer_size: size_t) {
-    unsafe { leveldb_options_set_write_buffer_size(self.opts, buffer_size) }
+    unsafe { leveldb_options_set_write_buffer_size(self.options, buffer_size) }
   }
 
   pub fn max_open_files(&mut self, number: int) {
-    unsafe { leveldb_options_set_max_open_files(self.opts, number as c_int) }
+    unsafe { leveldb_options_set_max_open_files(self.options, number as c_int) }
   }
 
   pub fn block_size(&mut self, block_size: size_t) {
-    unsafe { leveldb_options_set_block_size(self.opts, block_size) }
+    unsafe { leveldb_options_set_block_size(self.options, block_size) }
   }
 
   pub fn block_restart_interval(&mut self, block_restart_interval: int) {
-    unsafe { leveldb_options_set_block_restart_interval(self.opts, block_restart_interval as c_int) }
+    unsafe { leveldb_options_set_block_restart_interval(self.options, block_restart_interval as c_int) }
   }
 
   pub fn compression(&mut self, compression: Compression) {
-    unsafe { leveldb_options_set_compression(self.opts, compression) }
+    unsafe { leveldb_options_set_compression(self.options, compression) }
   }
 }
 
 impl Drop for Options {
   fn drop(&mut self) {
     unsafe {
-      leveldb_options_destroy(self.opts);
+      leveldb_options_destroy(self.options);
     }
   }
 }

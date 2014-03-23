@@ -26,7 +26,7 @@ impl Database {
     name.with_c_str(|c_string| {
       unsafe {
         let error = ptr::null();
-        let database = leveldb_open(options.opts, c_string, &error);
+        let database = leveldb_open(options.options, c_string, &error);
         if error == ptr::null() {
           Ok(Database::new(database))
         } else {

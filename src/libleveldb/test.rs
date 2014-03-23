@@ -6,6 +6,7 @@ extern crate leveldb;
 #[cfg(test)]
 mod tests {
   use leveldb::database::Database;
+  use leveldb::database::binary::Interface;
   use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
 

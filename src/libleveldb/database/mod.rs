@@ -12,6 +12,7 @@ use std::slice::*;
 pub mod options;
 pub mod error;
 pub mod iterator;
+pub mod binary;
 
 pub struct Database {
   database: *leveldb_t,
@@ -36,10 +37,10 @@ impl Database {
     })
   }
 
-  pub fn put(&mut self,
-             options: WriteOptions,
-             key: &[u8],
-             value: &[u8]) -> Result<(), Error> {
+  fn put_binary(&mut self,
+                options: WriteOptions,
+                key: &[u8],
+                value: &[u8]) -> Result<(), Error> {
     unsafe {
       let error = ptr::null();
       leveldb_put(self.database,
@@ -58,9 +59,9 @@ impl Database {
     }
   }
 
-  pub fn delete(&mut self,
-                options: WriteOptions,
-                key: &[u8]) -> Result<(), Error> {
+  fn delete_binary(&mut self,
+                   options: WriteOptions,
+                   key: &[u8]) -> Result<(), Error> {
     unsafe {
       let error = ptr::null();
       leveldb_delete(self.database,
@@ -76,9 +77,9 @@ impl Database {
     }
   }
 
-  pub fn get(&mut self,
-             options: ReadOptions,
-             key: &[u8]) -> Result<Option<~[i8]>, Error> {
+  fn get_binary(&mut self,
+                options: ReadOptions,
+                key: &[u8]) -> Result<Option<~[i8]>, Error> {
     unsafe {
       let error = ptr::null();
       let length: size_t = 0;

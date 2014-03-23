@@ -1,12 +1,17 @@
+
 use cbits::leveldb::*;
 
-use super::error::Error;
-use super::options::{Options,WriteOptions,ReadOptions};
+use self::options::{Options,WriteOptions,ReadOptions};
+use self::error::Error;
 
 use std::ptr;
 use std::libc::{c_char, size_t};
 use std::str::raw::*;
 use std::slice::*;
+
+pub mod options;
+pub mod error;
+pub mod iterator;
 
 pub struct Database {
   database: *leveldb_t,

@@ -3,8 +3,9 @@
 #[feature(globs,phase)];
 #[phase(syntax, link)] extern crate log;
 
+pub use options = database::options;
+pub use error = database::error;
+pub use iterator = database::iterator;
+
 mod cbits;
 pub mod database;
-pub mod error;
-pub mod options;
-pub mod iterator;

@@ -2,7 +2,7 @@ use cbits::leveldb::*;
 use std::libc::{size_t};
 use std::slice::*;
 use std::iter;
-use super::database::Database;
+use super::Database;
 use super::options::ReadOptions;
 
 pub struct Iterator {

@@ -1,5 +1,5 @@
-#[feature(globs,phase)];
-#[phase(syntax, link)] extern crate log;
+#![feature(globs,phase)]
+#![phase(syntax, link)] extern crate log;
 
 extern crate leveldb;
 extern crate serialize;
@@ -164,8 +164,9 @@ mod json_tests {
         let data = data.unwrap();
         assert!(data.is_object());
         let mut decoder = json::Decoder::new(data);
-        let decoded_object: ToEncode = Decodable::decode(&mut decoder);
-        assert_eq!(decoded_object.test, ~"string2" );
+        let decoded_object: Result<ToEncode,json::Error> = Decodable::decode(&mut decoder);
+        assert!(decoded_object.is_ok())
+        assert_eq!(decoded_object.unwrap().test, ~"string2" );
       },
       Err(_) => { fail!("failed reading data") }
     }

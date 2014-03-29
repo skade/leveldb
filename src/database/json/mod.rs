@@ -7,8 +7,9 @@ use serialize::json::Json;
 use serialize::json::Encoder;
 use serialize::json::from_reader;
 use std::io::BufReader;
+use std::io;
 
-pub trait Interface<'a, T:Encodable<json::Encoder<'a>>> {
+pub trait Interface<'a, T:Encodable<json::Encoder<'a>,io::IoError>> {
   fn put(&mut self,
          options: WriteOptions,
          key: &T,
@@ -22,7 +23,7 @@ pub trait Interface<'a, T:Encodable<json::Encoder<'a>>> {
          key: &T) -> Result<Option<Json>, Error>;
 }
 
-impl<'a, T: Encodable<json::Encoder<'a>>> Interface<'a, T> for Database {
+impl<'a, T: Encodable<json::Encoder<'a>, io::IoError>> Interface<'a, T> for Database {
   fn put(&mut self,
         options: WriteOptions,
         key: &T,

@@ -1,7 +1,7 @@
 pub mod leveldb {
   //dead_code only allowed temporary, to avoid noise during
   //construction work
-  #[allow(non_camel_case_types,dead_code)];
+  #![allow(non_camel_case_types,dead_code)]
   use std::libc::{c_int,c_char,size_t};
 
   pub struct leveldb_t;
@@ -20,7 +20,7 @@ pub mod leveldb {
   pub struct leveldb_writablefile_t;
   pub struct leveldb_writebatch_t;
   pub struct leveldb_writeoptions_t;
-  
+
   pub enum Compression {
     No = 0,
     Snappy = 1
@@ -78,7 +78,7 @@ pub mod leveldb {
                                           block_size: size_t);
     pub fn leveldb_options_set_block_restart_interval(options: *leveldb_options_t,
                                                       interval: c_int);
-    pub fn leveldb_options_set_compression(options: *leveldb_options_t,         
+    pub fn leveldb_options_set_compression(options: *leveldb_options_t,
                                            compression_level: Compression);
 
     pub fn leveldb_writeoptions_create() -> *leveldb_writeoptions_t;
@@ -94,7 +94,7 @@ pub mod leveldb {
                                               fill_cache: c_char);
     pub fn leveldb_readoptions_set_snapshot(options: *leveldb_readoptions_t,
                                             snapshot: *leveldb_snapshot_t);
-                                        
+
     pub fn leveldb_create_iterator(database: *leveldb_t,
                                    options: *leveldb_readoptions_t) -> *leveldb_iterator_t;
     pub fn leveldb_iter_destroy(iterator: *leveldb_iterator_t);

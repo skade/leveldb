@@ -28,11 +28,11 @@ impl Database {
     name.with_c_str(|c_string| {
       unsafe {
         let error = ptr::null();
-        let database = leveldb_open(options.options, c_string, &error);
+        let database = leveldb_open(options.options(), c_string, &error);
         if error == ptr::null() {
           Ok(Database::new(database))
         } else {
-          Err(Error { message: from_c_str(error) })
+          Err(Error::new(from_c_str(error)))
         }
       }
     })
@@ -45,7 +45,7 @@ impl Database {
     unsafe {
       let error = ptr::null();
       leveldb_put(self.database,
-                  options.options,
+                  options.options(),
                   key.as_ptr() as *c_char,
                   key.len() as size_t,
                   value.as_ptr() as *c_char,
@@ -55,7 +55,7 @@ impl Database {
       if error == ptr::null() {
         Ok(())
       } else {
-        Err( Error { message: from_c_str(error) } )
+        Err(Error::new(from_c_str(error)))
       }
     }
   }
@@ -66,14 +66,14 @@ impl Database {
     unsafe {
       let error = ptr::null();
       leveldb_delete(self.database,
-                     options.options,
+                     options.options(),
                      key.as_ptr() as *c_char,
                      key.len() as size_t,
                      &error);
       if error == ptr::null() {
         Ok(())
       } else {
-        Err( Error { message: from_c_str(error) } )
+        Err(Error::new(from_c_str(error)))
       }
     }
   }
@@ -85,7 +85,7 @@ impl Database {
       let error = ptr::null();
       let length: size_t = 0;
       let result = leveldb_get(self.database,
-                               options.options,
+                               options.options(),
                                key.as_ptr() as *c_char,
                                key.len() as size_t,
                                &length,
@@ -99,7 +99,7 @@ impl Database {
            Ok(Some(vec))
          }
        } else {
-         Err( Error { message: from_c_str(error) } )
+         Err(Error::new(from_c_str(error)))
        }
     }
   }

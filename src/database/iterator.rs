@@ -6,7 +6,7 @@ use super::Database;
 use super::options::ReadOptions;
 
 pub struct Iterator {
-  priv iter: *leveldb_iterator_t,
+  iter: *leveldb_iterator_t,
 }
 
 pub trait Iterable {
@@ -24,7 +24,7 @@ impl Iterator {
          options: ReadOptions) -> Iterator {
     unsafe {
       let iter = leveldb_create_iterator(database.database,
-                                         options.options);
+                                         options.options());
       leveldb_iter_seek_to_first(iter);
       Iterator { iter: iter }
     }

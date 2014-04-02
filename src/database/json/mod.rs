@@ -52,7 +52,7 @@ impl<'a, T: Encodable<json::Encoder<'a>, io::IoError>> Interface<'a, T> for Data
             let mut reader = BufReader::new(binary);
             match from_reader(&mut reader) {
               Ok(json) => { Ok(Some(json)) },
-              Err(_) => { Err( Error { message: ~"json parsing failed" } ) }
+              Err(_) => { Err( Error::new(~"json parsing failed") ) }
             }
           }
         }

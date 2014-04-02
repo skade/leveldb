@@ -15,6 +15,10 @@ impl Options {
     }
   }
 
+  pub fn options(&self) -> *leveldb_options_t {
+    self.options
+  }
+
   pub fn create_if_missing(&mut self, create: bool) {
     unsafe { leveldb_options_set_create_if_missing(self.options, to_bit::<i8>(create)) }
   }
@@ -68,6 +72,10 @@ impl WriteOptions {
     }
   }
 
+  pub fn options(&self) -> *leveldb_writeoptions_t {
+    self.options
+  }
+
   pub fn sync(&mut self, sync: bool) {
     unsafe { leveldb_writeoptions_set_sync(self.options, to_bit::<i8>(sync)) }
   }
@@ -91,6 +99,10 @@ impl ReadOptions {
       let options = leveldb_readoptions_create();
       ReadOptions { options: options }
     }
+  }
+
+  pub fn options(&self) -> *leveldb_readoptions_t {
+    self.options
   }
 
   pub fn verify_checksums(&mut self, verify_checksums: bool) {

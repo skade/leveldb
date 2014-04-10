@@ -1,6 +1,6 @@
 use cbits::leveldb::*;
 
-use std::libc::{size_t, c_int};
+use libc::{size_t, c_int};
 use std::bool::to_bit;
 
 pub struct Options {

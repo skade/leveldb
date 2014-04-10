@@ -30,19 +30,19 @@ impl<'a, T: Encodable<json::Encoder<'a>, io::IoError>> Interface<'a, T> for Data
         value: &T) -> Result<(), Error> {
     let encoded_key = json::Encoder::buffer_encode(&key);
     let encoded_val = json::Encoder::buffer_encode(&value);
-    self.put_binary(options, encoded_key, encoded_val)
+    self.put_binary(options, encoded_key.as_slice(), encoded_val.as_slice())
   }
   fn delete(&mut self,
             options: WriteOptions,
             key: &T) -> Result<(), Error> {
     let encoded_key = json::Encoder::buffer_encode(&key);
-    self.delete_binary(options, encoded_key)
+    self.delete_binary(options, encoded_key.as_slice())
   }
   fn get(&mut self,
          options: ReadOptions,
          key: &T) -> Result<Option<Json>, Error> {
     let encoded_key = json::Encoder::buffer_encode(&key);
-    let result = self.get_binary(options, encoded_key);
+    let result = self.get_binary(options, encoded_key.as_slice());
     match result {
       Err(error) => { Err (error) },
       Ok(opt) => {

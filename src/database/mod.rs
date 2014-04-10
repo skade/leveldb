@@ -1,11 +1,10 @@
-
 use cbits::leveldb::*;
 
 use self::options::{Options,WriteOptions,ReadOptions};
 use self::error::Error;
 
 use std::ptr;
-use std::libc::{c_char, size_t};
+use libc::{c_char, size_t};
 use std::str::raw::*;
 use std::slice::*;
 

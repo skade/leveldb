@@ -2,7 +2,7 @@ pub mod leveldb {
   //dead_code only allowed temporary, to avoid noise during
   //construction work
   #![allow(non_camel_case_types,dead_code)]
-  use std::libc::{c_int,c_char,size_t,c_void};
+  use libc::{c_int,c_char,size_t,c_void};
 
   pub struct leveldb_t;
   pub struct leveldb_cache_t;

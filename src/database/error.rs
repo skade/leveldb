@@ -1,3 +1,4 @@
+use cbits::leveldb::leveldb_free;
 
 pub struct Error {
   message: ~str

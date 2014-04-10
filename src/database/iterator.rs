@@ -1,5 +1,5 @@
 use cbits::leveldb::*;
-use std::libc::{size_t};
+use libc::{size_t};
 use std::slice::*;
 use std::iter;
 use super::Database;

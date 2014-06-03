@@ -1,11 +1,11 @@
 use cbits::leveldb::leveldb_free;
 
 pub struct Error {
-  message: ~str
+  message: String
 }
 
 impl Error {
-  pub fn new(message: ~str) -> Error {
+  pub fn new(message: String) -> Error {
     Error { message: message }
   }
 }

@@ -44,15 +44,15 @@ impl<'a, T: Encodable<json::Encoder<'a>, io::IoError>> Interface<'a, T> for Data
     let encoded_key = json::Encoder::buffer_encode(&key);
     let result = self.get_binary(options, encoded_key.as_slice());
     match result {
-      Err(error) => { Err (error) },
+      Err(error) => { Err(error) },
       Ok(opt) => {
         match opt {
           None => { Ok(None) },
           Some(binary) => {
-            let mut reader = BufReader::new(binary);
+            let mut reader = BufReader::new(binary.as_slice());
             match from_reader(&mut reader) {
               Ok(json) => { Ok(Some(json)) },
-              Err(_) => { Err( Error::new(~"json parsing failed") ) }
+              Err(_) => { Err( Error::new(from_str("json parsing failed").unwrap()) ) }
             }
           }
         }

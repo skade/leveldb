@@ -3,7 +3,7 @@ use super::options::{ReadOptions,WriteOptions};
 use super::error::Error;
 
 pub trait Interface {
-  fn put(&mut self, 
+  fn put(&mut self,
          options: WriteOptions,
          key: &[u8],
          value: &[u8])
@@ -13,7 +13,7 @@ pub trait Interface {
            key: &[u8]) -> Result<(), Error>;
   fn get(&mut self,
          options: ReadOptions,
-         key: &[u8]) -> Result<Option<~[u8]>, Error>;
+         key: &[u8]) -> Result<Option<Vec<u8>>, Error>;
 }
 
 impl Interface for Database {
@@ -30,7 +30,7 @@ impl Interface for Database {
   }
   fn get(&mut self,
          options: ReadOptions,
-         key: &[u8]) -> Result<Option<~[u8]>, Error> {
+         key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
     self.get_binary(options, key)
   }
 }

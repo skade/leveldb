@@ -4,6 +4,7 @@ use self::options::{Options,WriteOptions,ReadOptions};
 use self::error::Error;
 
 use std::ptr;
+use std::vec::raw::*;
 use libc::{c_char, size_t};
 use std::str::raw::*;
 use std::slice::*;
@@ -79,7 +80,7 @@ impl Database {
 
   fn get_binary(&mut self,
                 options: ReadOptions,
-                key: &[u8]) -> Result<Option<~[u8]>, Error> {
+                key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
     unsafe {
       let error = ptr::null();
       let length: size_t = 0;
@@ -94,7 +95,7 @@ impl Database {
          if result == ptr::null() {
            Ok(None)
          } else {
-           let vec: ~[u8] = from_buf(result, length as uint);
+           let vec: Vec<u8> = from_buf(result, length as uint);
            Ok(Some(vec))
          }
        } else {

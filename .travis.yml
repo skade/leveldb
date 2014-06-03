@@ -1,7 +1,16 @@
-before_install:
-  - yes | sudo add-apt-repository ppa:hansjorg/rust
-  - sudo apt-get update
+# Use something that's not 'ruby' so we don't set up things like
+# RVM/bundler/ruby and whatnot. Right now 'rust' isn't a language on
+# travis and it treats unknown languages as ruby
+language: c
+env:
+  global:
+    - secure: AxOWVIrwyqVZclNhljLLcMKuiTBDeG40xuzHFgOOCdfQBWyI+LjuOb0rje9L942j46+p1rw/9DzhDks3wwtQizuARZGTIRFAbkxboSSsW16b+Vip1LMmWFL0eXeSJ3ZmPCOQr8E6jPiqCE5m0SvFrkFNb8d3X1PVvuiMKDGCivY=
 install:
-  - sudo apt-get install rust-nightly
+  - curl -O http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - tar xfz rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - (cd rust-nightly-x86_64-unknown-linux-gnu/ && sudo ./install.sh)
 script:
+  - rustc --version
   - "make test"
+after_script:
+  - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh

@@ -26,6 +26,7 @@ pub mod leveldb {
     Snappy = 1
   }
 
+  #[link = "leveldb"]
   extern {
     pub fn leveldb_open(options: *mut leveldb_options_t,
                         name: *const c_char,

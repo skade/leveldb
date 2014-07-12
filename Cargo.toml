@@ -1,0 +1,5 @@
+[package]
+
+name = "leveldb"
+version = "0.1.0"
+authors = [ "florian.gilcher@asquera.de" ]

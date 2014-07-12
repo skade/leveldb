@@ -1,19 +1,16 @@
 RUST ?= rust
 RUSTC ?= rustc
 RUSTTEST ?= rustc --test
-RUSTFLAGS ?= -O --out-dir build -L build -L leveldb -C link-args="-lleveldb"
+RUSTFLAGS ?= -O --out-dir build -L build -C link-args="-lleveldb"
 VERSION=0.1-pre
 
-libleveldb: leveldb/libleveldb.dylib
+libleveldb:
 	mkdir -p build/
 	$(RUSTC) $(RUSTFLAGS) src/lib.rs
 
-test: leveldb/libleveldb.dylib libleveldb
+test: libleveldb
 	mkdir -p build/
 	$(RUSTC) $(RUSTFLAGS) --test src/test.rs
 	rm -rf testdbs
 	mkdir testdbs
-	LD_LIBRARY_PATH=leveldb build/test
-
-leveldb/libleveldb.dylib:
-	cd leveldb; make
+	build/test

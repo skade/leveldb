@@ -6,6 +6,9 @@ env:
   global:
     - secure: AxOWVIrwyqVZclNhljLLcMKuiTBDeG40xuzHFgOOCdfQBWyI+LjuOb0rje9L942j46+p1rw/9DzhDks3wwtQizuARZGTIRFAbkxboSSsW16b+Vip1LMmWFL0eXeSJ3ZmPCOQr8E6jPiqCE5m0SvFrkFNb8d3X1PVvuiMKDGCivY=
 install:
+  - curl -O https://leveldb.googlecode.com/files/leveldb-1.15.0.tar.gz
+  - tar xfz leveldb-1.15.0.tar.gz
+  - cd leveldb-1.15.0; make && sudo make install
   - curl -O http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
   - tar xfz rust-nightly-x86_64-unknown-linux-gnu.tar.gz
   - (cd rust-nightly-x86_64-unknown-linux-gnu/ && sudo ./install.sh)

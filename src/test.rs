@@ -8,7 +8,7 @@ pub mod utils {
   use leveldb::database::Database;
   use leveldb::options::{Options};
 
-  pub fn open_database(name: ~str, create_if_missing: bool) -> Database {
+  pub fn open_database(name: &str, create_if_missing: bool) -> Database {
     let mut opts = Options::new();
     opts.create_if_missing(create_if_missing);
     match Database::open(name, opts) {
@@ -43,7 +43,7 @@ mod binary_tests {
   fn test_open_database() {
     let mut opts = Options::new();
     opts.create_if_missing(true);
-    let res = Database::open(~"testdbs/create_if_missing", opts);
+    let res = Database::open("testdbs/create_if_missing", opts);
     assert!(res.is_ok());
   }
 
@@ -51,13 +51,13 @@ mod binary_tests {
   fn test_open_non_existant_database_without_create() {
     let mut opts = Options::new();
     opts.create_if_missing(false);
-    let res = Database::open(~"testdbs/missing", opts);
+    let res = Database::open("testdbs/missing", opts);
     assert!(res.is_err());
   }
 
   #[test]
   fn test_write_to_database() {
-    let mut database = open_database(~"testdbs/put_simple", true);
+    let mut database = open_database("testdbs/put_simple", true);
     let write_opts = WriteOptions::new();
     let result = database.put(write_opts,
                               &[1],
@@ -67,7 +67,7 @@ mod binary_tests {
 
   #[test]
   fn test_delete_from_database() {
-    let mut database = open_database(~"testdbs/delete_simple", true);
+    let mut database = open_database("testdbs/delete_simple", true);
     db_put_simple(&mut database, &[1], &[1]);
 
     let write2 = WriteOptions::new();
@@ -78,7 +78,7 @@ mod binary_tests {
 
   #[test]
   fn test_get_from_empty_database() {
-    let mut database = open_database(~"testdbs/get_simple", true);
+    let mut database = open_database("testdbs/get_simple", true);
     let read_opts = ReadOptions::new();
     let res = database.get(read_opts, [1,2,3]);
     match res {
@@ -89,7 +89,7 @@ mod binary_tests {
 
   #[test]
   fn test_get_from_filled_database() {
-    let mut database = open_database(~"testdbs/get_filled", true);
+    let mut database = open_database("testdbs/get_filled", true);
     db_put_simple(&mut database, &[1], &[1]);
 
     let read_opts = ReadOptions::new();
@@ -99,7 +99,7 @@ mod binary_tests {
       Ok(data) => {
         assert!(data.is_some())
         let data = data.unwrap();
-        assert_eq!(data, ~[1]);
+        assert_eq!(data, vec!(1));
       },
       Err(_) => { fail!("failed reading data") }
     }
@@ -107,7 +107,7 @@ mod binary_tests {
 
   #[test]
   fn test_iterator() {
-    let mut database = open_database(~"testdbs/iter", true);
+    let mut database = open_database("testdbs/iter", true);
     db_put_simple(&mut database, &[1], &[1]);
     db_put_simple(&mut database, &[2], &[2]);
 
@@ -130,15 +130,15 @@ mod json_tests {
 
   #[deriving(Encodable,Decodable)]
   struct ToEncode {
-    test: ~str,
+    test: String,
   }
 
   #[test]
   fn test_write_to_database() {
-    let mut database = open_database(~"testdbs/json_put", true);
+    let mut database = open_database("testdbs/json_put", true);
     let write_opts = WriteOptions::new();
-    let key = ToEncode { test: ~"string" };
-    let val = ToEncode { test: ~"string2" };
+    let key = ToEncode { test: "string".to_string() };
+    let val = ToEncode { test: "string2".to_string() };
     let result = database.put(write_opts,
                               &key,
                               &val);
@@ -147,10 +147,10 @@ mod json_tests {
 
   #[test]
   fn test_read_from_database() {
-    let mut database = open_database(~"testdbs/json_read", true);
+    let mut database = open_database("testdbs/json_read", true);
     let write_opts = WriteOptions::new();
-    let key = ToEncode { test: ~"string" };
-    let val = ToEncode { test: ~"string2" };
+    let key = ToEncode { test: "string".to_string() };
+    let val = ToEncode { test: "string2".to_string() };
     let result = database.put(write_opts,
                               &key,
                               &val);
@@ -164,9 +164,10 @@ mod json_tests {
         let data = data.unwrap();
         assert!(data.is_object());
         let mut decoder = json::Decoder::new(data);
-        let decoded_object: Result<ToEncode,json::Error> = Decodable::decode(&mut decoder);
-        assert!(decoded_object.is_ok())
-        assert_eq!(decoded_object.unwrap().test, ~"string2" );
+        let result = Decodable::decode(&mut decoder);
+        assert!(result.is_ok())
+        let decoded_object : ToEncode = result.unwrap();
+        assert_eq!(decoded_object.test, "string2".to_string() );
       },
       Err(_) => { fail!("failed reading data") }
     }

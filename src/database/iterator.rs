@@ -9,7 +9,7 @@ use super::options::ReadOptions;
 
 
 pub struct Iterator {
-  iter: *leveldb_iterator_t,
+  iter: *mut leveldb_iterator_t,
 }
 
 pub trait Iterable {

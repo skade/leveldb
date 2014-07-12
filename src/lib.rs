@@ -1,5 +1,5 @@
 #![crate_type = "lib"]
-#![crate_id = "leveldb#0.0.1"]
+#![crate_name = "leveldb"]
 #![feature(globs,phase)]
 #![phase(syntax, link)] extern crate log;
 

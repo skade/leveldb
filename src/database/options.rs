@@ -1,10 +1,9 @@
 use cbits::leveldb::*;
 
 use libc::{size_t, c_int};
-use std::bool::to_bit;
 
 pub struct Options {
-  options: *leveldb_options_t,
+  options: *mut leveldb_options_t,
 }
 
 impl Options {
@@ -15,20 +14,20 @@ impl Options {
     }
   }
 
-  pub fn options(&self) -> *leveldb_options_t {
+  pub fn options(&self) -> *mut leveldb_options_t {
     self.options
   }
 
   pub fn create_if_missing(&mut self, create: bool) {
-    unsafe { leveldb_options_set_create_if_missing(self.options, to_bit::<i8>(create)) }
+    unsafe { leveldb_options_set_create_if_missing(self.options, create as i8) }
   }
 
   pub fn error_if_exists(&mut self, error: bool) {
-    unsafe { leveldb_options_set_error_if_exists(self.options, to_bit::<i8>(error)) }
+    unsafe { leveldb_options_set_error_if_exists(self.options, error as i8) }
   }
 
   pub fn paranoid_checks(&mut self, paranoid: bool) {
-    unsafe { leveldb_options_set_paranoid_checks(self.options, to_bit::<i8>(paranoid)) }
+    unsafe { leveldb_options_set_paranoid_checks(self.options, paranoid as i8) }
   }
 
   pub fn write_buffer_size(&mut self, buffer_size: size_t) {
@@ -61,7 +60,7 @@ impl Drop for Options {
 }
 
 pub struct WriteOptions {
-  options: *leveldb_writeoptions_t,
+  options: *mut leveldb_writeoptions_t,
 }
 
 impl WriteOptions {
@@ -72,12 +71,12 @@ impl WriteOptions {
     }
   }
 
-  pub fn options(&self) -> *leveldb_writeoptions_t {
+  pub fn options(&self) -> *mut leveldb_writeoptions_t {
     self.options
   }
 
   pub fn sync(&mut self, sync: bool) {
-    unsafe { leveldb_writeoptions_set_sync(self.options, to_bit::<i8>(sync)) }
+    unsafe { leveldb_writeoptions_set_sync(self.options, sync as i8) }
   }
 }
 
@@ -90,7 +89,7 @@ impl Drop for WriteOptions {
 }
 
 pub struct ReadOptions {
-  options: *leveldb_readoptions_t,
+  options: *mut   leveldb_readoptions_t,
 }
 
 impl ReadOptions {
@@ -101,16 +100,16 @@ impl ReadOptions {
     }
   }
 
-  pub fn options(&self) -> *leveldb_readoptions_t {
+  pub fn options(&self) -> *mut leveldb_readoptions_t {
     self.options
   }
 
   pub fn verify_checksums(&mut self, verify_checksums: bool) {
-    unsafe { leveldb_readoptions_set_verify_checksums(self.options, to_bit::<i8>(verify_checksums)); }
+    unsafe { leveldb_readoptions_set_verify_checksums(self.options, verify_checksums as i8); }
   }
 
   pub fn fill_cache(&mut self, fill_cache: bool) {
-     unsafe { leveldb_readoptions_set_fill_cache(self.options, to_bit::<i8>(fill_cache)); }
+     unsafe { leveldb_readoptions_set_fill_cache(self.options, fill_cache as i8); }
   }
 }
 

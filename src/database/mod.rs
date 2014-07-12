@@ -8,6 +8,7 @@ use std::vec::raw::*;
 use libc::{c_char, size_t};
 use std::str::raw::*;
 use std::slice::*;
+use std::fmt::{Formatter,FormatError,Show};
 
 pub mod options;
 pub mod error;

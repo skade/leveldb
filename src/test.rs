@@ -1,5 +1,4 @@
 #![feature(globs,phase)]
-#![phase(syntax, link)] extern crate log;
 
 extern crate leveldb;
 extern crate serialize;
@@ -107,9 +106,9 @@ mod binary_tests {
 
   #[test]
   fn test_iterator() {
-    let mut database = open_database("testdbs/iter", true);
-    db_put_simple(&mut database, &[1], &[1]);
-    db_put_simple(&mut database, &[2], &[2]);
+    let mut database = &mut open_database("testdbs/iter", true);
+    db_put_simple(database, &[1], &[1]);
+    db_put_simple(database, &[2], &[2]);
 
     let read_opts = ReadOptions::new();
     let mut iter = database.iter(read_opts);

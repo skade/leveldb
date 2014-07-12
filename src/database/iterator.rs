@@ -13,17 +13,17 @@ pub struct Iterator {
 }
 
 pub trait Iterable {
-  fn iter(self, options: ReadOptions) -> Iterator;
+  fn iter(&self, options: ReadOptions) -> Iterator;
 }
 
 impl Iterable for Database {
-  fn iter(self, options: ReadOptions) -> Iterator {
+  fn iter(&self, options: ReadOptions) -> Iterator {
     Iterator::new(self, options)
   }
 }
 
 impl Iterator {
-  fn new(database: Database,
+  fn new(database: &Database,
          options: ReadOptions) -> Iterator {
     unsafe {
       let iter = leveldb_create_iterator(database.database,

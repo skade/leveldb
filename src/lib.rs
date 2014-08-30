@@ -6,9 +6,9 @@
 extern crate serialize;
 extern crate libc;
 
-pub use options = database::options;
-pub use error = database::error;
-pub use iterator = database::iterator;
+pub use database::options as options;
+pub use database::error as error;
+pub use database::iterator as iterator;
 
 mod cbits;
 pub mod database;

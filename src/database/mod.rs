@@ -6,9 +6,8 @@ use self::error::Error;
 use std::ptr;
 use std::vec::raw::*;
 use libc::{c_char, size_t};
-use std::str::raw::*;
 use std::slice::*;
-use std::fmt::{Formatter,FormatError,Show};
+use std::string;
 
 pub mod options;
 pub mod error;
@@ -26,7 +25,7 @@ impl Database {
     Database { database: database }
   }
 
-  pub fn open(name: &str, options: Options) -> Result<Database,Error> {
+  pub fn open(name: Path, options: Options) -> Result<Database,Error> {
     name.with_c_str(|c_string| {
       unsafe {
         let mut error = ptr::null();
@@ -35,7 +34,7 @@ impl Database {
         if error == ptr::null() {
           Ok(Database::new(database))
         } else {
-          Err(Error::new(from_c_str(error)))
+          Err(Error::new(string::raw::from_buf(error as *const u8)))
         }
       }
     })
@@ -58,7 +57,7 @@ impl Database {
       if error == ptr::null() {
         Ok(())
       } else {
-        Err(Error::new(from_c_str(error)))
+        Err(Error::new(string::raw::from_buf(error as *const u8)))
       }
     }
   }
@@ -76,7 +75,7 @@ impl Database {
       if error == ptr::null() {
         Ok(())
       } else {
-        Err(Error::new(from_c_str(error)))
+        Err(Error::new(string::raw::from_buf(error as *const u8)))
       }
     }
   }
@@ -102,7 +101,7 @@ impl Database {
            Ok(Some(vec))
          }
        } else {
-         Err(Error::new(from_c_str(error)))
+         Err(Error::new(string::raw::from_buf(error as *const u8)))
        }
     }
   }

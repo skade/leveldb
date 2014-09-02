@@ -26,6 +26,15 @@ pub mod leveldb {
     Snappy = 1
   }
 
+  pub type destructor_fn = extern "C" fn(obj: *mut c_void);
+  pub type comparator_fn = extern "C" fn(
+    state: *mut c_void,
+    a: *mut c_char, alen: size_t,
+    b: *mut c_char, blen: size_t) -> int;
+  pub type name_fn = extern "C" fn(
+    state: *mut c_void
+  ) -> &'static str;
+
   #[link(name = "leveldb")]
   extern {
     pub fn leveldb_open(options: *mut leveldb_options_t,
@@ -113,6 +122,12 @@ pub mod leveldb {
                               vallen: *const size_t) -> *const c_char;
     pub fn leveldb_iter_get_error(iterator: *mut leveldb_iterator_t,
                                   errptr: &mut *const c_char);
+
+    pub fn leveldb_comparator_create(state: *mut c_void,
+                                     destructor: destructor_fn,
+                                     comparator: comparator_fn,
+                                     name: name_fn);
+    pub fn leveldb_comparator_destroy(comparator: *mut leveldb_comparator_t);
     pub fn leveldb_free(ptr: *mut c_void);
   }
 }

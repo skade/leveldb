@@ -13,6 +13,7 @@ use std::fmt::{Formatter,FormatError,Show};
 pub mod options;
 pub mod error;
 pub mod iterator;
+pub mod comparator;
 pub mod binary;
 pub mod json;
 

@@ -36,6 +36,7 @@ pub mod leveldb {
   ) -> &'static str;
 
   #[link(name = "leveldb")]
+  #[link(name = "snappy")]
   #[link(name = "stdc++")]
   extern {
     pub fn leveldb_open(options: *mut leveldb_options_t,

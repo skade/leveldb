@@ -46,11 +46,11 @@ pub mod leveldb {
   pub type destructor_fn = extern "C" fn(obj: *mut c_void);
   pub type comparator_fn = extern "C" fn(
     state: *mut c_void,
-    a: *const c_char, alen: size_t,
-    b: *const c_char, blen: size_t) -> int;
+    a: *const u8, alen: size_t,
+    b: *const u8, blen: size_t) -> i32;
   pub type name_fn = extern "C" fn(
     state: *mut c_void
-  ) -> &'static str;
+  ) -> *const u8;
 
   #[link(name = "leveldb")]
   #[link(name = "snappy")]

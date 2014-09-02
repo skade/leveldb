@@ -1,80 +1,43 @@
 use cbits::leveldb::*;
-use libc::{size_t,c_char,c_void};
-use std::mem::transmute;
-use std::raw::Slice;
+use libc::{size_t,c_void};
+use libc;
+use std::mem;
+use std::slice;
 
-struct ComparatorState {
-  name: &'static str,
-  cmp: |&[u8], &[u8]|: 'static -> Ordering,
+pub trait Comparator {
+     fn name(&self) -> *const u8;
+     fn compare(&self, a: &[u8], b: &[u8]) -> i32;
 }
 
-pub struct Comparator {
-  #[allow(dead_code)] //used in c-space
-  state: ComparatorState,
-  pub comparator: *mut leveldb_comparator_t,
+extern "C" fn name<T: Comparator>(state: *mut libc::c_void) -> *const u8 {
+     let x: &T = unsafe { &*(state as *mut T) };
+     x.name()
 }
 
-#[unsafe_destructor]
-impl Drop for Comparator {
-  fn drop(&mut self) {
-    unsafe { leveldb_comparator_destroy(self.comparator) };
-  }
+extern "C" fn compare<T: Comparator>(state: *mut libc::c_void,
+                                     a: *const u8, a_len: size_t,
+                                     b: *const u8, b_len: size_t) -> i32 {
+     unsafe {
+         slice::raw::buf_as_slice(a, a_len as uint, |a_slice| {
+              slice::raw::buf_as_slice(b, b_len as uint, |b_slice| {
+                   let x: &T = &*(state as *mut T);
+                   x.compare(a_slice, b_slice)
+              })
+         })
+     }
 }
 
-impl Comparator {
-  pub fn new(name: &'static str,
-             cmp: |&[u8], &[u8]|: 'static -> Ordering)
-             -> Comparator {
-    unsafe {
-      let mut state = ComparatorState { name: name, cmp: cmp };
-      let comparator = leveldb_comparator_create(
-        &mut state as *mut _ as *mut c_void,
-        destructor_callback,
-        compare_callback,
-        name_callback
-      );
-
-      Comparator { state: state, comparator: comparator }
-    }
-  }
-
-  pub fn comparator(&self) -> *mut leveldb_comparator_t {
-    self.comparator
-  }
+extern "C" fn destructor<T>(state: *mut libc::c_void) {
+     let _x: Box<T> = unsafe {mem::transmute(state)};
+     // let the Box fall out of scope and run the T's destructor
 }
 
-#[allow(dead_code)]
-extern "C" fn destructor_callback(_state: *mut c_void) {
-  // Do nothing
+pub fn create_comparator<T: Comparator>(x: Box<T>) -> *mut leveldb_comparator_t {
+     unsafe {
+          leveldb_comparator_create(mem::transmute(x),
+                                    destructor::<T>,
+                                    compare::<T>,
+                                    name::<T>)
+     }
 }
 
-extern "C" fn compare_callback(state: *mut c_void,
-           a: *const c_char, alen: size_t,
-           b: *const c_char, blen: size_t) -> int {
-  unsafe {
-    let s: &mut ComparatorState = &mut *(state as *mut ComparatorState);
-
-    let a_slice = transmute(Slice {
-      data: a,
-      len: alen as uint,
-    });
-
-    let b_slice = transmute(Slice {
-      data: b,
-      len: blen as uint,
-    });
-
-    match (s.cmp)(a_slice, b_slice) {
-      Less    => -1,
-      Equal   => 0,
-      Greater => 1
-    }
-  }
-}
-
-extern "C" fn name_callback(state: *mut c_void) -> &'static str {
-  unsafe {
-    let s: &mut ComparatorState = &mut *(state as *mut ComparatorState);
-    s.name
-  }
-}

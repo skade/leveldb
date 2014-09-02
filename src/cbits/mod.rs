@@ -46,8 +46,8 @@ pub mod leveldb {
   pub type destructor_fn = extern "C" fn(obj: *mut c_void);
   pub type comparator_fn = extern "C" fn(
     state: *mut c_void,
-    a: *mut c_char, alen: size_t,
-    b: *mut c_char, blen: size_t) -> int;
+    a: *const c_char, alen: size_t,
+    b: *const c_char, blen: size_t) -> int;
   pub type name_fn = extern "C" fn(
     state: *mut c_void
   ) -> &'static str;
@@ -83,8 +83,8 @@ pub mod leveldb {
 
     pub fn leveldb_options_create() -> *mut leveldb_options_t;
     pub fn leveldb_options_destroy(options: *mut leveldb_options_t);
-    pub fn leveldb_options_set_comparator(cache: *mut leveldb_cache_t,
-                                          options: *mut leveldb_comparator_t);
+    pub fn leveldb_options_set_comparator(options: *mut leveldb_options_t,
+                                          comparator: *mut leveldb_comparator_t);
     pub fn leveldb_options_set_filter_policy(options: *mut leveldb_options_t,
                                              filter_policy: *mut leveldb_filterpolicy_t);
     pub fn leveldb_options_set_create_if_missing(options: *mut leveldb_options_t,
@@ -145,7 +145,7 @@ pub mod leveldb {
     pub fn leveldb_comparator_create(state: *mut c_void,
                                      destructor: destructor_fn,
                                      comparator: comparator_fn,
-                                     name: name_fn);
+                                     name: name_fn) -> *mut leveldb_comparator_t;
     pub fn leveldb_comparator_destroy(comparator: *mut leveldb_comparator_t);
     pub fn leveldb_free(ptr: *mut c_void);
   }

@@ -1,16 +1,18 @@
 use cbits::leveldb::*;
+use super::comparator::Comparator;
 
 use libc::{size_t, c_int};
 
 pub struct Options {
   options: *mut leveldb_options_t,
+  comparator: Option<Comparator>
 }
 
 impl Options {
   pub fn new() -> Options {
     unsafe {
       let options = leveldb_options_create();
-      Options { options: options }
+      Options { options: options, comparator: None }
     }
   }
 
@@ -49,8 +51,13 @@ impl Options {
   pub fn compression(&mut self, compression: Compression) {
     unsafe { leveldb_options_set_compression(self.options, compression) }
   }
+
+  //pub fn set_comparator(&mut self, comparator: Comparator) {
+  //  unsafe { leveldb_options_set_comparator(self.options, comparator.comparator()) }
+  //}
 }
 
+#[unsafe_destructor]
 impl Drop for Options {
   fn drop(&mut self) {
     unsafe {

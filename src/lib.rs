@@ -1,6 +1,7 @@
 #![crate_type = "lib"]
 #![crate_name = "leveldb"]
 #![feature(globs)]
+#![feature(unsafe_destructor)]
 
 extern crate serialize;
 extern crate libc;

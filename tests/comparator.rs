@@ -25,7 +25,7 @@ pub mod utils {
 
 #[cfg(test)]
 mod comparator {
-  use super::utils::{open_database,tmpdir};
+  use super::utils::{tmpdir};
   use leveldb::database::Database;
   use leveldb::database::binary::Interface;
   use leveldb::iterator::Iterable;

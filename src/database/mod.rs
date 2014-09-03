@@ -18,6 +18,7 @@ pub mod json;
 
 pub struct Database {
   database: *mut leveldb_t,
+  #[allow(dead_code)]
   options: Options
 }
 

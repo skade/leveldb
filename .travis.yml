@@ -1,15 +1,14 @@
 # Use something that's not 'ruby' so we don't set up things like
 # RVM/bundler/ruby and whatnot. Right now 'rust' isn't a language on
 # travis and it treats unknown languages as ruby
-language: c
+language: rust
 env:
   global:
     - secure: AxOWVIrwyqVZclNhljLLcMKuiTBDeG40xuzHFgOOCdfQBWyI+LjuOb0rje9L942j46+p1rw/9DzhDks3wwtQizuARZGTIRFAbkxboSSsW16b+Vip1LMmWFL0eXeSJ3ZmPCOQr8E6jPiqCE5m0SvFrkFNb8d3X1PVvuiMKDGCivY=
 install:
   - sudo apt-get install libleveldb-dev
   - sudo apt-get install libsnappy-dev
-  - curl -s https://static.rust-lang.org/rustup.sh | sudo sh
-script:
-  - rustc --version  && cargo build && cargo test
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
+rust:
+  - nightly

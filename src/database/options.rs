@@ -1,4 +1,5 @@
 use cbits::leveldb::*;
+use database::comparator::*;
 
 use libc::{size_t, c_int};
 
@@ -51,9 +52,10 @@ impl Options {
     unsafe { leveldb_options_set_compression(self.options, compression) }
   }
 
-  pub fn set_comparator(&mut self, comparator: *mut leveldb_comparator_t) {
-    unsafe { leveldb_options_set_comparator(self.options, comparator) }
-    self.comparator = Some(comparator)
+  pub fn set_comparator<C: Comparator>(&mut self, comparator: Box<C>) {
+    let ptr = create_comparator(comparator);
+    unsafe { leveldb_options_set_comparator(self.options, ptr) }
+    self.comparator = Some(ptr)
   }
 }
 

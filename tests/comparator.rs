@@ -59,8 +59,8 @@ mod comparator {
   }
   
   #[test]
-  fn test_open_database() {
-    let comparator = create_comparator(box ReverseComparator { name: "test" });
+  fn test_comparator() {
+    let comparator = box ReverseComparator { name: "test" };
     let mut opts = Options::new();
     opts.create_if_missing(true);
     opts.set_comparator(comparator);

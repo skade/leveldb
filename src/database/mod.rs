@@ -18,26 +18,25 @@ pub mod json;
 
 pub struct Database {
   database: *mut leveldb_t,
+  options: Options
 }
 
 impl Database {
-  fn new(database: *mut leveldb_t) -> Database {
-    Database { database: database }
+  fn new(database: *mut leveldb_t, options: Options) -> Database {
+    Database { database: database, options: options }
   }
 
   pub fn open(name: Path, options: Options) -> Result<Database,Error> {
-    name.with_c_str(|c_string| {
-      unsafe {
-        let mut error = ptr::null();
-        let database = leveldb_open(options.options(), c_string, &mut error);
+    let mut error = ptr::null();
+    let res = name.with_c_str(|c_string| {
+      unsafe { leveldb_open(options.options(), c_string, &mut error) }
+    });
 
-        if error == ptr::null() {
-          Ok(Database::new(database))
-        } else {
-          Err(Error::new(string::raw::from_buf(error as *const u8)))
-        }
-      }
-    })
+    if error == ptr::null() {
+      Ok(Database::new(res, options))
+    } else {
+      Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
+    }
   }
 
   fn put_binary(&mut self,

@@ -16,8 +16,8 @@ impl Options {
     }
   }
 
-  pub fn options(&self) -> *mut leveldb_options_t {
-    self.options
+  pub fn options(&self) -> *const leveldb_options_t {
+    self.options as *const leveldb_options_t
   }
 
   pub fn create_if_missing(&mut self, create: bool) {
@@ -63,10 +63,10 @@ impl Options {
 impl Drop for Options {
   fn drop(&mut self) {
     unsafe {
-      //match self.comparator {
-      //  Some(c) =>  leveldb_comparator_destroy(c),
-      //  _ => {}
-      //}
+      match self.comparator {
+        Some(c) =>  leveldb_comparator_destroy(c),
+        _ => {}
+      }
       leveldb_options_destroy(self.options);
     }
   }

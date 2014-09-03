@@ -56,7 +56,7 @@ pub mod leveldb {
   #[link(name = "snappy")]
   #[link(name = "stdc++")]
   extern {
-    pub fn leveldb_open(options: *mut leveldb_options_t,
+    pub fn leveldb_open(options: *const leveldb_options_t,
                         name: *const c_char,
                         errptr: &mut *const c_char) -> *mut leveldb_t;
     pub fn leveldb_close(database: *mut leveldb_t);

@@ -1,2 +1,5 @@
 build
 testdbs
+target
+*swp
+*swo

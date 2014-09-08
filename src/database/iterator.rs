@@ -41,18 +41,18 @@ impl Iterator {
     unsafe { leveldb_iter_seek_to_first(self.iter) }
   }
 
-  pub fn current_value(self) -> Vec<i8> {
+  pub fn current_value(self) -> Vec<u8> {
     unsafe {
       let length: size_t = 0;
       let value = leveldb_iter_value(self.iter,
-                                     &length);
+                                     &length) as *const u8;
       from_buf(value, length as uint)
     }
   }
 }
 
-impl iter::Iterator<Vec<i8>> for Iterator {
-  fn next(&mut self) -> Option<Vec<i8>> {
+impl iter::Iterator<Vec<u8>> for Iterator {
+  fn next(&mut self) -> Option<Vec<u8>> {
     unsafe {
       if self.valid() {
         let vec = self.current_value();

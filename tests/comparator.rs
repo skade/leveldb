@@ -73,6 +73,6 @@ mod comparator {
     let mut iter = database.iter(read_opts);
 
     assert!(iter.valid());
-    assert_eq!(vec![2], iter.next().unwrap())
+    assert_eq!(vec![2], iter.next().unwrap().value())
   }
 }

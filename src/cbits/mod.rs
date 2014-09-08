@@ -136,7 +136,7 @@ pub mod leveldb {
     pub fn leveldb_iter_next(iterator: *mut leveldb_iterator_t);
     pub fn leveldb_iter_prev(iterator: *mut leveldb_iterator_t);
     pub fn leveldb_iter_key(iterator: *mut leveldb_iterator_t,
-                            keylen: *mut size_t) -> *mut c_char;
+                            keylen: *const size_t) -> *mut c_char;
     pub fn leveldb_iter_value(iterator: *mut leveldb_iterator_t,
                               vallen: *const size_t) -> *const c_char;
     pub fn leveldb_iter_get_error(iterator: *mut leveldb_iterator_t,

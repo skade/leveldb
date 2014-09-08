@@ -41,11 +41,11 @@ mod comparator {
       self.name.as_ptr()
     }
   
-    fn compare(&self, a: &[u8], b: &[u8]) -> i32 {
+    fn compare(&self, a: &[u8], b: &[u8]) -> Ordering {
       if a[0] < b[0] {
-        1
+        Greater
       } else {
-        -1
+        Less
       }
     }
   }

@@ -6,7 +6,7 @@ use std::slice;
 
 pub trait Comparator {
      fn name(&self) -> *const u8;
-     fn compare(&self, a: &[u8], b: &[u8]) -> i32;
+     fn compare(&self, a: &[u8], b: &[u8]) -> Ordering;
 }
 
 extern "C" fn name<T: Comparator>(state: *mut libc::c_void) -> *const u8 {
@@ -21,7 +21,11 @@ extern "C" fn compare<T: Comparator>(state: *mut libc::c_void,
          slice::raw::buf_as_slice(a, a_len as uint, |a_slice| {
               slice::raw::buf_as_slice(b, b_len as uint, |b_slice| {
                    let x: &T = &*(state as *mut T);
-                   x.compare(a_slice, b_slice)
+                   match x.compare(a_slice, b_slice) {
+                       Less => -1,
+                       Equal => 0,
+                       Greater => 1
+                   }
               })
          })
      }

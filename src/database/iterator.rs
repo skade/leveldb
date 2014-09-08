@@ -93,5 +93,12 @@ impl iter::Iterator<Entry> for Iterator {
       }
     }
   }
+
+  fn last(&mut self) -> Option<Entry> {
+    unsafe {
+      leveldb_iter_seek_to_last(self.iter);
+      Some(Entry { iter: self.iter })
+    }
+  }
 }
 

@@ -80,7 +80,7 @@ impl Database {
     }
   }
 
-  fn get_binary(&mut self,
+  fn get_binary(&self,
                 options: ReadOptions,
                 key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
     unsafe {

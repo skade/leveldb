@@ -86,7 +86,7 @@ mod binary_tests {
   #[test]
   fn test_get_from_empty_database() {
     let tmp = tmpdir("testdbs");
-    let mut database = open_database(tmp.path().join("get_simple"), true);
+    let database = open_database(tmp.path().join("get_simple"), true);
     let read_opts = ReadOptions::new();
     let res = database.get(read_opts, [1,2,3]);
     match res {

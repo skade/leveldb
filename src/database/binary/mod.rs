@@ -11,7 +11,7 @@ pub trait Interface {
   fn delete(&mut self,
            options: WriteOptions,
            key: &[u8]) -> Result<(), Error>;
-  fn get(&mut self,
+  fn get(&self,
          options: ReadOptions,
          key: &[u8]) -> Result<Option<Vec<u8>>, Error>;
 }
@@ -28,7 +28,7 @@ impl Interface for Database {
             key: &[u8]) -> Result<(), Error> {
     self.delete_binary(options, key)
   }
-  fn get(&mut self,
+  fn get(&self,
          options: ReadOptions,
          key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
     self.get_binary(options, key)

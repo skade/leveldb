@@ -18,7 +18,7 @@ pub trait Interface<'a, T:Encodable<json::Encoder<'a>,io::IoError>> {
   fn delete(&mut self,
            options: WriteOptions,
            key: &T) -> Result<(), Error>;
-  fn get(&mut self,
+  fn get(&self,
          options: ReadOptions,
          key: &T) -> Result<Option<Json>, Error>;
 }
@@ -38,7 +38,7 @@ impl<'a, T: Encodable<json::Encoder<'a>, io::IoError>> Interface<'a, T> for Data
     let encoded_key = json::Encoder::buffer_encode(&key);
     self.delete_binary(options, encoded_key.as_slice())
   }
-  fn get(&mut self,
+  fn get(&self,
          options: ReadOptions,
          key: &T) -> Result<Option<Json>, Error> {
     let encoded_key = json::Encoder::buffer_encode(&key);

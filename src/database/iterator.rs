@@ -100,5 +100,6 @@ impl iter::Iterator<Entry> for Iterator {
       Some(Entry { iter: self.iter })
     }
   }
+
 }
 

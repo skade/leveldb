@@ -1,3 +1,5 @@
+#![feature(globs)]
+
 extern crate leveldb;
 extern crate serialize;
 
@@ -133,10 +135,9 @@ mod binary_tests {
 #[cfg(test)]
 mod json_tests {
   use super::utils::{open_database,tmpdir};
-  use leveldb::database::json::Interface;
+  use leveldb::database::Interface;
   use leveldb::options::{ReadOptions,WriteOptions};
-  use serialize::{Encodable,Decodable};
-  use serialize::json;
+  use serialize::{Encodable};
 
   #[deriving(Encodable,Decodable)]
   struct ToEncode {
@@ -146,12 +147,12 @@ mod json_tests {
   #[test]
   fn test_write_to_database() {
     let tmp = tmpdir("testdbs");
-    let mut database = open_database(tmp.path().join("json_put"), true);
+    let database: &mut Interface<ToEncode,ToEncode> = &mut open_database(tmp.path().join("json_put"), true);
     let write_opts = WriteOptions::new();
-    let key = ToEncode { test: "string".to_string() };
+    let key = "test".as_bytes();
     let val = ToEncode { test: "string2".to_string() };
     let result = database.put(write_opts,
-                              &key,
+                              key,
                               &val);
     assert!(result.is_ok());
   }
@@ -159,26 +160,21 @@ mod json_tests {
   #[test]
   fn test_read_from_database() {
     let tmp = tmpdir("testdbs");
-    let mut database = open_database(tmp.path().join("json_read"), true);
+    let database: &mut Interface<ToEncode,ToEncode> = &mut open_database(tmp.path().join("json_read"), true);
     let write_opts = WriteOptions::new();
-    let key = ToEncode { test: "string".to_string() };
+    let key = "test".as_bytes();
     let val = ToEncode { test: "string2".to_string() };
     let result = database.put(write_opts,
-                              &key,
+                              key,
                               &val);
     assert!(result.is_ok());
     let read_opts = ReadOptions::new();
     let read = database.get(read_opts,
-                            &key);
+                            key);
     match read {
       Ok(data) => {
         assert!(data.is_some())
-        let data = data.unwrap();
-        assert!(data.is_object());
-        let mut decoder = json::Decoder::new(data);
-        let result = Decodable::decode(&mut decoder);
-        assert!(result.is_ok())
-        let decoded_object : ToEncode = result.unwrap();
+        let decoded_object : ToEncode = data.unwrap();
         assert_eq!(decoded_object.test, "string2".to_string() );
       },
       Err(_) => { fail!("failed reading data") }

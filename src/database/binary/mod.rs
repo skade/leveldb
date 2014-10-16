@@ -19,7 +19,7 @@ use super::error::Error;
 
 pub struct Binary;
 
-impl Interface<Binary, Vec<u8>,Vec<u8>> for Database {
+impl Interface<Binary, Vec<u8>> for Database {
   fn put(&mut self,
         options: WriteOptions,
         key: &[u8],

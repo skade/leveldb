@@ -115,7 +115,7 @@ impl Drop for Database {
   }
 }
 
-pub trait Interface<T, V, R> {
+pub trait Interface<T, V> {
   fn put(&mut self,
          options: WriteOptions,
          key: &[u8],
@@ -126,5 +126,5 @@ pub trait Interface<T, V, R> {
             key: &[u8]) -> Result<(), Error>;
   fn get(&self,
          options: ReadOptions,
-         key: &[u8]) -> Result<Option<R>, Error>;
+         key: &[u8]) -> Result<Option<V>, Error>;
 }

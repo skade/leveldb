@@ -31,7 +31,7 @@ mod binary_tests {
   use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
 
-  fn db_put_simple(database: &mut Interface<Binary, Vec<u8>, Vec<u8>>, key: &[u8], val: &[u8]) {
+  fn db_put_simple(database: &mut Interface<Binary, Vec<u8>>, key: &[u8], val: &[u8]) {
     let write_opts = WriteOptions::new();
     match database.put(write_opts, key, val.to_vec()) {
       Ok(_) => { () },
@@ -65,7 +65,7 @@ mod binary_tests {
   #[test]
   fn test_write_to_database() {
     let tmp = tmpdir("testdbs");
-    let database: &mut Interface<Binary, Vec<u8>, Vec<u8>> = &mut open_database(tmp.path().join("write"), true);
+    let database: &mut Interface<Binary, Vec<u8>> = &mut open_database(tmp.path().join("write"), true);
     let write_opts = WriteOptions::new();
     let result = database.put(write_opts,
                               &[1],
@@ -76,7 +76,7 @@ mod binary_tests {
   #[test]
   fn test_delete_from_database() {
     let tmp = tmpdir("testdbs");
-    let database: &mut Interface<Binary, Vec<u8>, Vec<u8>> = &mut open_database(tmp.path().join("delete_simple"), true);
+    let database: &mut Interface<Binary, Vec<u8>> = &mut open_database(tmp.path().join("delete_simple"), true);
     db_put_simple(database, &[1], &[1]);
 
     let write2 = WriteOptions::new();
@@ -88,7 +88,7 @@ mod binary_tests {
   #[test]
   fn test_get_from_empty_database() {
     let tmp = tmpdir("testdbs");
-    let database: &mut Interface<Binary, Vec<u8>, Vec<u8>> = &mut open_database(tmp.path().join("get_simple"), true);
+    let database: &mut Interface<Binary, Vec<u8>> = &mut open_database(tmp.path().join("get_simple"), true);
     let read_opts = ReadOptions::new();
     let res = database.get(read_opts, [1,2,3]);
     match res {
@@ -100,7 +100,7 @@ mod binary_tests {
   #[test]
   fn test_get_from_filled_database() {
     let tmp = tmpdir("testdbs");
-    let database: &mut Interface<Binary, Vec<u8>, Vec<u8>> = &mut open_database(tmp.path().join("get_filled"), true);
+    let database: &mut Interface<Binary, Vec<u8>> = &mut open_database(tmp.path().join("get_filled"), true);
     db_put_simple(database, &[1], &[1]);
 
     let read_opts = ReadOptions::new();
@@ -148,7 +148,7 @@ mod json_tests {
   #[test]
   fn test_write_to_database() {
     let tmp = tmpdir("testdbs");
-    let database: &mut Interface<JSON,ToEncode,ToEncode> = &mut open_database(tmp.path().join("json_put"), true);
+    let database: &mut Interface<JSON,ToEncode> = &mut open_database(tmp.path().join("json_put"), true);
     let write_opts = WriteOptions::new();
     let key = "test".as_bytes();
     let val = ToEncode { test: "string2".to_string() };
@@ -161,7 +161,7 @@ mod json_tests {
   #[test]
   fn test_read_from_database() {
     let tmp = tmpdir("testdbs");
-    let database: &mut Interface<JSON,ToEncode,ToEncode> = &mut open_database(tmp.path().join("json_read"), true);
+    let database: &mut Interface<JSON,ToEncode> = &mut open_database(tmp.path().join("json_read"), true);
     let write_opts = WriteOptions::new();
     let key = "test".as_bytes();
     let val = ToEncode { test: "string2".to_string() };

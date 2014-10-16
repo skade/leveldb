@@ -1,27 +1,30 @@
+use super::Interface;
 use super::Database;
 use super::options::{ReadOptions,WriteOptions};
 use super::error::Error;
 
-pub trait Interface {
-  fn put(&mut self,
-         options: WriteOptions,
-         key: &[u8],
-         value: &[u8])
-        -> Result<(), Error>;
-  fn delete(&mut self,
-           options: WriteOptions,
-           key: &[u8]) -> Result<(), Error>;
-  fn get(&self,
-         options: ReadOptions,
-         key: &[u8]) -> Result<Option<Vec<u8>>, Error>;
-}
+//pub trait Interface {
+//  fn put(&mut self,
+//         options: WriteOptions,
+//         key: &[u8],
+//         value: &[u8])
+//        -> Result<(), Error>;
+//  fn delete(&mut self,
+//           options: WriteOptions,
+//           key: &[u8]) -> Result<(), Error>;
+//  fn get(&self,
+//         options: ReadOptions,
+//         key: &[u8]) -> Result<Option<Vec<u8>>, Error>;
+//}
 
-impl Interface for Database {
+pub struct Binary;
+
+impl Interface<Binary, Vec<u8>,Vec<u8>> for Database {
   fn put(&mut self,
         options: WriteOptions,
         key: &[u8],
-        value: &[u8]) -> Result<(), Error> {
-    self.put_binary(options, key, value)
+        value: Vec<u8>) -> Result<(), Error> {
+    self.put_binary(options, key, value.as_slice())
   }
   fn delete(&mut self,
             options: WriteOptions,

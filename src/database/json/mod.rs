@@ -22,11 +22,13 @@ use std::str::from_utf8;
 //         key: &T) -> Result<Option<Json>, Error>;
 //}
 
-impl<'a, V: Encodable<json::Encoder<'a>, IoError>, R: Decodable<json::Decoder, json::DecoderError>> Interface<V, R> for Database {
+pub struct JSON;
+
+impl<'a, V: Encodable<json::Encoder<'a>, IoError>, R: Decodable<json::Decoder, json::DecoderError>> Interface<JSON, V, R> for Database {
   fn put(&mut self,
         options: WriteOptions,
         key: &[u8],
-        value: &V) -> Result<(), Error> {
+        value: V) -> Result<(), Error> {
     let encoded_val = json::Encoder::buffer_encode(&value);
     self.put_binary(options, key, encoded_val.as_slice())
   }

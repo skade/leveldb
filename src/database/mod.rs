@@ -115,11 +115,11 @@ impl Drop for Database {
   }
 }
 
-pub trait Interface<V, R> {
+pub trait Interface<T, V, R> {
   fn put(&mut self,
          options: WriteOptions,
          key: &[u8],
-         value: &V)
+         value: V)
         -> Result<(), Error>;
   fn delete(&mut self,
             options: WriteOptions,

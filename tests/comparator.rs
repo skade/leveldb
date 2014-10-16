@@ -26,8 +26,8 @@ pub mod utils {
 #[cfg(test)]
 mod comparator {
   use super::utils::{tmpdir};
-  use leveldb::database::Database;
-  use leveldb::database::binary::Interface;
+  use leveldb::database::{Database,Interface};
+  use leveldb::database::binary::*;
   use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
   use leveldb::comparator::*;
@@ -50,9 +50,9 @@ mod comparator {
     }
   }
 
-  fn db_put_simple(database: &mut Database, key: &[u8], val: &[u8]) {
+  fn db_put_simple(database: &mut Interface<Binary, Vec<u8>, Vec<u8>>, key: &[u8], val: &[u8]) {
     let write_opts = WriteOptions::new();
-    match database.put(write_opts, key, val) {
+    match database.put(write_opts, key, val.to_vec()) {
       Ok(_) => { () },
       Err(e) => { fail!("failed to write to database: {}", e) }
     }

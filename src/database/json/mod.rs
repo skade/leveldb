@@ -8,20 +8,6 @@ use serialize::json::{DecodeResult, DecoderError};
 use std::io::IoError;
 use std::str::from_utf8;
 
-//pub trait Interface<'a, T:Encodable<json::Encoder<'a>,io::IoError>> {
-//  fn put(&mut self,
-//         options: WriteOptions,
-//         key: &T,
-//         value: &T)
-//        -> Result<(), Error>;
-//  fn delete(&mut self,
-//           options: WriteOptions,
-//           key: &T) -> Result<(), Error>;
-//  fn get(&self,
-//         options: ReadOptions,
-//         key: &T) -> Result<Option<Json>, Error>;
-//}
-
 pub struct JSON;
 
 impl<'a, V: Encodable<json::Encoder<'a>, IoError> + Decodable<json::Decoder, json::DecoderError>> database::Interface<JSON, V> for Database {

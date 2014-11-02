@@ -1,8 +1,6 @@
 use cbits::leveldb::*;
-use database::comparator::*;
-use database::key::Key;
 
-use libc::{size_t, c_int};
+use libc::{size_t};
 
 pub struct Options {
   pub create_if_missing: bool,

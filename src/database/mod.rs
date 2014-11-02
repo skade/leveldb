@@ -75,6 +75,19 @@ pub struct Database<C> {
   comparator: Option<RawComparator>,
 }
 
+pub trait RawInterface<K: Key> {
+  fn put_binary(&mut self,
+                options: WriteOptions,
+                key: K,
+                value: &[u8]) -> Result<(), Error>;
+  fn get_binary(&self,
+                options: ReadOptions,
+                key: K) -> Result<Option<Vec<u8>>, Error>;
+  fn delete_binary(&mut self,
+                   options: WriteOptions,
+                   key: K) -> Result<(), Error>;
+}
+
 impl<K: Key, C: Comparator<K>> Database<C> {
   fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<C> {
     let raw_comp = match comparator {
@@ -105,7 +118,9 @@ impl<K: Key, C: Comparator<K>> Database<C> {
       Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
     }
   }
+}
 
+impl<K: Key, C: Comparator<K>> RawInterface<K> for Database<C> {
   fn put_binary(&mut self,
                 options: WriteOptions,
                 key: K,
@@ -179,16 +194,35 @@ impl<K: Key, C: Comparator<K>> Database<C> {
   }
 }
 
-pub trait Interface<T, K, V> {
+pub trait Interface<T, K: Key, V> : RawInterface<K> {
   fn put(&mut self,
-         options: WriteOptions,
-         key: K,
-         value: V)
-        -> Result<(), Error>;
+        options: WriteOptions,
+        key: K,
+        value: V) -> Result<(), Error> {
+    let binary = self.to_binary(value);
+    self.put_binary(options, key, binary.as_slice())
+  }
   fn delete(&mut self,
             options: WriteOptions,
-            key: K) -> Result<(), Error>;
+            key: K) -> Result<(), Error> {
+    self.delete_binary(options, key)
+  }
   fn get(&self,
          options: ReadOptions,
-         key: K) -> Result<Option<V>, Error>;
+         key: K) -> Result<Option<V>, Error> {
+    let result = self.get_binary(options, key);
+    match result {
+      Err(error) => { Err(error) },
+      Ok(opt) => {
+        match opt {
+          None => { Ok(None) },
+          Some(binary) => {
+            self.from_binary(binary)
+          }
+        }
+      }
+    }
+  }
+  fn from_binary(&self, binary: Vec<u8>) -> Result<Option<V>, Error>;
+  fn to_binary(&mut self, val: V) -> Vec<u8>;
 }

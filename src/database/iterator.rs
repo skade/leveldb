@@ -5,6 +5,7 @@ use std::vec::raw::*;
 use std::vec::*;
 use std::iter;
 use super::Database;
+use comparator::Comparator;
 use super::options::ReadOptions;
 
 pub struct Iterator {
@@ -16,17 +17,17 @@ pub trait Iterable {
   fn iter(&self, options: ReadOptions) -> Iterator;
 }
 
-impl Iterable for Database {
+impl<K, C: Comparator<K>> Iterable for Database<C> {
   fn iter(&self, options: ReadOptions) -> Iterator {
     Iterator::new(self, options)
   }
 }
 
 impl Iterator {
-  fn new(database: &Database,
+  fn new<K, C: Comparator<K>>(database: &Database<C>,
          options: ReadOptions) -> Iterator {
     unsafe {
-      let iter = leveldb_create_iterator(database.database,
+      let iter = leveldb_create_iterator(database.database.ptr,
                                          options.options());
       leveldb_iter_seek_to_first(iter);
       Iterator { iter: iter, start: true }

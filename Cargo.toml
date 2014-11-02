@@ -7,3 +7,7 @@ authors = [ "florian.gilcher@asquera.de" ]
 [lib]
 
 name = "leveldb"
+
+[dependencies.key]
+
+git = "https://github.com/skade/key.git"

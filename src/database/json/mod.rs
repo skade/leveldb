@@ -2,6 +2,8 @@ use database;
 use super::Database;
 use super::options::{ReadOptions,WriteOptions};
 use super::error::Error;
+use super::key::Key;
+use comparator::Comparator;
 use serialize::{Encodable, Decodable, Encoder, Decoder};
 use serialize::json;
 use serialize::json::{DecodeResult, DecoderError};
@@ -10,23 +12,22 @@ use std::str::from_utf8;
 
 pub struct JSON;
 
-impl<'a, V: Encodable<json::Encoder<'a>, IoError> + Decodable<json::Decoder, json::DecoderError>> database::Interface<JSON, V> for Database {
+impl<'a, K: Key, C: Comparator<K>, V: Encodable<json::Encoder<'a>, IoError> + Decodable<json::Decoder, json::DecoderError>> database::Interface<JSON, K, V> for Database<C> {
   fn put(&mut self,
         options: WriteOptions,
-        key: &[u8],
+        key: K,
         value: V) -> Result<(), Error> {
     let encoded_val = json::Encoder::buffer_encode(&value);
     self.put_binary(options, key, encoded_val.as_slice())
   }
   fn delete(&mut self,
             options: WriteOptions,
-            key: &[u8]) -> Result<(), Error> {
-    let encoded_key = json::Encoder::buffer_encode(&key);
-    self.delete_binary(options, encoded_key.as_slice())
+            key: K) -> Result<(), Error> {
+    self.delete_binary(options, key)
   }
   fn get(&self,
          options: ReadOptions,
-         key: &[u8]) -> Result<Option<V>, Error> {
+         key: K) -> Result<Option<V>, Error> {
     let result = self.get_binary(options, key);
     match result {
       Err(error) => { Err(error) },

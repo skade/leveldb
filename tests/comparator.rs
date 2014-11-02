@@ -1,21 +1,9 @@
-#![feature(globs)]
-
+extern crate key;
 extern crate leveldb;
 extern crate serialize;
 
 pub mod utils {
-  use leveldb::database::Database;
-  use leveldb::options::{Options};
   use std::io::TempDir;
-
-  pub fn open_database(path: Path, create_if_missing: bool) -> Database {
-    let mut opts = Options::new();
-    opts.create_if_missing(create_if_missing);
-    match Database::open(path, opts) {
-      Ok(db) => { db },
-      Err(e) => { fail!("failed to open database: {}", e) }
-    }
-  }
 
   pub fn tmpdir(name: &str) -> TempDir {
     TempDir::new(name)
@@ -25,49 +13,44 @@ pub mod utils {
 
 #[cfg(test)]
 mod comparator {
+  use key::Key;
   use super::utils::{tmpdir};
   use leveldb::database::{Database,Interface};
-  use leveldb::database::binary::*;
+  use leveldb::database::binary::Binary;
   use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
-  use leveldb::comparator::*;
+  use leveldb::comparator::Comparator;
   
-  struct ReverseComparator {
-    name: &'static str,
-  }
-  
-  impl Comparator for ReverseComparator {
+  struct ReverseComparator<K>;
+
+  impl<K: Key> Comparator<K> for ReverseComparator<K> {
     fn name(&self) -> *const u8 {
-      self.name.as_ptr()
+      "reverse".as_ptr()
     }
   
-    fn compare(&self, a: &[u8], b: &[u8]) -> Ordering {
-      if a[0] < b[0] {
-        Greater
-      } else {
-        Less
-      }
+    fn compare(&self, a: &K, b: &K) -> Ordering {
+      b.compare(a)
     }
+
   }
 
-  fn db_put_simple(database: &mut Interface<Binary, Vec<u8>>, key: &[u8], val: &[u8]) {
+  fn db_put_simple(database: &mut Interface<Binary, int, Vec<u8>>, key: int, val: &[u8]) {
     let write_opts = WriteOptions::new();
     match database.put(write_opts, key, val.to_vec()) {
       Ok(_) => { () },
-      Err(e) => { fail!("failed to write to database: {}", e) }
+      Err(e) => { panic!("failed to write to database: {}", e) }
     }
   }
   
   #[test]
   fn test_comparator() {
-    let comparator = box ReverseComparator { name: "test" };
+    let comparator: ReverseComparator<int> = ReverseComparator::<int>;
     let mut opts = Options::new();
-    opts.create_if_missing(true);
-    opts.set_comparator(comparator);
+    opts.create_if_missing = true;
     let tmp = tmpdir("testdbs");
-    let database = &mut Database::open(tmp.path().join("reverse_comparator"), opts).unwrap();
-    db_put_simple(database, &[1], &[1]);
-    db_put_simple(database, &[2], &[2]);
+    let database = &mut Database::open(tmp.path().join("reverse_comparator"), opts, Some(comparator)).unwrap();
+    db_put_simple(database, 1, &[1]);
+    db_put_simple(database, 2, &[2]);
 
     let read_opts = ReadOptions::new();
     let mut iter = database.iter(read_opts);

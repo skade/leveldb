@@ -1,4 +1,12 @@
 [root]
 name = "leveldb"
 version = "0.1.0"
+dependencies = [
+ "key 0.0.1 (git+https://github.com/skade/key.git)",
+]
+
+[[package]]
+name = "key"
+version = "0.0.1"
+source = "git+https://github.com/skade/key.git#0d783cedb66065cbecceb41fb535899d065ba60b"
 

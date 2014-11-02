@@ -130,8 +130,12 @@ mod binary_tests {
     let read_opts = ReadOptions::new();
     let mut iter = database.iter(read_opts);
     assert!(iter.valid());
-    assert!(iter.next().is_some());
-    assert!(iter.next().is_some());
+    let mut entry = iter.next();
+    assert!(entry.is_some());
+    assert_eq!(entry.unwrap().key(), 1);
+    let mut entry2 = iter.next();
+    assert!(entry2.is_some());
+    assert_eq!(entry2.unwrap().key(), 2);
     assert!(iter.next().is_none());
   }
 }

@@ -7,25 +7,26 @@ use std::iter;
 use super::Database;
 use comparator::Comparator;
 use super::options::ReadOptions;
+use super::key::{Key,from_u8};
 
-pub struct Iterator {
+pub struct Iterator<K> {
   iter: *mut leveldb_iterator_t,
   start: bool
 }
 
-pub trait Iterable {
-  fn iter(&self, options: ReadOptions) -> Iterator;
+pub trait Iterable<K> {
+  fn iter(&self, options: ReadOptions) -> Iterator<K>;
 }
 
-impl<K, C: Comparator<K>> Iterable for Database<C> {
-  fn iter(&self, options: ReadOptions) -> Iterator {
-    Iterator::new(self, options)
+impl<K: Key, C: Comparator<K>> Iterable<K> for Database<C> {
+  fn iter(&self, options: ReadOptions) -> Iterator<K> {
+    Iterator::new::<C>(self, options)
   }
 }
 
-impl Iterator {
-  fn new<K, C: Comparator<K>>(database: &Database<C>,
-         options: ReadOptions) -> Iterator {
+impl<K: Key> Iterator<K> {
+  fn new<C: Comparator<K>>(database: &Database<C>,
+         options: ReadOptions) -> Iterator<K> {
     unsafe {
       let iter = leveldb_create_iterator(database.database.ptr,
                                          options.options());
@@ -48,17 +49,18 @@ impl Iterator {
 
 }
 
-impl Drop for Iterator {
+#[unsafe_destructor]
+impl<K: Key> Drop for Iterator<K> {
   fn drop(&mut self) {
     unsafe { leveldb_iter_destroy(self.iter) }
   }
 }
 
-pub struct Entry {
+pub struct Entry<K: Key> {
   iter: *mut leveldb_iterator_t
 }
 
-impl Entry {
+impl<K: Key> Entry<K> {
   pub fn value(self) -> Vec<u8> {
     unsafe {
       let length: size_t = 0;
@@ -68,18 +70,18 @@ impl Entry {
     }
   }
 
-  pub fn key(self) -> Vec<u8> {
+  pub fn key(self) -> K {
     unsafe {
       let length: size_t = 0;
       let value = leveldb_iter_key(self.iter,
                                    &length) as *const u8;
-      from_buf(value, length as uint)
+      from_u8(from_buf(value, length as uint).as_slice())
     }
   }
 }
 
-impl iter::Iterator<Entry> for Iterator {
-  fn next(&mut self) -> Option<Entry> {
+impl<K: Key> iter::Iterator<Entry<K>> for Iterator<K> {
+  fn next(&mut self) -> Option<Entry<K>> {
     unsafe {
       if !self.start() {
         leveldb_iter_next(self.iter);
@@ -95,7 +97,7 @@ impl iter::Iterator<Entry> for Iterator {
     }
   }
 
-  fn last(&mut self) -> Option<Entry> {
+  fn last(&mut self) -> Option<Entry<K>> {
     unsafe {
       leveldb_iter_seek_to_last(self.iter);
       Some(Entry { iter: self.iter })

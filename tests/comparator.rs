@@ -22,7 +22,7 @@ mod comparator {
     }
   
     fn compare(&self, a: &K, b: &K) -> Ordering {
-      b.compare(a)
+      b.cmp(a)
     }
 
   }

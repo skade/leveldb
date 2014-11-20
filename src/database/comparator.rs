@@ -9,7 +9,7 @@ use database::key::from_u8;
 pub trait Comparator<K: Key + Ord> {
      fn name(&self) -> *const u8;
      fn compare(&self, a: &K, b: &K) -> Ordering {
-         a.compare(b)
+         a.cmp(b)
      }
 }
 

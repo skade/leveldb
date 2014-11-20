@@ -8,6 +8,6 @@ authors = [ "florian.gilcher@asquera.de" ]
 
 name = "leveldb"
 
-[dependencies.key]
+[dependencies]
 
-git = "https://github.com/skade/key.git"
+db_key = "0.0.1"

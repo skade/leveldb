@@ -2,11 +2,11 @@
 name = "leveldb"
 version = "0.1.0"
 dependencies = [
- "key 0.0.1 (git+https://github.com/skade/key.git)",
+ "db_key 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
-name = "key"
+name = "db_key"
 version = "0.0.1"
-source = "git+https://github.com/skade/key.git#c5f3fc17a1a7345fb6bfd88df4de6f3492cd3924"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 

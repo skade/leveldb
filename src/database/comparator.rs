@@ -3,8 +3,8 @@ use libc::{size_t,c_void};
 use libc;
 use std::mem;
 use std::slice;
-use database::key::Key;
-use database::key::from_u8;
+use database::db_key::Key;
+use database::db_key::from_u8;
 
 pub trait Comparator<K: Key + Ord> {
      fn name(&self) -> *const u8;

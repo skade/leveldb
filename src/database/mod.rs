@@ -1,5 +1,5 @@
 #[deny(warnings)]
-extern crate key;
+extern crate db_key;
 
 use cbits::leveldb::*;
 
@@ -12,7 +12,7 @@ use libc::{c_char,size_t};
 use std::slice::*;
 use std::string;
 use comparator::{Comparator,create_comparator};
-use self::key::Key;
+use self::db_key::Key;
 
 pub mod options;
 pub mod error;

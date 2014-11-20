@@ -7,7 +7,7 @@ use std::iter;
 use super::Database;
 use comparator::Comparator;
 use super::options::{ReadOptions,c_readoptions};
-use super::key::{Key,from_u8};
+use super::db_key::{Key,from_u8};
 
 struct RawIterator {
   ptr: *mut leveldb_iterator_t,

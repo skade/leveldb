@@ -2,19 +2,12 @@ extern crate key;
 extern crate leveldb;
 extern crate serialize;
 
-pub mod utils {
-  use std::io::TempDir;
-
-  pub fn tmpdir(name: &str) -> TempDir {
-    TempDir::new(name)
-             .unwrap()
-  }
-}
+mod utils;
 
 #[cfg(test)]
 mod comparator {
   use key::Key;
-  use super::utils::{tmpdir};
+  use utils::{tmpdir};
   use leveldb::database::{Database,Interface};
   use leveldb::database::binary::Binary;
   use leveldb::iterator::Iterable;
@@ -57,5 +50,6 @@ mod comparator {
 
     assert!(iter.valid());
     assert_eq!((2, vec![2]), iter.next().unwrap())
+    assert_eq!((1, vec![1]), iter.next().unwrap())
   }
 }

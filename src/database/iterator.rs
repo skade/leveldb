@@ -10,11 +10,11 @@ use comparator::Comparator;
 use super::options::ReadOptions;
 use super::key::{Key,from_u8};
 
-struct IteratorPtr {
+struct RawIterator {
   ptr: *mut leveldb_iterator_t,
 }
 
-impl Drop for IteratorPtr {
+impl Drop for RawIterator {
   fn drop(&mut self) {
     unsafe { leveldb_iter_destroy(self.ptr) }
   }
@@ -22,17 +22,17 @@ impl Drop for IteratorPtr {
 
 pub struct Iterator<K: Key, V> {
   start: bool,
-  iter: IteratorPtr
+  iter: RawIterator
 }
 
 pub struct KeyIterator<K: Key> {
   start: bool,
-  iter: IteratorPtr
+  iter: RawIterator
 }
 
 pub struct ValueIterator<V> {
   start: bool,
-  iter: IteratorPtr
+  iter: RawIterator
 }
 
 pub trait Iterable<K: Key,V> {
@@ -60,7 +60,7 @@ impl<K: Key, V> Iterator<K, V> {
       let ptr = leveldb_create_iterator(database.database.ptr,
                                          options.options());
       leveldb_iter_seek_to_first(ptr);
-      Iterator { start: true, iter: IteratorPtr { ptr: ptr } }
+      Iterator { start: true, iter: RawIterator { ptr: ptr } }
     }
   }
 
@@ -103,7 +103,7 @@ impl<K: Key> KeyIterator<K> {
       let ptr = leveldb_create_iterator(database.database.ptr,
                                          options.options());
       leveldb_iter_seek_to_first(ptr);
-      KeyIterator { start: true, iter: IteratorPtr { ptr: ptr } }
+      KeyIterator { start: true, iter: RawIterator { ptr: ptr } }
     }
   }
 
@@ -127,7 +127,7 @@ impl<V> ValueIterator<V> {
       let ptr = leveldb_create_iterator(database.database.ptr,
                                          options.options());
       leveldb_iter_seek_to_first(ptr);
-      ValueIterator { start: true, iter: IteratorPtr { ptr: ptr } }
+      ValueIterator { start: true, iter: RawIterator { ptr: ptr } }
     }
   }
 

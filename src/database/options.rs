@@ -23,7 +23,7 @@ impl Options {
       max_open_files: None,
       block_size: None,
       block_restart_interval: None,
-      compression: No
+      compression: Compression::No
     }
   }
 }

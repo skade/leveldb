@@ -8,5 +8,5 @@ dependencies = [
 [[package]]
 name = "key"
 version = "0.0.1"
-source = "git+https://github.com/skade/key.git#5ce000bba8c75a4ea197679c9ee94e2fc0c37ba3"
+source = "git+https://github.com/skade/key.git#c5f3fc17a1a7345fb6bfd88df4de6f3492cd3924"
 

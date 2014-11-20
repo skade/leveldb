@@ -57,7 +57,4 @@ impl<K: Key + Ord> Comparator<K> for DefaultComparator {
   fn name(&self) -> *const u8 {
     "default_comparator".as_ptr()
   }
-  fn compare(&self, a: &K, b: &K) -> Ordering {
-      a.compare(b)
-  }
 }

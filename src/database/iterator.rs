@@ -5,7 +5,6 @@ use std::vec::raw::*;
 use std::vec::*;
 use std::iter;
 use super::Database;
-use super::RawInterface;
 use comparator::Comparator;
 use super::options::ReadOptions;
 use super::key::{Key,from_u8};

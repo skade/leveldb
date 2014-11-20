@@ -16,7 +16,6 @@ use self::key::Key;
 pub mod options;
 pub mod error;
 pub mod iterator;
-//pub mod key;
 pub mod comparator;
 pub mod binary;
 pub mod json;
@@ -45,7 +44,6 @@ unsafe fn c_options(options: Options, comparator: Option<*mut leveldb_comparator
   c_options
 }
 
-
 struct RawDB {
   ptr: *mut leveldb_t
 }
@@ -72,6 +70,7 @@ impl Drop for RawComparator {
 
 pub struct Database<C> {
   database: RawDB,
+  #[allow(dead_code)] // this holds a reference passed into leveldb
   comparator: Option<RawComparator>,
 }
 

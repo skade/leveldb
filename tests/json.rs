@@ -3,6 +3,7 @@ extern crate key;
 extern crate leveldb;
 extern crate serialize;
 
+#[allow(dead_code)]
 mod utils;
 
 #[cfg(test)]

@@ -16,7 +16,7 @@ mod comparator {
   
   struct ReverseComparator<K>;
 
-  impl<K: Key> Comparator<K> for ReverseComparator<K> {
+  impl<K: Key + Ord> Comparator<K> for ReverseComparator<K> {
     fn name(&self) -> *const u8 {
       "reverse".as_ptr()
     }

@@ -32,6 +32,7 @@ mod binary_tests {
   use leveldb::database::{Database,Interface};
   use leveldb::database::binary::*;
   use leveldb::iterator::Iterable;
+  use leveldb::iterator;
   use leveldb::comparator::DefaultComparator;
   use leveldb::options::{Options,ReadOptions,WriteOptions};
 
@@ -132,10 +133,10 @@ mod binary_tests {
     assert!(iter.valid());
     let mut entry = iter.next();
     assert!(entry.is_some());
-    assert_eq!(entry.unwrap().key(), 1);
+    assert_eq!(entry.unwrap(), (1, vec![1]));
     let mut entry2 = iter.next();
     assert!(entry2.is_some());
-    assert_eq!(entry2.unwrap().key(), 2);
+    assert_eq!(entry2.unwrap(), (2, vec![2]));
     assert!(iter.next().is_none());
   }
 }

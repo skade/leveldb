@@ -1,4 +1,4 @@
-extern crate key;
+extern crate db_key;
 extern crate leveldb;
 extern crate serialize;
 
@@ -6,7 +6,7 @@ use leveldb::database::Database;
 use leveldb::options::{Options,WriteOptions};
 use leveldb::comparator::Comparator;
 use std::io::TempDir;
-use key::Key;
+use db_key::Key;
 
 pub fn open_database<K: Key + Ord, C: Comparator<K>>(path: Path, create_if_missing: bool) -> Database<K, C> {
   let mut opts = Options::new();

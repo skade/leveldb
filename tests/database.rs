@@ -1,5 +1,5 @@
 #![feature(globs)]
-extern crate key;
+extern crate db_key;
 extern crate leveldb;
 extern crate serialize;
 

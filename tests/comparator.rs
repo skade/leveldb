@@ -1,4 +1,4 @@
-extern crate key;
+extern crate db_key;
 extern crate leveldb;
 extern crate serialize;
 
@@ -7,7 +7,7 @@ mod utils;
 
 #[cfg(test)]
 mod comparator {
-  use key::Key;
+  use db_key::Key;
   use utils::{tmpdir, db_put_simple};
   use leveldb::database::{Database};
   use leveldb::iterator::Iterable;

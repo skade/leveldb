@@ -49,7 +49,6 @@ mod comparator {
     let read_opts = ReadOptions::new();
     let mut iter = database.iter(read_opts);
 
-    assert!(iter.valid());
     assert_eq!((2, vec![2]), iter.next().unwrap())
     assert_eq!((1, vec![1]), iter.next().unwrap())
   }

@@ -1,3 +1,4 @@
+#[deny(warnings)]
 extern crate key;
 
 use cbits::leveldb::*;
@@ -70,7 +71,9 @@ impl Drop for RawComparator {
 
 pub struct Database<C> {
   database: RawDB,
-  #[allow(dead_code)] // this holds a reference passed into leveldb
+  // this holds a reference passed into leveldb
+  // it is never read from Rust, but must be kept around
+  #[allow(dead_code)]
   comparator: Option<RawComparator>,
 }
 

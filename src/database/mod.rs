@@ -43,7 +43,7 @@ impl Drop for RawComparator {
   }
 }
 
-pub struct Database<K: Key, C> {
+pub struct Database<K: Key + Ord, C> {
   database: RawDB,
   // this holds a reference passed into leveldb
   // it is never read from Rust, but must be kept around
@@ -51,7 +51,7 @@ pub struct Database<K: Key, C> {
   comparator: Option<RawComparator>,
 }
 
-impl<K: Key, C: Comparator<K>> Database<K, C> {
+impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
   fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<K, C> {
     let raw_comp = match comparator {
       Some(p) => Some(RawComparator { ptr: p }),

@@ -40,7 +40,7 @@ pub trait Iterable<K: Key,V> {
   fn value_iter(&self, options: ReadOptions) -> ValueIterator<V>;
 }
 
-impl<K: Key, C: Comparator<K>, V> Iterable<K, V> for Database<K, C> {
+impl<K: Key + Ord, C: Comparator<K>, V> Iterable<K, V> for Database<K, C> {
   fn iter(&self, options: ReadOptions) -> Iterator<K,V> {
     Iterator::new::<C>(self, options)
   }

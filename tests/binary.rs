@@ -4,8 +4,6 @@ extern crate leveldb;
 extern crate serialize;
 
 use utils::{open_database,tmpdir,db_put_simple};
-use leveldb::database::{Interface};
-use leveldb::database::binary::*;
 use leveldb::options::{ReadOptions,WriteOptions};
 
 #[allow(dead_code)]
@@ -14,18 +12,18 @@ mod utils;
 #[test]
 fn test_write_to_database() {
   let tmp = tmpdir("testdbs");
-  let database: &mut Interface<Binary, int, Vec<u8>> = &mut open_database(tmp.path().join("write"), true);
+  let mut database = open_database(tmp.path().join("write"), true);
   let write_opts = WriteOptions::new();
   let result = database.put(write_opts,
                             1,
-                            [1].to_vec());
+                            &[1]);
   assert!(result.is_ok());
 }
 
 #[test]
 fn test_delete_from_database() {
   let tmp = tmpdir("testdbs");
-  let database: &mut Interface<Binary, int, Vec<u8>> = &mut open_database(tmp.path().join("delete_simple"), true);
+  let database = &mut open_database(tmp.path().join("delete_simple"), true);
   db_put_simple(database, 1, &[1]);
 
   let write2 = WriteOptions::new();
@@ -37,7 +35,7 @@ fn test_delete_from_database() {
 #[test]
 fn test_get_from_empty_database() {
   let tmp = tmpdir("testdbs");
-  let database: &mut Interface<Binary, int, Vec<u8>> = &mut open_database(tmp.path().join("get_simple"), true);
+  let database = &mut open_database(tmp.path().join("get_simple"), true);
   let read_opts = ReadOptions::new();
   let res = database.get(read_opts, 1);
   match res {
@@ -49,7 +47,7 @@ fn test_get_from_empty_database() {
 #[test]
 fn test_get_from_filled_database() {
   let tmp = tmpdir("testdbs");
-  let database: &mut Interface<Binary, int, Vec<u8>> = &mut open_database(tmp.path().join("get_filled"), true);
+  let database = &mut open_database(tmp.path().join("get_filled"), true);
   db_put_simple(database, 1, &[1]);
 
   let read_opts = ReadOptions::new();

@@ -40,7 +40,7 @@ pub trait Iterable<K: Key,V> {
   fn value_iter(&self, options: ReadOptions) -> ValueIterator<V>;
 }
 
-impl<K: Key, C: Comparator<K>, V> Iterable<K, V> for Database<C> {
+impl<K: Key, C: Comparator<K>, V> Iterable<K, V> for Database<K, C> {
   fn iter(&self, options: ReadOptions) -> Iterator<K,V> {
     Iterator::new::<C>(self, options)
   }
@@ -114,10 +114,8 @@ trait KeyAccess<K: Key> : LevelDBIterator {
   }
 }
 
-trait KeyValueAccess<K: Key, V> : KeyAccess<K> + ValueAccess<V> {}
-
 impl<K: Key, V> Iterator<K, V> {
-  fn new<C>(database: &Database<C>,
+  fn new<C>(database: &Database<K, C>,
          options: ReadOptions) -> Iterator<K,V> {
     unsafe {
       let ptr = leveldb_create_iterator(database.database.ptr,
@@ -153,7 +151,7 @@ impl<K: Key> ValueAccess<Vec<u8>> for Iterator<K,Vec<u8>> {
 }
 
 impl<K: Key> KeyIterator<K> {
-  fn new<C>(database: &Database<C>,
+  fn new<C>(database: &Database<K, C>,
          options: ReadOptions) -> KeyIterator<K> {
     unsafe {
       let ptr = leveldb_create_iterator(database.database.ptr,
@@ -183,8 +181,8 @@ impl<K: Key> LevelDBIterator for KeyIterator<K> {
 
 impl<K: Key> KeyAccess<K> for KeyIterator<K> { }
 
-impl<V> ValueIterator<V> {
-  fn new<C>(database: &Database<C>,
+impl<K, V> ValueIterator<V> {
+  fn new<C>(database: &Database<K, C>,
          options: ReadOptions) -> ValueIterator<V> {
     unsafe {
       let ptr = leveldb_create_iterator(database.database.ptr,

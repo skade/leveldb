@@ -8,7 +8,7 @@ use self::error::Error;
 
 use std::ptr;
 use std::vec::raw::*;
-use libc::{c_char, size_t};
+use libc::{c_char,size_t};
 use std::slice::*;
 use std::string;
 use comparator::{Comparator,create_comparator};
@@ -18,8 +18,6 @@ pub mod options;
 pub mod error;
 pub mod iterator;
 pub mod comparator;
-pub mod binary;
-pub mod json;
 
 unsafe fn c_options(options: Options, comparator: Option<*mut leveldb_comparator_t>) -> *mut leveldb_options_t {
   let c_options = leveldb_options_create();
@@ -69,7 +67,7 @@ impl Drop for RawComparator {
   }
 }
 
-pub struct Database<C> {
+pub struct Database<K: Key, C> {
   database: RawDB,
   // this holds a reference passed into leveldb
   // it is never read from Rust, but must be kept around
@@ -77,21 +75,8 @@ pub struct Database<C> {
   comparator: Option<RawComparator>,
 }
 
-pub trait RawInterface<K: Key> {
-  fn put_binary(&mut self,
-                options: WriteOptions,
-                key: K,
-                value: &[u8]) -> Result<(), Error>;
-  fn get_binary(&self,
-                options: ReadOptions,
-                key: K) -> Result<Option<Vec<u8>>, Error>;
-  fn delete_binary(&mut self,
-                   options: WriteOptions,
-                   key: K) -> Result<(), Error>;
-}
-
-impl<K: Key, C: Comparator<K>> Database<C> {
-  fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<C> {
+impl<K: Key, C: Comparator<K>> Database<K, C> {
+  fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<K, C> {
     let raw_comp = match comparator {
       Some(p) => Some(RawComparator { ptr: p }),
       None => None
@@ -99,7 +84,7 @@ impl<K: Key, C: Comparator<K>> Database<C> {
     Database { database: RawDB { ptr: database }, comparator: raw_comp }
   }
 
-  pub fn open(name: Path, options: Options, comparator: Option<C>) -> Result<Database<C>,Error> {
+  pub fn open(name: Path, options: Options, comparator: Option<C>) -> Result<Database<K, C>,Error> {
     let mut error = ptr::null();
     let comp_ptr = match comparator {
       Some(c) => Some(create_comparator(box c)),
@@ -120,13 +105,11 @@ impl<K: Key, C: Comparator<K>> Database<C> {
       Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
     }
   }
-}
 
-impl<K: Key, C: Comparator<K>> RawInterface<K> for Database<C> {
-  fn put_binary(&mut self,
-                options: WriteOptions,
-                key: K,
-                value: &[u8]) -> Result<(), Error> {
+  pub fn put(&mut self,
+             options: WriteOptions,
+             key: K,
+             value: &[u8]) -> Result<(), Error> {
     unsafe {
       key.as_slice(|k| {
         let mut error = ptr::null();
@@ -147,9 +130,9 @@ impl<K: Key, C: Comparator<K>> RawInterface<K> for Database<C> {
     }
   }
 
-  fn delete_binary(&mut self,
-                   options: WriteOptions,
-                   key: K) -> Result<(), Error> {
+  pub fn delete(&mut self,
+                options: WriteOptions,
+                key: K) -> Result<(), Error> {
     unsafe {
       key.as_slice(|k| {
         let mut error = ptr::null();
@@ -167,9 +150,9 @@ impl<K: Key, C: Comparator<K>> RawInterface<K> for Database<C> {
     }
   }
 
-  fn get_binary(&self,
-                options: ReadOptions,
-                key: K) -> Result<Option<Vec<u8>>, Error> {
+  pub fn get(&self,
+             options: ReadOptions,
+             key: K) -> Result<Option<Vec<u8>>, Error> {
     unsafe {
       key.as_slice(|k| {
         let mut error = ptr::null();
@@ -194,37 +177,4 @@ impl<K: Key, C: Comparator<K>> RawInterface<K> for Database<C> {
       })
     }
   }
-}
-
-pub trait Interface<T, K: Key, V> : RawInterface<K> {
-  fn put(&mut self,
-        options: WriteOptions,
-        key: K,
-        value: V) -> Result<(), Error> {
-    let binary = self.to_binary(value);
-    self.put_binary(options, key, binary.as_slice())
-  }
-  fn delete(&mut self,
-            options: WriteOptions,
-            key: K) -> Result<(), Error> {
-    self.delete_binary(options, key)
-  }
-  fn get(&self,
-         options: ReadOptions,
-         key: K) -> Result<Option<V>, Error> {
-    let result = self.get_binary(options, key);
-    match result {
-      Err(error) => { Err(error) },
-      Ok(opt) => {
-        match opt {
-          None => { Ok(None) },
-          Some(binary) => {
-            self.from_binary(binary)
-          }
-        }
-      }
-    }
-  }
-  fn from_binary(&self, binary: Vec<u8>) -> Result<Option<V>, Error>;
-  fn to_binary(&mut self, val: V) -> Vec<u8>;
 }

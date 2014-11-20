@@ -8,11 +8,10 @@ mod utils;
 #[cfg(test)]
 mod comparator {
   use key::Key;
-  use utils::{tmpdir};
-  use leveldb::database::{Database,Interface};
-  use leveldb::database::binary::Binary;
+  use utils::{tmpdir, db_put_simple};
+  use leveldb::database::{Database};
   use leveldb::iterator::Iterable;
-  use leveldb::options::{Options,ReadOptions,WriteOptions};
+  use leveldb::options::{Options,ReadOptions};
   use leveldb::comparator::Comparator;
   
   struct ReverseComparator<K>;
@@ -28,14 +27,6 @@ mod comparator {
 
   }
 
-  fn db_put_simple(database: &mut Interface<Binary, int, Vec<u8>>, key: int, val: &[u8]) {
-    let write_opts = WriteOptions::new();
-    match database.put(write_opts, key, val.to_vec()) {
-      Ok(_) => { () },
-      Err(e) => { panic!("failed to write to database: {}", e) }
-    }
-  }
-  
   #[test]
   fn test_comparator() {
     let comparator: ReverseComparator<int> = ReverseComparator::<int>;

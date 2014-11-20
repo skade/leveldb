@@ -3,7 +3,7 @@ extern crate key;
 
 use cbits::leveldb::*;
 
-use self::options::{Options,WriteOptions,ReadOptions};
+use self::options::{Options,WriteOptions,ReadOptions,c_options,c_writeoptions,c_readoptions};
 use self::error::Error;
 
 use std::ptr;
@@ -18,30 +18,6 @@ pub mod options;
 pub mod error;
 pub mod iterator;
 pub mod comparator;
-
-unsafe fn c_options(options: Options, comparator: Option<*mut leveldb_comparator_t>) -> *mut leveldb_options_t {
-  let c_options = leveldb_options_create();
-  leveldb_options_set_create_if_missing(c_options, options.create_if_missing as i8);
-  leveldb_options_set_error_if_exists(c_options, options.error_if_exists as i8);
-  leveldb_options_set_paranoid_checks(c_options, options.paranoid_checks as i8);
-  if options.write_buffer_size.is_some() {
-    leveldb_options_set_write_buffer_size(c_options, options.write_buffer_size.unwrap());
-  }
-  if options.max_open_files.is_some() {
-    leveldb_options_set_max_open_files(c_options, options.max_open_files.unwrap());
-  }
-  if options.block_size.is_some() {
-    leveldb_options_set_block_size(c_options, options.block_size.unwrap());
-  }
-  if options.block_restart_interval.is_some() {
-    leveldb_options_set_block_restart_interval(c_options, options.block_restart_interval.unwrap());
-  }
-  leveldb_options_set_compression(c_options, options.compression);
-  if comparator.is_some() {
-    leveldb_options_set_comparator(c_options, comparator.unwrap());
-  }
-  c_options
-}
 
 struct RawDB {
   ptr: *mut leveldb_t
@@ -113,13 +89,15 @@ impl<K: Key, C: Comparator<K>> Database<K, C> {
     unsafe {
       key.as_slice(|k| {
         let mut error = ptr::null();
+        let c_writeoptions = c_writeoptions(options);
         leveldb_put(self.database.ptr,
-                    options.options(),
+                    c_writeoptions,
                     k.as_ptr() as *mut c_char,
                     k.len() as size_t,
                     value.as_ptr() as *mut c_char,
                     value.len() as size_t,
                     &mut error);
+        leveldb_writeoptions_destroy(c_writeoptions);
 
         if error == ptr::null() {
           Ok(())
@@ -136,11 +114,13 @@ impl<K: Key, C: Comparator<K>> Database<K, C> {
     unsafe {
       key.as_slice(|k| {
         let mut error = ptr::null();
+        let c_writeoptions = c_writeoptions(options);
         leveldb_delete(self.database.ptr,
-                       options.options(),
+                       c_writeoptions,
                        k.as_ptr() as *mut c_char,
                        k.len() as size_t,
                        &mut error);
+        leveldb_writeoptions_destroy(c_writeoptions);
         if error == ptr::null() {
           Ok(())
         } else {
@@ -157,23 +137,25 @@ impl<K: Key, C: Comparator<K>> Database<K, C> {
       key.as_slice(|k| {
         let mut error = ptr::null();
         let length: size_t = 0;
+        let c_readoptions = c_readoptions(options);
         let result = leveldb_get(self.database.ptr,
-                                 options.options(),
+                                 c_readoptions,
                                  k.as_ptr() as *mut c_char,
                                  k.len() as size_t,
                                  &length,
                                  &mut error);
+        leveldb_readoptions_destroy(c_readoptions);
 
-         if error == ptr::null() {
-           if result == ptr::null() {
-             Ok(None)
-           } else {
-             let vec: Vec<u8> = from_buf(result, length as uint);
-             Ok(Some(vec))
-           }
-         } else {
-           Err(Error::new(string::raw::from_buf(error as *const u8)))
-         }
+        if error == ptr::null() {
+          if result == ptr::null() {
+            Ok(None)
+          } else {
+            let vec: Vec<u8> = from_buf(result, length as uint);
+            Ok(Some(vec))
+          }
+        } else {
+          Err(Error::new(string::raw::from_buf(error as *const u8)))
+        }
       })
     }
   }

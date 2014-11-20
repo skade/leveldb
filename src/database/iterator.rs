@@ -6,7 +6,7 @@ use std::vec::*;
 use std::iter;
 use super::Database;
 use comparator::Comparator;
-use super::options::ReadOptions;
+use super::options::{ReadOptions,c_readoptions};
 use super::key::{Key,from_u8};
 
 struct RawIterator {
@@ -118,8 +118,10 @@ impl<K: Key, V> Iterator<K, V> {
   fn new<C>(database: &Database<K, C>,
          options: ReadOptions) -> Iterator<K,V> {
     unsafe {
+      let c_readoptions = c_readoptions(options);
       let ptr = leveldb_create_iterator(database.database.ptr,
-                                        options.options());
+                                        c_readoptions);
+      leveldb_readoptions_destroy(c_readoptions);
       leveldb_iter_seek_to_first(ptr);
       Iterator { start: true, iter: RawIterator { ptr: ptr } }
     }
@@ -154,8 +156,10 @@ impl<K: Key> KeyIterator<K> {
   fn new<C>(database: &Database<K, C>,
          options: ReadOptions) -> KeyIterator<K> {
     unsafe {
+      let c_readoptions = c_readoptions(options);
       let ptr = leveldb_create_iterator(database.database.ptr,
-                                         options.options());
+                                        c_readoptions);
+      leveldb_readoptions_destroy(c_readoptions);
       leveldb_iter_seek_to_first(ptr);
       KeyIterator { start: true, iter: RawIterator { ptr: ptr } }
     }
@@ -185,8 +189,10 @@ impl<K, V> ValueIterator<V> {
   fn new<C>(database: &Database<K, C>,
          options: ReadOptions) -> ValueIterator<V> {
     unsafe {
+      let c_readoptions = c_readoptions(options);
       let ptr = leveldb_create_iterator(database.database.ptr,
-                                         options.options());
+                                        c_readoptions);
+      leveldb_readoptions_destroy(c_readoptions);
       leveldb_iter_seek_to_first(ptr);
       ValueIterator { start: true, iter: RawIterator { ptr: ptr } }
     }

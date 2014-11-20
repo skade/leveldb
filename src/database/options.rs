@@ -34,39 +34,57 @@ pub struct WriteOptions {
 
 impl WriteOptions {
   pub fn new() -> WriteOptions {
-    WriteOptions { sync: true }
+    WriteOptions { sync: false }
   }
 }
 
 pub struct ReadOptions {
-  options: *mut   leveldb_readoptions_t,
+  pub verify_checksums: bool,
+  pub fill_cache: bool,
+  // TODO: Snapshotting
 }
 
 impl ReadOptions {
   pub fn new() -> ReadOptions {
-    unsafe {
-      let options = leveldb_readoptions_create();
-      ReadOptions { options: options }
-    }
-  }
-
-  pub fn options(&self) -> *mut leveldb_readoptions_t {
-    self.options
-  }
-
-  pub fn verify_checksums(&mut self, verify_checksums: bool) {
-    unsafe { leveldb_readoptions_set_verify_checksums(self.options, verify_checksums as i8); }
-  }
-
-  pub fn fill_cache(&mut self, fill_cache: bool) {
-     unsafe { leveldb_readoptions_set_fill_cache(self.options, fill_cache as i8); }
+    ReadOptions { verify_checksums: false,
+                  fill_cache: true }
   }
 }
 
-impl Drop for ReadOptions {
-  fn drop(&mut self) {
-    unsafe {
-      leveldb_readoptions_destroy(self.options);
-    }
+pub unsafe fn c_options(options: Options, comparator: Option<*mut leveldb_comparator_t>) -> *mut leveldb_options_t {
+  let c_options = leveldb_options_create();
+  leveldb_options_set_create_if_missing(c_options, options.create_if_missing as i8);
+  leveldb_options_set_error_if_exists(c_options, options.error_if_exists as i8);
+  leveldb_options_set_paranoid_checks(c_options, options.paranoid_checks as i8);
+  if options.write_buffer_size.is_some() {
+    leveldb_options_set_write_buffer_size(c_options, options.write_buffer_size.unwrap());
   }
+  if options.max_open_files.is_some() {
+    leveldb_options_set_max_open_files(c_options, options.max_open_files.unwrap());
+  }
+  if options.block_size.is_some() {
+    leveldb_options_set_block_size(c_options, options.block_size.unwrap());
+  }
+  if options.block_restart_interval.is_some() {
+    leveldb_options_set_block_restart_interval(c_options, options.block_restart_interval.unwrap());
+  }
+  leveldb_options_set_compression(c_options, options.compression);
+  if comparator.is_some() {
+    leveldb_options_set_comparator(c_options, comparator.unwrap());
+  }
+  c_options
 }
+
+pub unsafe fn c_writeoptions(options: WriteOptions) -> *mut leveldb_writeoptions_t {
+  let c_writeoptions = leveldb_writeoptions_create();
+  leveldb_writeoptions_set_sync(c_writeoptions, options.sync as i8);
+  c_writeoptions
+}
+
+pub unsafe fn c_readoptions(options: ReadOptions) -> *mut leveldb_readoptions_t {
+  let c_readoptions = leveldb_readoptions_create();
+  leveldb_readoptions_set_verify_checksums(c_readoptions, options.verify_checksums as i8);
+  leveldb_readoptions_set_fill_cache(c_readoptions, options.fill_cache as i8);
+  c_readoptions
+}
+

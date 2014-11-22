@@ -31,7 +31,7 @@
 //!      assert!(data.is_some());
 //!      assert_eq!(data, Some(vec![1]));
 //!    }
-//!    Err(_) => { panic!("failed reading data") }
+//!    Err(e) => { panic!("failed reading data: {}", e) }
 //!  }
 //! ```
  

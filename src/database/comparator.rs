@@ -6,21 +6,19 @@ use std::slice;
 use database::db_key::Key;
 use database::db_key::from_u8;
 
-pub trait Comparator<K: Key + Ord> {
+pub trait Comparator<K: Key> {
      fn name(&self) -> *const u8;
-     fn compare(&self, a: &K, b: &K) -> Ordering {
-         a.cmp(b)
-     }
+     fn compare(&self, a: &K, b: &K) -> Ordering;
 }
 
 pub struct OrdComparator;
 
-extern "C" fn name<K: Key + Ord, T: Comparator<K>>(state: *mut libc::c_void) -> *const u8 {
+extern "C" fn name<K: Key, T: Comparator<K>>(state: *mut libc::c_void) -> *const u8 {
      let x: &T = unsafe { &*(state as *mut T) };
      x.name()
 }
 
-extern "C" fn compare<K: Key + Ord, T: Comparator<K>>(state: *mut libc::c_void,
+extern "C" fn compare<K: Key, T: Comparator<K>>(state: *mut libc::c_void,
                                      a: *const u8, a_len: size_t,
                                      b: *const u8, b_len: size_t) -> i32 {
      unsafe {
@@ -44,7 +42,7 @@ extern "C" fn destructor<T>(state: *mut libc::c_void) {
      // let the Box fall out of scope and run the T's destructor
 }
 
-pub fn create_comparator<K: Key + Ord, T: Comparator<K>>(x: Box<T>) -> *mut leveldb_comparator_t {
+pub fn create_comparator<K: Key, T: Comparator<K>>(x: Box<T>) -> *mut leveldb_comparator_t {
      unsafe {
           leveldb_comparator_create(mem::transmute(x),
                                     destructor::<T>,
@@ -56,5 +54,9 @@ pub fn create_comparator<K: Key + Ord, T: Comparator<K>>(x: Box<T>) -> *mut leve
 impl<K: Key + Ord> Comparator<K> for OrdComparator {
   fn name(&self) -> *const u8 {
     "ord_comparator".as_ptr()
+  }
+  
+  fn compare(&self, a: &K, b: &K) -> Ordering {
+    a.cmp(b)
   }
 }

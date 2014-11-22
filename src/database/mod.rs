@@ -48,16 +48,17 @@ impl Drop for RawComparator {
 
 /// The main database object.
 ///
-/// leveldb databases are based on ordered keys, the `Database` struct
-/// requires the `Key` `K` also to be `Ord`. Additionally, a `Comparator`
-/// can be supplied, which allows to implement custom comparison logic.
+/// leveldb databases are based on ordered keys. By default, leveldb orders
+/// by the binary value of the key. Additionally, a custom `Comparator` can
+/// be passed when opening the database. This library ships with an Comparator
+/// implementation for keys that are `Ord`.
 ///
-/// When re-opening a database, you should use the same key type `K` and
+/// When re-opening a database, you must use the same key type `K` and
 /// comparator type `C`.
 ///
 /// Multiple Database objects can be kept around, as leveldb synchronises
 /// internally.
-pub struct Database<K: Key + Ord> {
+pub struct Database<K: Key> {
   database: RawDB,
   // this holds a reference passed into leveldb
   // it is never read from Rust, but must be kept around
@@ -65,7 +66,7 @@ pub struct Database<K: Key + Ord> {
   comparator: Option<RawComparator>,
 }
 
-impl<K: Key + Ord> Database<K> {
+impl<K: Key> Database<K> {
   fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<K> {
     let raw_comp = match comparator {
       Some(p) => Some(RawComparator { ptr: p }),

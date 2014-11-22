@@ -1,3 +1,5 @@
+//! The main database module, allowing to interface with leveldb on
+//! a key-value basis.
 extern crate db_key;
 
 use cbits::leveldb::*;
@@ -97,6 +99,14 @@ impl<K: Key> Database<K> {
     }
   }
 
+  /// Open a new database with a custom comparator
+  ///
+  /// If the database is missing, the behaviour depends on `options.create_if_missing`.
+  /// The database will be created using the settings given in `options`.
+  ///
+  /// The comparator must implement a total ordering over the keyspace.
+  ///
+  /// For keys that implement Ord, consider the `OrdComparator`.
   pub fn open_with_comparator<C: Comparator<K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
     let comp_ptr = create_comparator(box comparator);
@@ -116,14 +126,14 @@ impl<K: Key> Database<K> {
     }
   }
 
-  // put a binary value into the database.
-  //
-  // If the key is already present in the database, it will be overwritten.
-  //
-  // The passed key will be compared using the comparator.
-  //
-  // The database will be synced to disc if `options.sync == true`. This is
-  // NOT the default.
+  /// put a binary value into the database.
+  ///
+  /// If the key is already present in the database, it will be overwritten.
+  ///
+  /// The passed key will be compared using the comparator.
+  ///
+  /// The database will be synced to disc if `options.sync == true`. This is
+  /// NOT the default.
   pub fn put(&mut self,
              options: WriteOptions,
              key: K,
@@ -150,12 +160,12 @@ impl<K: Key> Database<K> {
     }
   }
 
-  // delete a value from the database.
-  //
-  // The passed key will be compared using the comparator.
-  //
-  // The database will be synced to disc if `options.sync == true`. This is
-  // NOT the default.
+  /// delete a value from the database.
+  ///
+  /// The passed key will be compared using the comparator.
+  ///
+  /// The database will be synced to disc if `options.sync == true`. This is
+  /// NOT the default.
   pub fn delete(&mut self,
                 options: WriteOptions,
                 key: K) -> Result<(), Error> {
@@ -178,9 +188,9 @@ impl<K: Key> Database<K> {
     }
   }
 
-  // get a value from the database.
-  //
-  // The passed key will be compared using the comparator.
+  /// get a value from the database.
+  ///
+  /// The passed key will be compared using the comparator.
   pub fn get(&self,
              options: ReadOptions,
              key: K) -> Result<Option<Vec<u8>>, Error> {

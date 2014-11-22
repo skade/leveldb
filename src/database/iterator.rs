@@ -1,41 +1,60 @@
-use cbits::leveldb::*;
+//! leveldb iterators
+//!
+//! Iteration is one of the most important parts of leveldb. This module provides
+//! Iterators to iterate over key, values and pairs of both.
+use cbits::leveldb::{leveldb_iterator_t,leveldb_iter_seek_to_first,leveldb_iter_destroy,leveldb_iter_seek_to_last,
+leveldb_create_iterator,leveldb_iter_valid,leveldb_iter_next,leveldb_iter_key,leveldb_iter_value,leveldb_readoptions_destroy};
 use libc::{size_t};
-use std::slice::*;
-use std::vec::raw::*;
-use std::vec::*;
+use std::vec::raw::from_buf;
 use std::iter;
 use super::Database;
 use super::options::{ReadOptions,c_readoptions};
 use super::db_key::{Key,from_u8};
 
+#[allow(missing_docs)]
 struct RawIterator {
   ptr: *mut leveldb_iterator_t,
 }
 
+#[allow(missing_docs)]
 impl Drop for RawIterator {
   fn drop(&mut self) {
     unsafe { leveldb_iter_destroy(self.ptr) }
   }
 }
 
+/// An iterator over the leveldb keyspace.
+///
+/// Returns key and value as a tuple.
 pub struct Iterator<K: Key, V> {
   start: bool,
   iter: RawIterator
 }
 
+/// An iterator over the leveldb keyspace.
+///
+/// Returns just the keys.
 pub struct KeyIterator<K: Key> {
   start: bool,
   iter: RawIterator
 }
 
+/// An iterator over the leveldb keyspace.
+///
+/// Returns just the value.
 pub struct ValueIterator<V> {
   start: bool,
   iter: RawIterator
 }
 
+
+/// A trait to allow access to the three main iteration styles of leveldb.
 pub trait Iterable<K: Key,V> {
+  /// Return an Iterator iterating over (Key,Value) pairs
   fn iter(&self, options: ReadOptions) -> Iterator<K,V>;
+  /// Returns an Iterator iterating over Keys only.
   fn keys_iter(&self, options: ReadOptions) -> KeyIterator<K>;
+  /// Returns an Iterator iterating over Values only.
   fn value_iter(&self, options: ReadOptions) -> ValueIterator<V>;
 }
 
@@ -52,6 +71,7 @@ impl<K: Key + Ord, V> Iterable<K, V> for Database<K> {
   }
 }
 
+#[allow(missing_docs)]
 trait LevelDBIterator {
   #[inline]
   fn raw_iterator(&self) -> *mut leveldb_iterator_t;
@@ -88,6 +108,7 @@ trait LevelDBIterator {
   }
 }
 
+#[allow(missing_docs)]
 trait ValueAccess<V> : LevelDBIterator {
   fn value(&self) -> V {
     unsafe {
@@ -102,6 +123,7 @@ trait ValueAccess<V> : LevelDBIterator {
   fn convert_value(&self, v: Vec<u8>) -> V;
 }
 
+#[allow(missing_docs)]
 trait KeyAccess<K: Key> : LevelDBIterator {
   fn key(&self) -> K {
     unsafe {

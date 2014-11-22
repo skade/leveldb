@@ -1,7 +1,7 @@
 language: rust
 env:
   global:
-    - secure: AxOWVIrwyqVZclNhljLLcMKuiTBDeG40xuzHFgOOCdfQBWyI+LjuOb0rje9L942j46+p1rw/9DzhDks3wwtQizuARZGTIRFAbkxboSSsW16b+Vip1LMmWFL0eXeSJ3ZmPCOQr8E6jPiqCE5m0SvFrkFNb8d3X1PVvuiMKDGCivY=
+    - secure: xvgEoA6Etp8KWAnA9FrCkPNTdz8dunFN93sgWFkd55NGtTqlLehHCvuqG/7DFteoQ6FK2+g45NqJoc2UWp1CUIs27Qm5ICvnmFFLSncHN2ofefN0fj0BWXJunVBuKsO1xYCossnXKsEBDSpLJ5BI1eMrJETyHW75Nb3YIXH0Dm4=
 install:
   - sudo apt-get install libleveldb-dev
   - sudo apt-get install libsnappy-dev

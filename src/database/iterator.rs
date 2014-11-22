@@ -29,6 +29,7 @@ impl Drop for RawIterator {
 pub struct Iterator<'a, K: Key, V> {
   start: bool,
   // Iterator accesses the Database through a leveldb_iter_t pointer
+  // but needs to hold the reference for lifetime tracking
   #[allow(dead_code)]
   database: &'a Database<K>,
   iter: RawIterator
@@ -40,6 +41,7 @@ pub struct Iterator<'a, K: Key, V> {
 pub struct KeyIterator<'a, K: Key> {
   start: bool,
   // Iterator accesses the Database through a leveldb_iter_t pointer
+  // but needs to hold the reference for lifetime tracking
   #[allow(dead_code)]
   database: &'a Database<K>,
   iter: RawIterator
@@ -51,6 +53,7 @@ pub struct KeyIterator<'a, K: Key> {
 pub struct ValueIterator<'a,K: Key,V> {
   start: bool,
   // Iterator accesses the Database through a leveldb_iter_t pointer
+  // but needs to hold the reference for lifetime tracking
   #[allow(dead_code)]
   database: &'a Database<K>,
   iter: RawIterator

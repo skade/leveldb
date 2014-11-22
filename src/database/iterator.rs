@@ -5,7 +5,6 @@ use std::vec::raw::*;
 use std::vec::*;
 use std::iter;
 use super::Database;
-use comparator::Comparator;
 use super::options::{ReadOptions,c_readoptions};
 use super::db_key::{Key,from_u8};
 
@@ -40,16 +39,16 @@ pub trait Iterable<K: Key,V> {
   fn value_iter(&self, options: ReadOptions) -> ValueIterator<V>;
 }
 
-impl<K: Key + Ord, C: Comparator<K>, V> Iterable<K, V> for Database<K, C> {
+impl<K: Key + Ord, V> Iterable<K, V> for Database<K> {
   fn iter(&self, options: ReadOptions) -> Iterator<K,V> {
-    Iterator::new::<C>(self, options)
+    Iterator::new(self, options)
   }
   fn keys_iter(&self, options: ReadOptions) -> KeyIterator<K> {
-    KeyIterator::new::<C>(self, options)
+    KeyIterator::new(self, options)
   }
 
   fn value_iter(&self, options: ReadOptions) -> ValueIterator<V> {
-    ValueIterator::new::<C>(self, options)
+    ValueIterator::new(self, options)
   }
 }
 
@@ -115,7 +114,7 @@ trait KeyAccess<K: Key> : LevelDBIterator {
 }
 
 impl<K: Key, V> Iterator<K, V> {
-  fn new<C>(database: &Database<K, C>,
+  fn new(database: &Database<K>,
          options: ReadOptions) -> Iterator<K,V> {
     unsafe {
       let c_readoptions = c_readoptions(options);
@@ -153,7 +152,7 @@ impl<K: Key> ValueAccess<Vec<u8>> for Iterator<K,Vec<u8>> {
 }
 
 impl<K: Key> KeyIterator<K> {
-  fn new<C>(database: &Database<K, C>,
+  fn new(database: &Database<K>,
          options: ReadOptions) -> KeyIterator<K> {
     unsafe {
       let c_readoptions = c_readoptions(options);
@@ -186,7 +185,7 @@ impl<K: Key> LevelDBIterator for KeyIterator<K> {
 impl<K: Key> KeyAccess<K> for KeyIterator<K> { }
 
 impl<K, V> ValueIterator<V> {
-  fn new<C>(database: &Database<K, C>,
+  fn new(database: &Database<K>,
          options: ReadOptions) -> ValueIterator<V> {
     unsafe {
       let c_readoptions = c_readoptions(options);

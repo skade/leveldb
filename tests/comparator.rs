@@ -1,10 +1,3 @@
-extern crate db_key;
-extern crate leveldb;
-extern crate serialize;
-
-#[allow(dead_code)]
-mod utils;
-
 #[cfg(test)]
 mod comparator {
   use db_key::Key;
@@ -33,7 +26,7 @@ mod comparator {
     let mut opts = Options::new();
     opts.create_if_missing = true;
     let tmp = tmpdir("testdbs");
-    let database = &mut Database::open(tmp.path().join("reverse_comparator"), opts, Some(comparator)).unwrap();
+    let database = &mut Database::open_with_comparator(tmp.path().join("reverse_comparator"), opts, comparator).unwrap();
     db_put_simple(database, 1, &[1]);
     db_put_simple(database, 2, &[2]);
 

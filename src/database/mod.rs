@@ -57,7 +57,7 @@ impl Drop for RawComparator {
 ///
 /// Multiple Database objects can be kept around, as leveldb synchronises
 /// internally.
-pub struct Database<K: Key + Ord, C> {
+pub struct Database<K: Key + Ord> {
   database: RawDB,
   // this holds a reference passed into leveldb
   // it is never read from Rust, but must be kept around
@@ -65,8 +65,8 @@ pub struct Database<K: Key + Ord, C> {
   comparator: Option<RawComparator>,
 }
 
-impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
-  fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<K, C> {
+impl<K: Key + Ord> Database<K> {
+  fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<K> {
     let raw_comp = match comparator {
       Some(p) => Some(RawComparator { ptr: p }),
       None => None
@@ -78,17 +78,11 @@ impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
   ///
   /// If the database is missing, the behaviour depends on `options.create_if_missing`.
   /// The database will be created using the settings given in `options`.
-  ///
-  /// A comparator can be passed, which must be able to compare the key object.
-  pub fn open(name: Path, options: Options, comparator: Option<C>) -> Result<Database<K, C>,Error> {
+  pub fn open(name: Path, options: Options) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
-    let comp_ptr = match comparator {
-      Some(c) => Some(create_comparator(box c)),
-      None => None
-    };
     let res = name.with_c_str(|c_string| {
       unsafe {
-        let c_options = c_options(options, comp_ptr);
+        let c_options = c_options(options, None);
         let db = leveldb_open(c_options as *const leveldb_options_t, c_string, &mut error);
         leveldb_options_destroy(c_options);
         db
@@ -96,7 +90,26 @@ impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
     });
 
     if error == ptr::null() {
-      Ok(Database::new(res, comp_ptr))
+      Ok(Database::new(res, None))
+    } else {
+      Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
+    }
+  }
+
+  pub fn open_with_comparator<C: Comparator<K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
+    let mut error = ptr::null();
+    let comp_ptr = create_comparator(box comparator);
+    let res = name.with_c_str(|c_string| {
+      unsafe {
+        let c_options = c_options(options, Some(comp_ptr));
+        let db = leveldb_open(c_options as *const leveldb_options_t, c_string, &mut error);
+        leveldb_options_destroy(c_options);
+        db
+      }
+    });
+
+    if error == ptr::null() {
+      Ok(Database::new(res, Some(comp_ptr)))
     } else {
       Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
     }

@@ -1,13 +1,6 @@
-#![feature(globs)]
-extern crate db_key;
-extern crate leveldb;
-extern crate serialize;
-
 use utils::{open_database,tmpdir,db_put_simple};
 use leveldb::iterator::Iterable;
 use leveldb::options::{ReadOptions};
-
-mod utils;
 
 #[test]
 fn test_iterator() {

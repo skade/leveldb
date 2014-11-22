@@ -1,13 +1,5 @@
-#![feature(globs)]
-extern crate db_key;
-extern crate leveldb;
-extern crate serialize;
-
 use utils::{open_database,tmpdir,db_put_simple};
 use leveldb::options::{ReadOptions,WriteOptions};
-
-#[allow(dead_code)]
-mod utils;
 
 #[test]
 fn test_write_to_database() {

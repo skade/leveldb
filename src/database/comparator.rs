@@ -13,7 +13,7 @@ pub trait Comparator<K: Key + Ord> {
      }
 }
 
-pub struct DefaultComparator;
+pub struct OrdComparator;
 
 extern "C" fn name<K: Key + Ord, T: Comparator<K>>(state: *mut libc::c_void) -> *const u8 {
      let x: &T = unsafe { &*(state as *mut T) };
@@ -53,8 +53,8 @@ pub fn create_comparator<K: Key + Ord, T: Comparator<K>>(x: Box<T>) -> *mut leve
      }
 }
 
-impl<K: Key + Ord> Comparator<K> for DefaultComparator {
+impl<K: Key + Ord> Comparator<K> for OrdComparator {
   fn name(&self) -> *const u8 {
-    "default_comparator".as_ptr()
+    "ord_comparator".as_ptr()
   }
 }

@@ -1,4 +1,3 @@
-#[deny(warnings)]
 extern crate db_key;
 
 use cbits::leveldb::*;
@@ -19,10 +18,12 @@ pub mod error;
 pub mod iterator;
 pub mod comparator;
 
+#[allow(missing_docs)]
 struct RawDB {
   ptr: *mut leveldb_t
 }
 
+#[allow(missing_docs)]
 impl Drop for RawDB {
   fn drop(&mut self) {
     unsafe {
@@ -31,10 +32,12 @@ impl Drop for RawDB {
   }
 }
 
+#[allow(missing_docs)]
 struct RawComparator {
   ptr: *mut leveldb_comparator_t
 }
 
+#[allow(missing_docs)]
 impl Drop for RawComparator {
   fn drop(&mut self) {
     unsafe {
@@ -43,6 +46,17 @@ impl Drop for RawComparator {
   }
 }
 
+/// The main database object.
+///
+/// leveldb databases are based on ordered keys, the `Database` struct
+/// requires the `Key` `K` also to be `Ord`. Additionally, a `Comparator`
+/// can be supplied, which allows to implement custom comparison logic.
+///
+/// When re-opening a database, you should use the same key type `K` and
+/// comparator type `C`.
+///
+/// Multiple Database objects can be kept around, as leveldb synchronises
+/// internally.
 pub struct Database<K: Key + Ord, C> {
   database: RawDB,
   // this holds a reference passed into leveldb
@@ -60,6 +74,12 @@ impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
     Database { database: RawDB { ptr: database }, comparator: raw_comp }
   }
 
+  /// Open a new database
+  ///
+  /// If the database is missing, the behaviour depends on `options.create_if_missing`.
+  /// The database will be created using the settings given in `options`.
+  ///
+  /// A comparator can be passed, which must be able to compare the key object.
   pub fn open(name: Path, options: Options, comparator: Option<C>) -> Result<Database<K, C>,Error> {
     let mut error = ptr::null();
     let comp_ptr = match comparator {
@@ -82,6 +102,14 @@ impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
     }
   }
 
+  // put a binary value into the database.
+  //
+  // If the key is already present in the database, it will be overwritten.
+  //
+  // The passed key will be compared using the comparator.
+  //
+  // The database will be synced to disc if `options.sync == true`. This is
+  // NOT the default.
   pub fn put(&mut self,
              options: WriteOptions,
              key: K,
@@ -108,6 +136,12 @@ impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
     }
   }
 
+  // delete a value from the database.
+  //
+  // The passed key will be compared using the comparator.
+  //
+  // The database will be synced to disc if `options.sync == true`. This is
+  // NOT the default.
   pub fn delete(&mut self,
                 options: WriteOptions,
                 key: K) -> Result<(), Error> {
@@ -130,6 +164,9 @@ impl<K: Key + Ord, C: Comparator<K>> Database<K, C> {
     }
   }
 
+  // get a value from the database.
+  //
+  // The passed key will be compared using the comparator.
   pub fn get(&self,
              options: ReadOptions,
              key: K) -> Result<Option<Vec<u8>>, Error> {

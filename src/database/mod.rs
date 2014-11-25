@@ -8,10 +8,7 @@ use self::options::{Options,WriteOptions,ReadOptions,c_options,c_writeoptions,c_
 use self::error::Error;
 
 use std::ptr;
-use std::vec::raw::*;
 use libc::{c_char,size_t};
-use std::slice::*;
-use std::string;
 use comparator::{Comparator,create_comparator};
 use self::db_key::Key;
 
@@ -95,7 +92,7 @@ impl<K: Key> Database<K> {
     if error == ptr::null() {
       Ok(Database::new(res, None))
     } else {
-      Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
+      Err(Error::new(unsafe { String::from_raw_buf(error as *const u8) }))
     }
   }
 
@@ -122,7 +119,7 @@ impl<K: Key> Database<K> {
     if error == ptr::null() {
       Ok(Database::new(res, Some(comp_ptr)))
     } else {
-      Err(Error::new(unsafe { string::raw::from_buf(error as *const u8) }))
+      Err(Error::new(unsafe { String::from_raw_buf(error as *const u8) }))
     }
   }
 
@@ -154,7 +151,7 @@ impl<K: Key> Database<K> {
         if error == ptr::null() {
           Ok(())
         } else {
-          Err(Error::new(string::raw::from_buf(error as *const u8)))
+          Err(Error::new(String::from_raw_buf(error as *const u8)))
         }
       })
     }
@@ -182,7 +179,7 @@ impl<K: Key> Database<K> {
         if error == ptr::null() {
           Ok(())
         } else {
-          Err(Error::new(string::raw::from_buf(error as *const u8)))
+          Err(Error::new(String::from_raw_buf(error as *const u8)))
         }
       })
     }
@@ -211,11 +208,11 @@ impl<K: Key> Database<K> {
           if result == ptr::null() {
             Ok(None)
           } else {
-            let vec: Vec<u8> = from_buf(result, length as uint);
+            let vec: Vec<u8> = Vec::from_raw_buf(result, length as uint);
             Ok(Some(vec))
           }
         } else {
-          Err(Error::new(string::raw::from_buf(error as *const u8)))
+          Err(Error::new(String::from_raw_buf(error as *const u8)))
         }
       })
     }

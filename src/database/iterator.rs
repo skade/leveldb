@@ -5,7 +5,6 @@
 use cbits::leveldb::{leveldb_iterator_t,leveldb_iter_seek_to_first,leveldb_iter_destroy,leveldb_iter_seek_to_last,
 leveldb_create_iterator,leveldb_iter_valid,leveldb_iter_next,leveldb_iter_key,leveldb_iter_value,leveldb_readoptions_destroy};
 use libc::{size_t};
-use std::vec::raw::from_buf;
 use std::iter;
 use super::Database;
 use super::options::{ReadOptions,c_readoptions};
@@ -127,7 +126,7 @@ trait ValueAccess<V> : LevelDBIterator {
       let length: size_t = 0;
       let value = leveldb_iter_value(self.raw_iterator(),
                                      &length) as *const u8;
-      let vec = from_buf(value, length as uint);
+      let vec = Vec::from_raw_buf(value, length as uint);
       self.convert_value(vec)
     }
   }
@@ -142,7 +141,7 @@ trait KeyAccess<K: Key> : LevelDBIterator {
       let length: size_t = 0;
       let value = leveldb_iter_key(self.raw_iterator(),
                                    &length) as *const u8;
-      from_u8(from_buf(value, length as uint).as_slice())
+      from_u8(Vec::from_raw_buf(value, length as uint).as_slice())
     }
   }
 }

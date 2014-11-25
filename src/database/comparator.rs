@@ -36,18 +36,16 @@ extern "C" fn compare<K: Key, T: Comparator<K>>(state: *mut libc::c_void,
                                      a: *const u8, a_len: size_t,
                                      b: *const u8, b_len: size_t) -> i32 {
      unsafe {
-         slice::raw::buf_as_slice(a, a_len as uint, |a_slice| {
-              slice::raw::buf_as_slice(b, b_len as uint, |b_slice| {
-                   let x: &T = &*(state as *mut T);
-                   let a_key = from_u8::<K>(a_slice);
-                   let b_key = from_u8::<K>(b_slice);
-                   match x.compare(&a_key, &b_key) {
-                       Less => -1,
-                       Equal => 0,
-                       Greater => 1
-                   }
-              })
-         })
+          let a_slice = slice::from_raw_buf(&a, a_len as uint);
+          let b_slice = slice::from_raw_buf(&b, b_len as uint);
+          let x: &T = &*(state as *mut T);
+          let a_key = from_u8::<K>(a_slice);
+          let b_key = from_u8::<K>(b_slice);
+          match x.compare(&a_key, &b_key) {
+              Less => -1,
+              Equal => 0,
+              Greater => 1
+          }
      }
 }
 

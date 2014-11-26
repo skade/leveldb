@@ -2,7 +2,7 @@
 
 name = "leveldb"
 version = "0.2.0"
-authors = [ "florian.gilcher@asquera.de" ]
+authors = [ "Florian Gilcher <florian.gilcher@asquera.de>" ]
 
 description = "An interface for leveldb"
 

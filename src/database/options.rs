@@ -23,6 +23,7 @@ use libc::{size_t};
 ///
 /// For more detailed explanations, consider the
 /// [leveldb documentation](https://github.com/google/leveldb/tree/master/doc)
+#[deriving(Copy)]
 pub struct Options {
   /// create the database if missing
   ///
@@ -76,6 +77,7 @@ impl Options {
 }
 
 /// The write options to use for a write operation.
+#[deriving(Copy)]
 pub struct WriteOptions {
   /// `fsync` before acknowledging a write operation.
   ///
@@ -91,6 +93,7 @@ impl WriteOptions {
 }
 
 /// The read options to use for any read operation.
+#[deriving(Copy)]
 pub struct ReadOptions {
   /// Whether to verify the saved checksums on read.
   ///

@@ -25,6 +25,7 @@ pub trait Comparator<K: Key> {
 }
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`
+#[deriving(Copy)]
 pub struct OrdComparator;
 
 extern "C" fn name<K: Key, T: Comparator<K>>(state: *mut libc::c_void) -> *const u8 {

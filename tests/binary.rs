@@ -47,7 +47,7 @@ fn test_get_from_filled_database() {
                          1);
   match res {
     Ok(data) => {
-      assert!(data.is_some())
+      assert!(data.is_some());
       let data = data.unwrap();
       assert_eq!(data, vec!(1));
     },

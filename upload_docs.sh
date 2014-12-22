@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Make a new repo for the gh-pages branch
 rm -rf .gh-pages
 mkdir .gh-pages

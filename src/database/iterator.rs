@@ -69,7 +69,7 @@ pub trait Iterable<K: Key> {
   fn value_iter(&self, options: ReadOptions) -> ValueIterator<K>;
 }
 
-impl<K: Key + Ord> Iterable<K> for Database<K> {
+impl<K: Key> Iterable<K> for Database<K> {
   fn iter(&self, options: ReadOptions) -> Iterator<K> {
     Iterator::new(self, options)
   }

@@ -4,7 +4,7 @@ use leveldb::options::{ReadOptions,WriteOptions};
 #[test]
 fn test_write_to_database() {
   let tmp = tmpdir("testdbs");
-  let mut database = open_database(tmp.path().join("write"), true);
+  let database = open_database(tmp.path().join("write"), true);
   let write_opts = WriteOptions::new();
   let result = database.put(write_opts,
                             1,

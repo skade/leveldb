@@ -11,7 +11,8 @@ use cbits::leveldb::{leveldb_options_create,leveldb_writeoptions_create,leveldb_
                      leveldb_options_set_write_buffer_size,leveldb_options_set_block_size,
                      leveldb_options_set_max_open_files,leveldb_options_set_block_restart_interval,
                      leveldb_options_set_comparator,leveldb_writeoptions_set_sync,
-                     leveldb_readoptions_set_verify_checksums,leveldb_readoptions_set_fill_cache,
+                     leveldb_readoptions_set_verify_checksums,leveldb_readoptions_set_fill_cache, leveldb_readoptions_set_snapshot,
+                     leveldb_snapshot_t,
                      Compression};
 
 use libc::{size_t};
@@ -93,7 +94,7 @@ impl WriteOptions {
 }
 
 /// The read options to use for any read operation.
-#[deriving(Copy)]
+#[allow(missing_copy_implementations)]
 pub struct ReadOptions {
   /// Whether to verify the saved checksums on read.
   ///
@@ -104,14 +105,21 @@ pub struct ReadOptions {
   ///
   /// default: true
   pub fill_cache: bool,
-  // TODO: Snapshotting
+  /// An optional snapshot to base this operation on.
+  ///
+  /// Consider using the `Snapshot` trait instead of setting
+  /// this yourself.
+  ///
+  /// default: None
+  pub snapshot: Option<*mut leveldb_snapshot_t>
 }
 
 impl ReadOptions {
   /// Return a `ReadOptions` struct with the default values.
   pub fn new() -> ReadOptions {
     ReadOptions { verify_checksums: false,
-                  fill_cache: true }
+                  fill_cache: true,
+                  snapshot: None }
   }
 }
 
@@ -148,10 +156,14 @@ pub unsafe fn c_writeoptions(options: WriteOptions) -> *mut leveldb_writeoptions
 }
 
 #[allow(missing_docs)]
-pub unsafe fn c_readoptions(options: ReadOptions) -> *mut leveldb_readoptions_t {
+pub unsafe fn c_readoptions(options: &ReadOptions) -> *mut leveldb_readoptions_t {
   let c_readoptions = leveldb_readoptions_create();
   leveldb_readoptions_set_verify_checksums(c_readoptions, options.verify_checksums as i8);
   leveldb_readoptions_set_fill_cache(c_readoptions, options.fill_cache as i8);
+
+  if let Some(snapshot) = options.snapshot {
+    leveldb_readoptions_set_snapshot(c_readoptions, snapshot);
+  }
   c_readoptions
 }
 

@@ -44,11 +44,31 @@
 extern crate serialize;
 extern crate libc;
 
+use cbits::leveldb::{leveldb_major_version,leveldb_minor_version};
 pub use database::options as options;
 pub use database::error as error;
 pub use database::iterator as iterator;
+pub use database::snapshots as snapshots;
 pub use database::comparator as comparator;
 
 #[allow(missing_docs)]
 pub mod cbits;
 pub mod database;
+
+/// Library version information
+///
+/// Need a recent version of leveldb to be used.
+#[deriving(Copy)]
+pub struct Version;
+
+impl Version {
+    /// The major version.
+    pub fn major(&self) -> int {
+        unsafe { leveldb_major_version() as int }
+    }
+
+    /// The minor version
+    pub fn minor(&self) -> int {
+        unsafe { leveldb_minor_version() as int }
+    }
+}

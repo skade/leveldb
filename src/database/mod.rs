@@ -16,6 +16,7 @@ pub mod options;
 pub mod error;
 pub mod iterator;
 pub mod comparator;
+pub mod snapshots;
 
 #[allow(missing_docs)]
 struct RawDB {
@@ -131,7 +132,7 @@ impl<K: Key> Database<K> {
   ///
   /// The database will be synced to disc if `options.sync == true`. This is
   /// NOT the default.
-  pub fn put(&mut self,
+  pub fn put(&self,
              options: WriteOptions,
              key: K,
              value: &[u8]) -> Result<(), Error> {
@@ -163,7 +164,7 @@ impl<K: Key> Database<K> {
   ///
   /// The database will be synced to disc if `options.sync == true`. This is
   /// NOT the default.
-  pub fn delete(&mut self,
+  pub fn delete(&self,
                 options: WriteOptions,
                 key: K) -> Result<(), Error> {
     unsafe {
@@ -195,7 +196,7 @@ impl<K: Key> Database<K> {
       key.as_slice(|k| {
         let mut error = ptr::null();
         let length: size_t = 0;
-        let c_readoptions = c_readoptions(options);
+        let c_readoptions = c_readoptions(&options);
         let result = leveldb_get(self.database.ptr,
                                  c_readoptions,
                                  k.as_ptr() as *mut c_char,

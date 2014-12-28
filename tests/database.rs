@@ -1,7 +1,3 @@
-extern crate db_key;
-extern crate leveldb;
-extern crate serialize;
-
 use utils::{tmpdir};
 use leveldb::database::{Database};
 use leveldb::options::{Options};

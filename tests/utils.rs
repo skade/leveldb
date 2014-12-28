@@ -17,7 +17,7 @@ pub fn tmpdir(name: &str) -> TempDir {
            .unwrap()
 }
 
-pub fn db_put_simple<K: Key + Ord>(database: &mut Database<K>, key: K, val: &[u8]) {
+pub fn db_put_simple<K: Key + Ord>(database: &Database<K>, key: K, val: &[u8]) {
   let write_opts = WriteOptions::new();
   match database.put(write_opts, key, val) {
     Ok(_) => { () },

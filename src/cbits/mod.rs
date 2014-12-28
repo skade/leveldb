@@ -165,5 +165,12 @@ pub mod leveldb {
                                      name: name_fn) -> *mut leveldb_comparator_t;
     pub fn leveldb_comparator_destroy(comparator: *mut leveldb_comparator_t);
     pub fn leveldb_free(ptr: *mut c_void);
+
+    // snapshots
+    pub fn leveldb_create_snapshot(database: *mut leveldb_t) -> *mut leveldb_snapshot_t;
+    pub fn leveldb_release_snapshot(database: *mut leveldb_t, snapshot: *mut leveldb_snapshot_t);
+
+    pub fn leveldb_major_version() -> c_int;
+    pub fn leveldb_minor_version() -> c_int;
   }
 }

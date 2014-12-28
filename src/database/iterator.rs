@@ -154,7 +154,7 @@ impl<'a, K: Key> Iterator<'a, K> {
   fn new(database: &'a Database<K>,
          options: ReadOptions) -> Iterator<'a,K> {
     unsafe {
-      let c_readoptions = c_readoptions(options);
+      let c_readoptions = c_readoptions(&options);
       let ptr = leveldb_create_iterator(database.database.ptr,
                                         c_readoptions);
       leveldb_readoptions_destroy(c_readoptions);
@@ -193,7 +193,7 @@ impl<'a,K: Key> KeyIterator<'a,K> {
   fn new(database: &'a Database<K>,
          options: ReadOptions) -> KeyIterator<K> {
     unsafe {
-      let c_readoptions = c_readoptions(options);
+      let c_readoptions = c_readoptions(&options);
       let ptr = leveldb_create_iterator(database.database.ptr,
                                         c_readoptions);
       leveldb_readoptions_destroy(c_readoptions);
@@ -232,7 +232,7 @@ impl<'a,K: Key> ValueIterator<'a,K> {
   fn new(database: &'a Database<K>,
          options: ReadOptions) -> ValueIterator<K> {
     unsafe {
-      let c_readoptions = c_readoptions(options);
+      let c_readoptions = c_readoptions(&options);
       let ptr = leveldb_create_iterator(database.database.ptr,
                                         c_readoptions);
       leveldb_readoptions_destroy(c_readoptions);

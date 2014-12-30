@@ -3,6 +3,8 @@
 extern crate db_key;
 
 use cbits::leveldb::*;
+use libc::{c_void};
+use libc::funcs::c95::stdlib::{free};
 
 use self::options::{Options,WriteOptions,ReadOptions,c_options,c_writeoptions,c_readoptions};
 use self::error::Error;
@@ -93,7 +95,7 @@ impl<K: Key> Database<K> {
     if error == ptr::null() {
       Ok(Database::new(res, None))
     } else {
-      Err(Error::new(unsafe { String::from_raw_buf(error as *const u8) }))
+      Err(to_error(error))
     }
   }
 
@@ -120,7 +122,7 @@ impl<K: Key> Database<K> {
     if error == ptr::null() {
       Ok(Database::new(res, Some(comp_ptr)))
     } else {
-      Err(Error::new(unsafe { String::from_raw_buf(error as *const u8) }))
+      Err(to_error(error))
     }
   }
 
@@ -152,7 +154,7 @@ impl<K: Key> Database<K> {
         if error == ptr::null() {
           Ok(())
         } else {
-          Err(Error::new(String::from_raw_buf(error as *const u8)))
+          Err(to_error(error))
         }
       })
     }
@@ -180,7 +182,7 @@ impl<K: Key> Database<K> {
         if error == ptr::null() {
           Ok(())
         } else {
-          Err(Error::new(String::from_raw_buf(error as *const u8)))
+          Err(to_error(error))
         }
       })
     }
@@ -213,9 +215,15 @@ impl<K: Key> Database<K> {
             Ok(Some(vec))
           }
         } else {
-          Err(Error::new(String::from_raw_buf(error as *const u8)))
+          Err(to_error(error))
         }
       })
     }
   }
+}
+
+fn to_error(leveldb_error: *const i8) -> Error {
+  let err_string = unsafe { String::from_raw_buf(leveldb_error as *const u8)};
+  unsafe { free(leveldb_error as *mut c_void) };
+  Error::new(err_string)
 }

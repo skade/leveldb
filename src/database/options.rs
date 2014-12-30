@@ -12,10 +12,11 @@ use cbits::leveldb::{leveldb_options_create,leveldb_writeoptions_create,leveldb_
                      leveldb_options_set_max_open_files,leveldb_options_set_block_restart_interval,
                      leveldb_options_set_comparator,leveldb_writeoptions_set_sync,
                      leveldb_readoptions_set_verify_checksums,leveldb_readoptions_set_fill_cache, leveldb_readoptions_set_snapshot,
-                     leveldb_snapshot_t,
                      Compression};
 
 use libc::{size_t};
+use database::snapshots::{Snapshot};
+use database::db_key::{Key};
 
 /// Options to consider when opening a new or pre-existing database.
 ///
@@ -95,7 +96,7 @@ impl WriteOptions {
 
 /// The read options to use for any read operation.
 #[allow(missing_copy_implementations)]
-pub struct ReadOptions {
+pub struct ReadOptions<'a, K: Key> {
   /// Whether to verify the saved checksums on read.
   ///
   /// default: false
@@ -111,12 +112,12 @@ pub struct ReadOptions {
   /// this yourself.
   ///
   /// default: None
-  pub snapshot: Option<*mut leveldb_snapshot_t>
+  pub snapshot: Option<&'a Snapshot<'a, K>>
 }
 
-impl ReadOptions {
+impl<'a, K: Key> ReadOptions<'a, K> {
   /// Return a `ReadOptions` struct with the default values.
-  pub fn new() -> ReadOptions {
+  pub fn new() -> ReadOptions<'a, K> {
     ReadOptions { verify_checksums: false,
                   fill_cache: true,
                   snapshot: None }
@@ -156,13 +157,13 @@ pub unsafe fn c_writeoptions(options: WriteOptions) -> *mut leveldb_writeoptions
 }
 
 #[allow(missing_docs)]
-pub unsafe fn c_readoptions(options: &ReadOptions) -> *mut leveldb_readoptions_t {
+pub unsafe fn c_readoptions<'a, K: Key>(options: &ReadOptions<'a, K>) -> *mut leveldb_readoptions_t {
   let c_readoptions = leveldb_readoptions_create();
   leveldb_readoptions_set_verify_checksums(c_readoptions, options.verify_checksums as i8);
   leveldb_readoptions_set_fill_cache(c_readoptions, options.fill_cache as i8);
 
-  if let Some(snapshot) = options.snapshot {
-    leveldb_readoptions_set_snapshot(c_readoptions, snapshot);
+  if let Some(ref snapshot) = options.snapshot {
+    leveldb_readoptions_set_snapshot(c_readoptions, snapshot.raw_ptr());
   }
   c_readoptions
 }

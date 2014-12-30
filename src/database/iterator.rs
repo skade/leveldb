@@ -60,25 +60,25 @@ pub struct ValueIterator<'a,K: Key> {
 
 
 /// A trait to allow access to the three main iteration styles of leveldb.
-pub trait Iterable<K: Key> {
+pub trait Iterable<'a, K: Key> {
   /// Return an Iterator iterating over (Key,Value) pairs
-  fn iter(&self, options: ReadOptions) -> Iterator<K>;
+  fn iter(&'a self, options: ReadOptions<'a,K>) -> Iterator<K>;
   /// Returns an Iterator iterating over Keys only.
-  fn keys_iter(&self, options: ReadOptions) -> KeyIterator<K>;
+  fn keys_iter(&'a self, options: ReadOptions<'a,K>) -> KeyIterator<K>;
   /// Returns an Iterator iterating over Values only.
-  fn value_iter(&self, options: ReadOptions) -> ValueIterator<K>;
+  fn value_iter(&'a self, options: ReadOptions<'a,K>) -> ValueIterator<K>;
 }
 
-impl<K: Key> Iterable<K> for Database<K> {
-  fn iter(&self, options: ReadOptions) -> Iterator<K> {
+impl<'a, K: Key> Iterable<'a, K> for Database<K> {
+  fn iter(&'a self, options: ReadOptions<'a,K>) -> Iterator<K> {
     Iterator::new(self, options)
   }
 
-  fn keys_iter(&self, options: ReadOptions) -> KeyIterator<K> {
+  fn keys_iter(&'a self, options: ReadOptions<'a,K>) -> KeyIterator<K> {
     KeyIterator::new(self, options)
   }
 
-  fn value_iter(&self, options: ReadOptions) -> ValueIterator<K> {
+  fn value_iter(&'a self, options: ReadOptions<'a,K>) -> ValueIterator<K> {
     ValueIterator::new(self, options)
   }
 }
@@ -152,7 +152,7 @@ pub trait LevelDBIteratorExt<K: Key> : LevelDBIterator<K> {
 
 impl<'a, K: Key> Iterator<'a, K> {
   fn new(database: &'a Database<K>,
-         options: ReadOptions) -> Iterator<'a,K> {
+         options: ReadOptions<'a,K>) -> Iterator<'a,K> {
     unsafe {
       let c_readoptions = c_readoptions(&options);
       let ptr = leveldb_create_iterator(database.database.ptr,
@@ -191,7 +191,7 @@ impl<'a, K: Key> LevelDBIteratorExt<K> for Iterator<'a,K> { }
 
 impl<'a,K: Key> KeyIterator<'a,K> {
   fn new(database: &'a Database<K>,
-         options: ReadOptions) -> KeyIterator<K> {
+         options: ReadOptions<'a, K>) -> KeyIterator<'a, K> {
     unsafe {
       let c_readoptions = c_readoptions(&options);
       let ptr = leveldb_create_iterator(database.database.ptr,
@@ -230,7 +230,7 @@ impl<'a, K: Key> LevelDBIteratorExt<K> for KeyIterator<'a,K> { }
 
 impl<'a,K: Key> ValueIterator<'a,K> {
   fn new(database: &'a Database<K>,
-         options: ReadOptions) -> ValueIterator<K> {
+         options: ReadOptions<'a, K>) -> ValueIterator<'a, K> {
     unsafe {
       let c_readoptions = c_readoptions(&options);
       let ptr = leveldb_create_iterator(database.database.ptr,

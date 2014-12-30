@@ -189,8 +189,8 @@ impl<K: Key> Database<K> {
   /// get a value from the database.
   ///
   /// The passed key will be compared using the comparator.
-  pub fn get(&self,
-             options: ReadOptions,
+  pub fn get<'a>(&self,
+             options: ReadOptions<'a,K>,
              key: K) -> Result<Option<Vec<u8>>, Error> {
     unsafe {
       key.as_slice(|k| {

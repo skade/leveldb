@@ -170,6 +170,10 @@ pub mod leveldb {
     pub fn leveldb_create_snapshot(database: *mut leveldb_t) -> *mut leveldb_snapshot_t;
     pub fn leveldb_release_snapshot(database: *mut leveldb_t, snapshot: *mut leveldb_snapshot_t);
 
+    // caches
+    pub fn leveldb_cache_create_lru(capacity: size_t) -> *mut leveldb_cache_t;
+    pub fn leveldb_cache_destroy(cache: *mut leveldb_cache_t);
+
     pub fn leveldb_major_version() -> c_int;
     pub fn leveldb_minor_version() -> c_int;
   }

@@ -19,6 +19,7 @@ pub mod error;
 pub mod iterator;
 pub mod comparator;
 pub mod snapshots;
+pub mod cache;
 
 #[allow(missing_docs)]
 struct RawDB {
@@ -39,7 +40,6 @@ struct RawComparator {
   ptr: *mut leveldb_comparator_t
 }
 
-#[allow(missing_docs)]
 impl Drop for RawComparator {
   fn drop(&mut self) {
     unsafe {
@@ -66,15 +66,19 @@ pub struct Database<K: Key> {
   // it is never read from Rust, but must be kept around
   #[allow(dead_code)]
   comparator: Option<RawComparator>,
+  // these hold multiple references that are used by the leveldb library
+  // and should survive as long as the database lives
+  #[allow(dead_code)]
+  options: Options
 }
 
 impl<K: Key> Database<K> {
-  fn new(database: *mut leveldb_t, comparator: Option<*mut leveldb_comparator_t>) -> Database<K> {
+  fn new(database: *mut leveldb_t, options: Options, comparator: Option<*mut leveldb_comparator_t>) -> Database<K> {
     let raw_comp = match comparator {
       Some(p) => Some(RawComparator { ptr: p }),
       None => None
     };
-    Database { database: RawDB { ptr: database }, comparator: raw_comp }
+    Database { database: RawDB { ptr: database }, comparator: raw_comp, options: options }
   }
 
   /// Open a new database
@@ -85,7 +89,7 @@ impl<K: Key> Database<K> {
     let mut error = ptr::null();
     let res = name.with_c_str(|c_string| {
       unsafe {
-        let c_options = c_options(options, None);
+        let c_options = c_options(&options, None);
         let db = leveldb_open(c_options as *const leveldb_options_t, c_string, &mut error);
         leveldb_options_destroy(c_options);
         db
@@ -93,7 +97,7 @@ impl<K: Key> Database<K> {
     });
 
     if error == ptr::null() {
-      Ok(Database::new(res, None))
+      Ok(Database::new(res, options, None))
     } else {
       Err(to_error(error))
     }
@@ -112,7 +116,7 @@ impl<K: Key> Database<K> {
     let comp_ptr = create_comparator(box comparator);
     let res = name.with_c_str(|c_string| {
       unsafe {
-        let c_options = c_options(options, Some(comp_ptr));
+        let c_options = c_options(&options, Some(comp_ptr));
         let db = leveldb_open(c_options as *const leveldb_options_t, c_string, &mut error);
         leveldb_options_destroy(c_options);
         db
@@ -120,7 +124,7 @@ impl<K: Key> Database<K> {
     });
 
     if error == ptr::null() {
-      Ok(Database::new(res, Some(comp_ptr)))
+      Ok(Database::new(res, options, Some(comp_ptr)))
     } else {
       Err(to_error(error))
     }

@@ -8,3 +8,4 @@ mod comparator;
 mod binary;
 mod iterator;
 mod snapshots;
+mod cache;

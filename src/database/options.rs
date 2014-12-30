@@ -10,13 +10,14 @@ use cbits::leveldb::{leveldb_options_create,leveldb_writeoptions_create,leveldb_
                      leveldb_options_set_error_if_exists,leveldb_options_set_paranoid_checks,
                      leveldb_options_set_write_buffer_size,leveldb_options_set_block_size,
                      leveldb_options_set_max_open_files,leveldb_options_set_block_restart_interval,
-                     leveldb_options_set_comparator,leveldb_writeoptions_set_sync,
+                     leveldb_options_set_comparator,leveldb_options_set_cache,leveldb_writeoptions_set_sync,
                      leveldb_readoptions_set_verify_checksums,leveldb_readoptions_set_fill_cache, leveldb_readoptions_set_snapshot,
                      Compression};
 
 use libc::{size_t};
 use database::snapshots::{Snapshot};
 use database::db_key::{Key};
+use database::cache::{Cache};
 
 /// Options to consider when opening a new or pre-existing database.
 ///
@@ -25,7 +26,6 @@ use database::db_key::{Key};
 ///
 /// For more detailed explanations, consider the
 /// [leveldb documentation](https://github.com/google/leveldb/tree/master/doc)
-#[deriving(Copy)]
 pub struct Options {
   /// create the database if missing
   ///
@@ -60,6 +60,10 @@ pub struct Options {
   ///
   /// default: Compression::No
   pub compression: Compression,
+  /// A cache to use during read operations.
+  ///
+  /// default: None
+  pub cache: Option<Cache>,
 }
 
 impl Options {
@@ -73,7 +77,8 @@ impl Options {
       max_open_files: None,
       block_size: None,
       block_restart_interval: None,
-      compression: Compression::No
+      compression: Compression::No,
+      cache: None
     }
   }
 }
@@ -125,26 +130,29 @@ impl<'a, K: Key> ReadOptions<'a, K> {
 }
 
 #[allow(missing_docs)]
-pub unsafe fn c_options(options: Options, comparator: Option<*mut leveldb_comparator_t>) -> *mut leveldb_options_t {
+pub unsafe fn c_options(options: &Options, comparator: Option<*mut leveldb_comparator_t>) -> *mut leveldb_options_t {
   let c_options = leveldb_options_create();
   leveldb_options_set_create_if_missing(c_options, options.create_if_missing as i8);
   leveldb_options_set_error_if_exists(c_options, options.error_if_exists as i8);
   leveldb_options_set_paranoid_checks(c_options, options.paranoid_checks as i8);
-  if options.write_buffer_size.is_some() {
-    leveldb_options_set_write_buffer_size(c_options, options.write_buffer_size.unwrap());
+  if let Some(wbs) = options.write_buffer_size {
+    leveldb_options_set_write_buffer_size(c_options, wbs);
   }
-  if options.max_open_files.is_some() {
-    leveldb_options_set_max_open_files(c_options, options.max_open_files.unwrap());
+  if let Some(mf) = options.max_open_files {
+    leveldb_options_set_max_open_files(c_options, mf);
   }
-  if options.block_size.is_some() {
-    leveldb_options_set_block_size(c_options, options.block_size.unwrap());
+  if let Some(bs) = options.block_size {
+    leveldb_options_set_block_size(c_options, bs);
   }
-  if options.block_restart_interval.is_some() {
-    leveldb_options_set_block_restart_interval(c_options, options.block_restart_interval.unwrap());
+  if let Some(bi) = options.block_restart_interval {
+    leveldb_options_set_block_restart_interval(c_options, bi);
   }
   leveldb_options_set_compression(c_options, options.compression);
-  if comparator.is_some() {
-    leveldb_options_set_comparator(c_options, comparator.unwrap());
+  if let Some(c) = comparator {
+    leveldb_options_set_comparator(c_options, c);
+  }
+  if let Some(ref cache) = options.cache {
+    leveldb_options_set_cache(c_options, cache.raw_ptr());
   }
   c_options
 }

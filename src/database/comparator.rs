@@ -9,6 +9,7 @@ use libc::{size_t,c_void};
 use libc;
 use std::mem;
 use std::slice;
+use std::cmp::Ordering;
 use database::db_key::Key;
 use database::db_key::from_u8;
 
@@ -25,7 +26,7 @@ pub trait Comparator<K: Key> {
 }
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct OrdComparator;
 
 extern "C" fn name<K: Key, T: Comparator<K>>(state: *mut libc::c_void) -> *const u8 {
@@ -43,9 +44,9 @@ extern "C" fn compare<K: Key, T: Comparator<K>>(state: *mut libc::c_void,
           let a_key = from_u8::<K>(a_slice);
           let b_key = from_u8::<K>(b_slice);
           match x.compare(&a_key, &b_key) {
-              Less => -1,
-              Equal => 0,
-              Greater => 1
+              Ordering::Less => -1,
+              Ordering::Equal => 0,
+              Ordering::Greater => 1
           }
      }
 }

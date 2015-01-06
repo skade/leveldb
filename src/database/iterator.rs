@@ -267,7 +267,9 @@ impl<'a,K: Key> LevelDBIterator<K> for ValueIterator<'a,K> {
 
 impl<'a, K: Key> LevelDBIteratorExt<K> for ValueIterator<'a,K> { }
 
-impl<'a,K: Key> iter::Iterator<(K,Vec<u8>)> for Iterator<'a,K> {
+impl<'a,K: Key> iter::Iterator for Iterator<'a,K> {
+  type Item = (K,Vec<u8>);
+
   fn next(&mut self) -> Option<(K,Vec<u8>)> {
     if self.advance() {
       Some((self.key(), self.value()))
@@ -277,7 +279,9 @@ impl<'a,K: Key> iter::Iterator<(K,Vec<u8>)> for Iterator<'a,K> {
   }
 }
 
-impl<'a, K: Key> iter::Iterator<K> for KeyIterator<'a,K> {
+impl<'a, K: Key> iter::Iterator for KeyIterator<'a,K> {
+  type Item = K;
+
   fn next(&mut self) -> Option<K> {
     if self.advance() {
       Some(self.key())
@@ -287,7 +291,9 @@ impl<'a, K: Key> iter::Iterator<K> for KeyIterator<'a,K> {
   }
 }
 
-impl<'a, K: Key> iter::Iterator<Vec<u8>> for ValueIterator<'a,K> {
+impl<'a, K: Key> iter::Iterator for ValueIterator<'a,K> {
+  type Item = Vec<u8>;
+
   fn next(&mut self) -> Option<Vec<u8>> {
     if self.advance() {
       Some(self.value())

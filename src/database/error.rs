@@ -2,7 +2,7 @@
 
 /// A leveldb error, just containing the error string
 /// provided by leveldb.
-#[deriving(Show)]
+#[derive(Show)]
 pub struct Error {
   message: String
 }

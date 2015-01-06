@@ -37,7 +37,6 @@
  
 #![crate_type = "lib"]
 #![crate_name = "leveldb"]
-#![feature(globs)]
 #![deny(warnings)]
 #![deny(missing_docs)]
 
@@ -58,7 +57,7 @@ pub mod database;
 /// Library version information
 ///
 /// Need a recent version of leveldb to be used.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Version;
 
 impl Version {

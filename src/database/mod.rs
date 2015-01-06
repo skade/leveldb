@@ -8,6 +8,7 @@ use libc::funcs::c95::stdlib::{free};
 
 use self::options::{Options,WriteOptions,ReadOptions,c_options,c_writeoptions,c_readoptions};
 use self::error::Error;
+use std::ffi::CString;
 
 use std::ptr;
 use libc::{c_char,size_t};
@@ -87,14 +88,13 @@ impl<K: Key> Database<K> {
   /// The database will be created using the settings given in `options`.
   pub fn open(name: Path, options: Options) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
-    let res = name.with_c_str(|c_string| {
-      unsafe {
-        let c_options = c_options(&options, None);
-        let db = leveldb_open(c_options as *const leveldb_options_t, c_string, &mut error);
-        leveldb_options_destroy(c_options);
-        db
-      }
-    });
+    let res = unsafe {
+      let c_string = CString::from_vec(name.into_vec());
+      let c_options = c_options(&options, None);
+      let db = leveldb_open(c_options as *const leveldb_options_t, c_string.as_slice_with_nul().as_ptr(), &mut error);
+      leveldb_options_destroy(c_options);
+      db
+    };
 
     if error == ptr::null() {
       Ok(Database::new(res, options, None))
@@ -114,14 +114,13 @@ impl<K: Key> Database<K> {
   pub fn open_with_comparator<C: Comparator<K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
     let comp_ptr = create_comparator(box comparator);
-    let res = name.with_c_str(|c_string| {
-      unsafe {
-        let c_options = c_options(&options, Some(comp_ptr));
-        let db = leveldb_open(c_options as *const leveldb_options_t, c_string, &mut error);
-        leveldb_options_destroy(c_options);
-        db
-      }
-    });
+    let res = unsafe {
+      let c_string = CString::from_vec(name.into_vec());
+      let c_options = c_options(&options, Some(comp_ptr));
+      let db = leveldb_open(c_options as *const leveldb_options_t, c_string.as_slice_with_nul().as_ptr(), &mut error);
+      leveldb_options_destroy(c_options);
+      db
+    };
 
     if error == ptr::null() {
       Ok(Database::new(res, options, Some(comp_ptr)))
@@ -227,7 +226,10 @@ impl<K: Key> Database<K> {
 }
 
 fn to_error(leveldb_error: *const i8) -> Error {
-  let err_string = unsafe { String::from_raw_buf(leveldb_error as *const u8)};
+  use std::str::from_utf8;
+  use std::ffi::c_str_to_bytes;
+
+  let err_string = unsafe { from_utf8(c_str_to_bytes(&leveldb_error)).to_string() };
   unsafe { free(leveldb_error as *mut c_void) };
   Error::new(err_string)
 }

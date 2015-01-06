@@ -1,7 +1,7 @@
 [package]
 
 name = "leveldb"
-version = "0.3.1"
+version = "0.3.3"
 authors = [ "Florian Gilcher <florian.gilcher@asquera.de>" ]
 
 description = "An interface for leveldb"
@@ -15,7 +15,7 @@ name = "leveldb"
 
 [dependencies]
 
-db_key = "0.0.1"
+db_key = "0.0.3"
 
 [[test]]
 name = "tests"

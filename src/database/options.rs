@@ -4,15 +4,7 @@
 //! * `Options`: used when opening a database
 //! * `ReadOptions`: used when reading from leveldb
 //! * `WriteOptions`: used when writng to leveldb
-use cbits::leveldb::{leveldb_options_create,leveldb_writeoptions_create,leveldb_readoptions_create,
-                     leveldb_options_t,leveldb_writeoptions_t,leveldb_readoptions_t,leveldb_comparator_t,
-                     leveldb_options_set_compression,leveldb_options_set_create_if_missing,
-                     leveldb_options_set_error_if_exists,leveldb_options_set_paranoid_checks,
-                     leveldb_options_set_write_buffer_size,leveldb_options_set_block_size,
-                     leveldb_options_set_max_open_files,leveldb_options_set_block_restart_interval,
-                     leveldb_options_set_comparator,leveldb_options_set_cache,leveldb_writeoptions_set_sync,
-                     leveldb_readoptions_set_verify_checksums,leveldb_readoptions_set_fill_cache, leveldb_readoptions_set_snapshot,
-                     Compression};
+use cbits::leveldb::*;
 
 use libc::{size_t};
 use database::snapshots::{Snapshot};
@@ -84,7 +76,7 @@ impl Options {
 }
 
 /// The write options to use for a write operation.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct WriteOptions {
   /// `fsync` before acknowledging a write operation.
   ///

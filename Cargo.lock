@@ -1,6 +1,6 @@
 [root]
 name = "leveldb"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "db_key 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

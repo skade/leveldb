@@ -23,11 +23,18 @@ pub trait Comparator<K: Key> {
      fn name(&self) -> *const u8;
      /// compare two keys. This must implement a total ordering.
      fn compare(&self, a: &K, b: &K) -> Ordering;
+     /// whether the comparator is the `DefaultComparator`
+     fn null() -> bool {
+         false
+     }
 }
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`
 #[derive(Copy)]
 pub struct OrdComparator;
+/// DefaultComparator is the a stand in for "no comparator set"
+#[derive(Copy)]
+pub struct DefaultComparator;
 
 extern "C" fn name<K: Key, T: Comparator<K>>(state: *mut libc::c_void) -> *const u8 {
      let x: &T = unsafe { &*(state as *mut T) };
@@ -73,5 +80,19 @@ impl<K: Key + Ord> Comparator<K> for OrdComparator {
   
   fn compare(&self, a: &K, b: &K) -> Ordering {
     a.cmp(b)
+  }
+}
+
+impl<K: Key> Comparator<K> for DefaultComparator {
+  fn name(&self) -> *const u8 {
+    "default_comparator".as_ptr()
+  }
+  
+  fn compare(&self, _a: &K, _b: &K) -> Ordering {
+    Ordering::Equal
+  }
+
+  fn null() -> bool {
+    true
   }
 }

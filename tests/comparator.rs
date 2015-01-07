@@ -6,6 +6,7 @@ mod comparator {
   use leveldb::iterator::Iterable;
   use leveldb::options::{Options,ReadOptions};
   use leveldb::comparator::Comparator;
+  use std::cmp::Ordering;
   
   struct ReverseComparator<K>;
 

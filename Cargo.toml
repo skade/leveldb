@@ -15,7 +15,7 @@ name = "leveldb"
 
 [dependencies]
 
-db_key = "0.0.3"
+db_key = "0.0.4"
 
 [[test]]
 name = "tests"

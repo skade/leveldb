@@ -3,42 +3,45 @@
 //! Usage:
 //!
 //! ```rust
-//!  use std::io::TempDir;
-//!  use leveldb::database::Database;
-//!  use leveldb::options::{Options,WriteOptions,ReadOptions};
+//! #![allow(unstable)]
 //!
-//!  let tempdir = TempDir::new("demo").unwrap();
-//!  let path = tempdir.path().join("simple");
-//!  
-//!  let mut options = Options::new();
-//!  options.create_if_missing = true;
-//!  let mut database = match Database::open(path, options) {
-//!      Ok(db) => { db },
-//!      Err(e) => { panic!("failed to open database: {}", e) }
-//!  };
+//! use std::io::TempDir;
+//! use leveldb::database::Database;
+//! use leveldb::options::{Options,WriteOptions,ReadOptions};
 //!
-//!  let write_opts = WriteOptions::new();
-//!  match database.put(write_opts, 1, &[1]) {
-//!      Ok(_) => { () },
-//!      Err(e) => { panic!("failed to write to database: {}", e) }
-//!  };
+//! let tempdir = TempDir::new("demo").unwrap();
+//! let path = tempdir.path().join("simple");
+//! 
+//! let mut options = Options::new();
+//! options.create_if_missing = true;
+//! let mut database = match Database::open(path, options) {
+//!     Ok(db) => { db },
+//!     Err(e) => { panic!("failed to open database: {}", e) }
+//! };
 //!
-//!  let read_opts = ReadOptions::new();
-//!  let res = database.get(read_opts,
-//!                         1);
-//!  match res {
-//!    Ok(data) => {
-//!      assert!(data.is_some());
-//!      assert_eq!(data, Some(vec![1]));
-//!    }
-//!    Err(e) => { panic!("failed reading data: {}", e) }
-//!  }
+//! let write_opts = WriteOptions::new();
+//! match database.put(write_opts, 1, &[1]) {
+//!     Ok(_) => { () },
+//!     Err(e) => { panic!("failed to write to database: {}", e) }
+//! };
+//!
+//! let read_opts = ReadOptions::new();
+//! let res = database.get(read_opts,
+//!                        1);
+//! match res {
+//!   Ok(data) => {
+//!     assert!(data.is_some());
+//!     assert_eq!(data, Some(vec![1]));
+//!   }
+//!   Err(e) => { panic!("failed reading data: {}", e) }
+//! }
 //! ```
  
 #![crate_type = "lib"]
 #![crate_name = "leveldb"]
 #![deny(warnings)]
 #![deny(missing_docs)]
+#![allow(unstable)]
 
 extern crate serialize;
 extern crate libc;
@@ -62,12 +65,12 @@ pub struct Version;
 
 impl Version {
     /// The major version.
-    pub fn major(&self) -> int {
-        unsafe { leveldb_major_version() as int }
+    pub fn major(&self) -> isize {
+        unsafe { leveldb_major_version() as isize }
     }
 
     /// The minor version
-    pub fn minor(&self) -> int {
-        unsafe { leveldb_minor_version() as int }
+    pub fn minor(&self) -> isize {
+        unsafe { leveldb_minor_version() as isize }
     }
 }

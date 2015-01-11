@@ -23,7 +23,7 @@ mod comparator {
 
   #[test]
   fn test_comparator() {
-    let comparator: ReverseComparator<int> = ReverseComparator::<int>;
+    let comparator: ReverseComparator<i32> = ReverseComparator::<i32>;
     let mut opts = Options::new();
     opts.create_if_missing = true;
     let tmp = tmpdir("testdbs");

@@ -38,7 +38,8 @@ to run the test suite.
 
 ## Examples
 
-```{.ignore .rust}
+```{.rust}
+#[allow(unstable)]
 use std::io::TempDir;
 use leveldb::database::Database;
 use leveldb::iterator::Iterable;

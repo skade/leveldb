@@ -113,7 +113,7 @@ impl<K: Key> Database<K> {
   /// For keys that implement Ord, consider the `OrdComparator`.
   pub fn open_with_comparator<C: Comparator<K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
-    let comp_ptr = create_comparator(box comparator);
+    let comp_ptr = create_comparator(Box::new(comparator));
     let res = unsafe {
       let c_string = CString::from_vec(name.into_vec());
       let c_options = c_options(&options, Some(comp_ptr));
@@ -214,7 +214,7 @@ impl<K: Key> Database<K> {
           if result == ptr::null() {
             Ok(None)
           } else {
-            let vec: Vec<u8> = Vec::from_raw_buf(result, length as uint);
+            let vec: Vec<u8> = Vec::from_raw_buf(result, length as usize);
             Ok(Some(vec))
           }
         } else {
@@ -229,7 +229,7 @@ fn to_error(leveldb_error: *const i8) -> Error {
   use std::str::from_utf8;
   use std::ffi::c_str_to_bytes;
 
-  let err_string = unsafe { from_utf8(c_str_to_bytes(&leveldb_error)).to_string() };
+  let err_string = unsafe { from_utf8(c_str_to_bytes(&leveldb_error)).unwrap().to_string() };
   unsafe { free(leveldb_error as *mut c_void) };
   Error::new(err_string)
 }

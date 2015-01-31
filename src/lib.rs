@@ -5,7 +5,7 @@
 //! ```rust
 //! #![allow(unstable)]
 //!
-//! use std::io::TempDir;
+//! use std::old_io::TempDir;
 //! use leveldb::database::Database;
 //! use leveldb::options::{Options,WriteOptions,ReadOptions};
 //!
@@ -16,13 +16,13 @@
 //! options.create_if_missing = true;
 //! let mut database = match Database::open(path, options) {
 //!     Ok(db) => { db },
-//!     Err(e) => { panic!("failed to open database: {}", e) }
+//!     Err(e) => { panic!("failed to open database: {:?}", e) }
 //! };
 //!
 //! let write_opts = WriteOptions::new();
 //! match database.put(write_opts, 1, &[1]) {
 //!     Ok(_) => { () },
-//!     Err(e) => { panic!("failed to write to database: {}", e) }
+//!     Err(e) => { panic!("failed to write to database: {:?}", e) }
 //! };
 //!
 //! let read_opts = ReadOptions::new();
@@ -33,7 +33,7 @@
 //!     assert!(data.is_some());
 //!     assert_eq!(data, Some(vec![1]));
 //!   }
-//!   Err(e) => { panic!("failed reading data: {}", e) }
+//!   Err(e) => { panic!("failed reading data: {:?}", e) }
 //! }
 //! ```
  

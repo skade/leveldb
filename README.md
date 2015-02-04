@@ -40,7 +40,7 @@ to run the test suite.
 
 ```{.rust}
 #[allow(unstable)]
-use std::io::TempDir;
+use std::old_io::TempDir;
 use leveldb::database::Database;
 use leveldb::iterator::Iterable;
 use leveldb::options::{Options,WriteOptions,ReadOptions};

@@ -41,7 +41,7 @@
 #![crate_name = "leveldb"]
 #![deny(warnings)]
 #![deny(missing_docs)]
-#![allow(unstable)]
+///#![allow(unstable)]
 
 extern crate serialize;
 extern crate libc;

@@ -86,7 +86,6 @@ assert_eq!(
 
 ## Open issues
 
-* Snapshots are missing
 * Filter policies are missing
 * Iterators with arbirary start and end points are unsupported
 

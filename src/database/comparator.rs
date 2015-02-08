@@ -45,8 +45,8 @@ extern "C" fn compare<K: Key, T: Comparator<K>>(state: *mut libc::c_void,
                                      a: *const u8, a_len: size_t,
                                      b: *const u8, b_len: size_t) -> i32 {
      unsafe {
-          let a_slice = slice::from_raw_buf(&a, a_len as usize);
-          let b_slice = slice::from_raw_buf(&b, b_len as usize);
+          let a_slice = slice::from_raw_parts::<u8>(a, a_len as usize);
+          let b_slice = slice::from_raw_parts::<u8>(b, b_len as usize);
           let x: &T = &*(state as *mut T);
           let a_key = from_u8::<K>(a_slice);
           let b_key = from_u8::<K>(b_slice);

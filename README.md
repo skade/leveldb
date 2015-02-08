@@ -17,7 +17,7 @@ If your project is using [Cargo](http://crates.io), drop the following lines in 
 ```text
 [dependencies]
 
-leveldb = "0.3.1"
+leveldb = "*"
 ```
 
 ## Development

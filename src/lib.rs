@@ -60,17 +60,15 @@ pub mod database;
 /// Library version information
 ///
 /// Need a recent version of leveldb to be used.
-#[derive(Copy)]
-pub struct Version;
 
-impl Version {
+pub trait Version {
     /// The major version.
-    pub fn major(&self) -> isize {
+    fn major() -> isize {
         unsafe { leveldb_major_version() as isize }
     }
 
     /// The minor version
-    pub fn minor(&self) -> isize {
+    fn minor() -> isize {
         unsafe { leveldb_minor_version() as isize }
     }
 }

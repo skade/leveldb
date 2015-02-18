@@ -111,7 +111,7 @@ impl<K: Key> Database<K> {
   /// The comparator must implement a total ordering over the keyspace.
   ///
   /// For keys that implement Ord, consider the `OrdComparator`.
-  pub fn open_with_comparator<C: Comparator<K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
+  pub fn open_with_comparator<C: Comparator<K = K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
     let comp_ptr = create_comparator(Box::new(comparator));
     let res = unsafe {

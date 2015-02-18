@@ -10,7 +10,9 @@ mod comparator {
   
   struct ReverseComparator<K>;
 
-  impl<K: Key + Ord> Comparator<K> for ReverseComparator<K> {
+  impl<K: Key + Ord> Comparator for ReverseComparator<K> {
+    type K = K;
+
     fn name(&self) -> *const u8 {
       "reverse".as_ptr()
     }
@@ -18,7 +20,6 @@ mod comparator {
     fn compare(&self, a: &K, b: &K) -> Ordering {
       b.cmp(a)
     }
-
   }
 
   #[test]

@@ -41,8 +41,12 @@
 #![crate_name = "leveldb"]
 #![deny(warnings)]
 #![deny(missing_docs)]
+#![feature(libc)]
+#![feature(path)]
+#![feature(std_misc)]
+#![feature(core)]
+#![feature(collections)]
 
-extern crate serialize;
 extern crate libc;
 
 use cbits::leveldb::{leveldb_major_version,leveldb_minor_version};

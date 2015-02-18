@@ -1,4 +1,3 @@
-#![allow(unstable)]
 extern crate db_key;
 extern crate leveldb;
 extern crate serialize;

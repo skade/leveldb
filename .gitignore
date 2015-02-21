@@ -1,5 +1,5 @@
 build
 testdbs
 target
-*swp
-*swo
+*sw*
+Cargo.lock

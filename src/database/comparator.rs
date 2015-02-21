@@ -37,6 +37,13 @@ pub trait Comparator {
 pub struct OrdComparator<K> {
     marker: PhantomData<K>,
 }
+
+impl<K> OrdComparator<K> {
+    /// Create a new OrdComparator
+    pub fn new() -> OrdComparator<K> {
+        OrdComparator { marker: PhantomData }
+    }
+}
 /// DefaultComparator is the a stand in for "no comparator set"
 #[derive(Copy)]
 pub struct DefaultComparator;

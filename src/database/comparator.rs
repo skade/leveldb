@@ -82,7 +82,10 @@ impl<K: Key + Ord> Comparator for OrdComparator<K> {
   type K = K;
 
   fn name(&self) -> *const u8 {
-    "ord_comparator".as_ptr()
+    use std::intrinsics::get_tydesc;
+
+    let tydesc = unsafe { *get_tydesc::<K>() };
+    tydesc.name.as_ptr()
   }
   
   fn compare(&self, a: &K, b: &K) -> Ordering {

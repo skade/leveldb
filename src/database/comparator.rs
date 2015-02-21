@@ -12,6 +12,7 @@ use std::slice;
 use std::cmp::Ordering;
 use database::db_key::Key;
 use database::db_key::from_u8;
+use core::marker::PhantomData;
 
 /// A comparator has two important functions:
 ///
@@ -33,7 +34,9 @@ pub trait Comparator {
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`
 #[derive(Copy)]
-pub struct OrdComparator<K>;
+pub struct OrdComparator<K> {
+    marker: PhantomData<K>,
+}
 /// DefaultComparator is the a stand in for "no comparator set"
 #[derive(Copy)]
 pub struct DefaultComparator;

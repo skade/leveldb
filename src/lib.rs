@@ -42,12 +42,12 @@
 #![deny(warnings)]
 #![deny(missing_docs)]
 #![feature(libc)]
-#![feature(path)]
 #![feature(std_misc)]
 #![feature(core)]
 #![feature(collections)]
 
 extern crate libc;
+extern crate core;
 
 use cbits::leveldb::{leveldb_major_version,leveldb_minor_version};
 pub use database::options as options;
@@ -55,6 +55,8 @@ pub use database::error as error;
 pub use database::iterator as iterator;
 pub use database::snapshots as snapshots;
 pub use database::comparator as comparator;
+
+use core::marker::PhantomFn;
 
 #[allow(missing_docs)]
 pub mod cbits;
@@ -64,7 +66,7 @@ pub mod database;
 ///
 /// Need a recent version of leveldb to be used.
 
-pub trait Version {
+pub trait Version : PhantomFn<Self, ()> {
     /// The major version.
     fn major() -> isize {
         unsafe { leveldb_major_version() as isize }

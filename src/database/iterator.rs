@@ -25,7 +25,7 @@ impl Drop for RawIterator {
 /// An iterator over the leveldb keyspace.
 ///
 /// Returns key and value as a tuple.
-pub struct Iterator<'a, K: Key> {
+pub struct Iterator<'a, K: Key + 'a> {
   start: bool,
   // Iterator accesses the Database through a leveldb_iter_t pointer
   // but needs to hold the reference for lifetime tracking
@@ -37,7 +37,7 @@ pub struct Iterator<'a, K: Key> {
 /// An iterator over the leveldb keyspace.
 ///
 /// Returns just the keys.
-pub struct KeyIterator<'a, K: Key> {
+pub struct KeyIterator<'a, K: Key + 'a> {
   start: bool,
   // Iterator accesses the Database through a leveldb_iter_t pointer
   // but needs to hold the reference for lifetime tracking
@@ -49,7 +49,7 @@ pub struct KeyIterator<'a, K: Key> {
 /// An iterator over the leveldb keyspace.
 ///
 /// Returns just the value.
-pub struct ValueIterator<'a,K: Key> {
+pub struct ValueIterator<'a,K: Key + 'a> {
   start: bool,
   // Iterator accesses the Database through a leveldb_iter_t pointer
   // but needs to hold the reference for lifetime tracking
@@ -60,7 +60,7 @@ pub struct ValueIterator<'a,K: Key> {
 
 
 /// A trait to allow access to the three main iteration styles of leveldb.
-pub trait Iterable<'a, K: Key> {
+pub trait Iterable<'a, K: Key + 'a> {
   /// Return an Iterator iterating over (Key,Value) pairs
   fn iter(&'a self, options: ReadOptions<'a,K>) -> Iterator<K>;
   /// Returns an Iterator iterating over Keys only.
@@ -69,7 +69,7 @@ pub trait Iterable<'a, K: Key> {
   fn value_iter(&'a self, options: ReadOptions<'a,K>) -> ValueIterator<K>;
 }
 
-impl<'a, K: Key> Iterable<'a, K> for Database<K> {
+impl<'a, K: Key + 'a> Iterable<'a, K> for Database<K> {
   fn iter(&'a self, options: ReadOptions<'a,K>) -> Iterator<K> {
     Iterator::new(self, options)
   }

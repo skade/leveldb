@@ -28,7 +28,7 @@ impl Drop for RawSnapshot {
 ///
 /// Represents a database at a certain point in time,
 /// and allows for all read operations (get and iteration).
-pub struct Snapshot<'a, K: Key> {
+pub struct Snapshot<'a, K: Key + 'a> {
   raw: RawSnapshot,
   database: &'a Database<K>
 }
@@ -69,7 +69,7 @@ impl<'a, K: Key> Snapshot<'a, K> {
   }
 }
 
-impl<'a, K: Key> Iterable<'a, K> for Snapshot<'a, K> {
+impl<'a, K: Key + 'a> Iterable<'a, K> for Snapshot<'a, K> {
   fn iter(&'a self, mut options: ReadOptions<'a, K>) -> Iterator<K> {
     options.snapshot = Some(self);
     self.database.iter(options)

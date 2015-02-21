@@ -93,7 +93,7 @@ impl WriteOptions {
 
 /// The read options to use for any read operation.
 #[allow(missing_copy_implementations)]
-pub struct ReadOptions<'a, K: Key> {
+pub struct ReadOptions<'a, K: Key + 'a> {
   /// Whether to verify the saved checksums on read.
   ///
   /// default: false
@@ -112,7 +112,7 @@ pub struct ReadOptions<'a, K: Key> {
   pub snapshot: Option<&'a Snapshot<'a, K>>
 }
 
-impl<'a, K: Key> ReadOptions<'a, K> {
+impl<'a, K: Key + 'a> ReadOptions<'a, K> {
   /// Return a `ReadOptions` struct with the default values.
   pub fn new() -> ReadOptions<'a, K> {
     ReadOptions { verify_checksums: false,

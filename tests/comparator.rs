@@ -7,8 +7,11 @@ mod comparator {
   use leveldb::options::{Options,ReadOptions};
   use leveldb::comparator::Comparator;
   use std::cmp::Ordering;
+  use core::marker::PhantomData;
   
-  struct ReverseComparator<K>;
+  struct ReverseComparator<K> {
+      marker: PhantomData<K>
+  }
 
   impl<K: Key + Ord> Comparator for ReverseComparator<K> {
     type K = K;
@@ -24,7 +27,7 @@ mod comparator {
 
   #[test]
   fn test_comparator() {
-    let comparator: ReverseComparator<i32> = ReverseComparator::<i32>;
+    let comparator: ReverseComparator<i32> = ReverseComparator { marker: PhantomData };
     let mut opts = Options::new();
     opts.create_if_missing = true;
     let tmp = tmpdir("testdbs");

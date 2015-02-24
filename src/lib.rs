@@ -41,7 +41,6 @@
 #![crate_name = "leveldb"]
 #![deny(warnings)]
 #![deny(missing_docs)]
-#![feature(libc)]
 #![feature(std_misc)]
 #![feature(core)]
 #![feature(collections)]

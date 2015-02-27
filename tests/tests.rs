@@ -1,6 +1,9 @@
+#![feature(tempdir)]
+#![feature(path)]
+#![feature(core)]
+
 extern crate db_key;
 extern crate leveldb;
-extern crate serialize;
 extern crate core;
 
 mod utils;

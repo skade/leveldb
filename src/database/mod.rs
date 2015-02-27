@@ -10,6 +10,8 @@ use self::options::{Options,WriteOptions,ReadOptions,c_options,c_writeoptions,c_
 use self::error::Error;
 use std::ffi::CString;
 
+use std::path::Path;
+
 use std::ptr;
 use libc::{c_char,size_t};
 use comparator::{Comparator,create_comparator};
@@ -89,10 +91,10 @@ impl<K: Key> Database<K> {
   ///
   /// If the database is missing, the behaviour depends on `options.create_if_missing`.
   /// The database will be created using the settings given in `options`.
-  pub fn open(name: Path, options: Options) -> Result<Database<K>,Error> {
+  pub fn open(name: &Path, options: Options) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
     let res = unsafe {
-      let c_string = CString::new(name.into_vec()).unwrap();
+      let c_string = CString::new(name.to_str().unwrap()).unwrap();
       let c_options = c_options(&options, None);
       let db = leveldb_open(c_options as *const leveldb_options_t, c_string.as_bytes_with_nul().as_ptr() as *const i8, &mut error);
       leveldb_options_destroy(c_options);
@@ -114,11 +116,11 @@ impl<K: Key> Database<K> {
   /// The comparator must implement a total ordering over the keyspace.
   ///
   /// For keys that implement Ord, consider the `OrdComparator`.
-  pub fn open_with_comparator<C: Comparator<K = K>>(name: Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
+  pub fn open_with_comparator<C: Comparator<K = K>>(name: &Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
     let mut error = ptr::null();
     let comp_ptr = create_comparator(Box::new(comparator));
     let res = unsafe {
-      let c_string = CString::new(name.into_vec()).unwrap();
+      let c_string = CString::new(name.to_str().unwrap()).unwrap();
       let c_options = c_options(&options, Some(comp_ptr));
       let db = leveldb_open(c_options as *const leveldb_options_t, c_string.as_bytes_with_nul().as_ptr() as *const i8, &mut error);
       leveldb_options_destroy(c_options);

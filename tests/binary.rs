@@ -3,8 +3,8 @@ use leveldb::options::{ReadOptions,WriteOptions};
 
 #[test]
 fn test_write_to_database() {
-  let tmp = tmpdir("testdbs");
-  let database = open_database(tmp.path().join("write"), true);
+  let tmp = tmpdir("write");
+  let database = open_database(tmp.path(), true);
   let write_opts = WriteOptions::new();
   let result = database.put(write_opts,
                             1,
@@ -14,8 +14,8 @@ fn test_write_to_database() {
 
 #[test]
 fn test_delete_from_database() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("delete_simple"), true);
+  let tmp = tmpdir("delete_simple");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
 
   let write2 = WriteOptions::new();
@@ -26,8 +26,8 @@ fn test_delete_from_database() {
 
 #[test]
 fn test_get_from_empty_database() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("get_simple"), true);
+  let tmp = tmpdir("get_simple");
+  let database = &mut open_database(tmp.path(), true);
   let read_opts = ReadOptions::new();
   let res = database.get(read_opts, 1);
   match res {
@@ -38,8 +38,8 @@ fn test_get_from_empty_database() {
 
 #[test]
 fn test_get_from_filled_database() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("get_filled"), true);
+  let tmp = tmpdir("get_filled");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
 
   let read_opts = ReadOptions::new();

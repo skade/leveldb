@@ -43,14 +43,14 @@ to run the test suite.
 
 extern crate leveldb;
 
-use std::old_io::TempDir;
+use std::fs::TempDir;
 use leveldb::database::Database;
 use leveldb::iterator::Iterable;
 use leveldb::options::{Options,WriteOptions,ReadOptions};
 
 fn main() {
   let tempdir = TempDir::new("demo").unwrap();
-  let path = tempdir.path().join("simple");
+  let path = tempdir.path();
   
   let mut options = Options::new();
   options.create_if_missing = true;

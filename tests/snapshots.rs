@@ -5,8 +5,8 @@ use leveldb::iterator::{Iterable};
 
 #[test]
 fn test_snapshots() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("iter"), true);
+  let tmp = tmpdir("snapshots");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
   let snapshot = database.snapshot();
   db_put_simple(database, 2, &[2]);
@@ -18,8 +18,8 @@ fn test_snapshots() {
 
 #[test]
 fn test_snapshot_iterator() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("iter"), true);
+  let tmp = tmpdir("snap_iterator");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
   let snapshot = database.snapshot();
   db_put_simple(database, 2, &[2]);

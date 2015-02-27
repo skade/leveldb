@@ -4,8 +4,8 @@ use leveldb::options::{ReadOptions};
 
 #[test]
 fn test_iterator() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("iter"), true);
+  let tmp = tmpdir("iter");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
   db_put_simple(database, 2, &[2]);
 
@@ -23,8 +23,8 @@ fn test_iterator() {
 
 #[test]
 fn test_iterator_last() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("iter"), true);
+  let tmp = tmpdir("iter_last");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
   db_put_simple(database, 2, &[2]);
 
@@ -36,8 +36,8 @@ fn test_iterator_last() {
 
 #[test]
 fn test_key_iterator() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("iter"), true);
+  let tmp = tmpdir("key_iter");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
   db_put_simple(database, 2, &[2]);
 
@@ -51,8 +51,8 @@ fn test_key_iterator() {
 
 #[test]
 fn test_value_iterator() {
-  let tmp = tmpdir("testdbs");
-  let database = &mut open_database(tmp.path().join("iter"), true);
+  let tmp = tmpdir("value_iter");
+  let database = &mut open_database(tmp.path(), true);
   db_put_simple(database, 1, &[1]);
   db_put_simple(database, 2, &[2]);
 

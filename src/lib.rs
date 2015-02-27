@@ -5,12 +5,12 @@
 //! ```rust
 //! #![allow(unstable)]
 //!
-//! use std::old_io::TempDir;
+//! use std::fs::TempDir;
 //! use leveldb::database::Database;
 //! use leveldb::options::{Options,WriteOptions,ReadOptions};
 //!
 //! let tempdir = TempDir::new("demo").unwrap();
-//! let path = tempdir.path().join("simple");
+//! let path = tempdir.path();
 //! 
 //! let mut options = Options::new();
 //! options.create_if_missing = true;
@@ -44,6 +44,7 @@
 #![feature(std_misc)]
 #![feature(core)]
 #![feature(collections)]
+#![feature(path)]
 
 extern crate libc;
 extern crate core;

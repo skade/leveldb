@@ -30,8 +30,8 @@ mod comparator {
     let comparator: ReverseComparator<i32> = ReverseComparator { marker: PhantomData };
     let mut opts = Options::new();
     opts.create_if_missing = true;
-    let tmp = tmpdir("testdbs");
-    let database = &mut Database::open_with_comparator(tmp.path().join("reverse_comparator"), opts, comparator).unwrap();
+    let tmp = tmpdir("reverse_comparator");
+    let database = &mut Database::open_with_comparator(tmp.path(), opts, comparator).unwrap();
     db_put_simple(database, 1, &[1]);
     db_put_simple(database, 2, &[2]);
 

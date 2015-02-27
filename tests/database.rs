@@ -11,8 +11,8 @@ fn test_create_options() {
 fn test_open_database() {
   let mut opts = Options::new();
   opts.create_if_missing = true;
-  let tmp = tmpdir("testdbs");
-  let res: Result<Database<i32>,_> = Database::open(tmp.path().join("create_if_missing"), opts);
+  let tmp = tmpdir("create_if_missing");
+  let res: Result<Database<i32>,_> = Database::open(tmp.path(), opts);
   assert!(res.is_ok());
 }
 
@@ -20,7 +20,7 @@ fn test_open_database() {
 fn test_open_non_existant_database_without_create() {
   let mut opts = Options::new();
   opts.create_if_missing = false;
-  let tmp = tmpdir("testdbs");
-  let res: Result<Database<i32>,_> = Database::open(tmp.path().join("missing"), opts);
+  let tmp = tmpdir("missing");
+  let res: Result<Database<i32>,_> = Database::open(tmp.path(), opts);
   assert!(res.is_err());
 }

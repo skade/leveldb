@@ -20,16 +20,17 @@ use core::marker::PhantomData;
 ///   opening databases with a different name
 /// * The comparison implementation
 pub trait Comparator {
-     type K: Key;
+    /// The type that the comparator compares.
+    type K: Key;
 
-     /// Return the name of the Comparator
-     fn name(&self) -> *const u8;
-     /// compare two keys. This must implement a total ordering.
-     fn compare(&self, a: &Self::K, b: &Self::K) -> Ordering;
-     /// whether the comparator is the `DefaultComparator`
-     fn null() -> bool {
-         false
-     }
+    /// Return the name of the Comparator
+    fn name(&self) -> *const u8;
+    /// compare two keys. This must implement a total ordering.
+    fn compare(&self, a: &Self::K, b: &Self::K) -> Ordering;
+    /// whether the comparator is the `DefaultComparator`
+    fn null() -> bool {
+        false
+    }
 }
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`

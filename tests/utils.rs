@@ -1,9 +1,10 @@
 use leveldb::database::Database;
 use leveldb::options::{Options,WriteOptions};
-use std::old_io::TempDir;
+use std::path::Path;
+use std::fs::TempDir;
 use db_key::Key;
 
-pub fn open_database<K: Key + Ord>(path: Path, create_if_missing: bool) -> Database<K> {
+pub fn open_database<K: Key + Ord>(path: &Path, create_if_missing: bool) -> Database<K> {
   let mut opts = Options::new();
   opts.create_if_missing = create_if_missing;
   match Database::open(path, opts) {

@@ -20,6 +20,7 @@ use core::marker::PhantomData;
 ///   opening databases with a different name
 /// * The comparison implementation
 pub trait Comparator {
+     /// comparator key 
      type K: Key;
 
      /// Return the name of the Comparator

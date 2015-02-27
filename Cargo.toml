@@ -1,13 +1,17 @@
 [package]
 
 name = "leveldb"
-version = "0.4.0"
+version = "0.4.1"
 authors = [ "Florian Gilcher <florian.gilcher@asquera.de>" ]
 
 description = "An interface for leveldb"
 
 license = "MIT"
 readme = "README.md"
+
+documentation = "http://skade.github.io/leveldb/"
+homepage = "https://github.com/skade/leveldb"
+repository = "https://github.com/skade/leveldb"
 
 [lib]
 

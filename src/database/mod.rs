@@ -3,17 +3,14 @@
 extern crate db_key;
 
 use cbits::leveldb::*;
-use libc::{c_void};
-use libc::funcs::c95::stdlib::{free};
 
-use self::options::{Options,WriteOptions,ReadOptions,c_options,c_writeoptions,c_readoptions};
+use self::options::{Options,c_options};
 use self::error::Error;
 use std::ffi::CString;
 
 use std::path::Path;
 
 use std::ptr;
-use libc::{c_char,size_t};
 use comparator::{Comparator,create_comparator};
 use self::db_key::Key;
 
@@ -25,6 +22,7 @@ pub mod iterator;
 pub mod comparator;
 pub mod snapshots;
 pub mod cache;
+pub mod kv;
 
 #[allow(missing_docs)]
 struct RawDB {
@@ -104,7 +102,7 @@ impl<K: Key> Database<K> {
     if error == ptr::null() {
       Ok(Database::new(res, options, None))
     } else {
-      Err(to_error(error))
+      Err(Error::new_from_i8(error))
     }
   }
 
@@ -130,111 +128,7 @@ impl<K: Key> Database<K> {
     if error == ptr::null() {
       Ok(Database::new(res, options, Some(comp_ptr)))
     } else {
-      Err(to_error(error))
+      Err(Error::new_from_i8(error))
     }
   }
-
-  /// put a binary value into the database.
-  ///
-  /// If the key is already present in the database, it will be overwritten.
-  ///
-  /// The passed key will be compared using the comparator.
-  ///
-  /// The database will be synced to disc if `options.sync == true`. This is
-  /// NOT the default.
-  pub fn put(&self,
-             options: WriteOptions,
-             key: K,
-             value: &[u8]) -> Result<(), Error> {
-    unsafe {
-      key.as_slice(|k| {
-        let mut error = ptr::null();
-        let c_writeoptions = c_writeoptions(options);
-        leveldb_put(self.database.ptr,
-                    c_writeoptions,
-                    k.as_ptr() as *mut c_char,
-                    k.len() as size_t,
-                    value.as_ptr() as *mut c_char,
-                    value.len() as size_t,
-                    &mut error);
-        leveldb_writeoptions_destroy(c_writeoptions);
-
-        if error == ptr::null() {
-          Ok(())
-        } else {
-          Err(to_error(error))
-        }
-      })
-    }
-  }
-
-  /// delete a value from the database.
-  ///
-  /// The passed key will be compared using the comparator.
-  ///
-  /// The database will be synced to disc if `options.sync == true`. This is
-  /// NOT the default.
-  pub fn delete(&self,
-                options: WriteOptions,
-                key: K) -> Result<(), Error> {
-    unsafe {
-      key.as_slice(|k| {
-        let mut error = ptr::null();
-        let c_writeoptions = c_writeoptions(options);
-        leveldb_delete(self.database.ptr,
-                       c_writeoptions,
-                       k.as_ptr() as *mut c_char,
-                       k.len() as size_t,
-                       &mut error);
-        leveldb_writeoptions_destroy(c_writeoptions);
-        if error == ptr::null() {
-          Ok(())
-        } else {
-          Err(to_error(error))
-        }
-      })
-    }
-  }
-
-  /// get a value from the database.
-  ///
-  /// The passed key will be compared using the comparator.
-  pub fn get<'a>(&self,
-             options: ReadOptions<'a,K>,
-             key: K) -> Result<Option<Vec<u8>>, Error> {
-    unsafe {
-      key.as_slice(|k| {
-        let mut error = ptr::null();
-        let length: size_t = 0;
-        let c_readoptions = c_readoptions(&options);
-        let result = leveldb_get(self.database.ptr,
-                                 c_readoptions,
-                                 k.as_ptr() as *mut c_char,
-                                 k.len() as size_t,
-                                 &length,
-                                 &mut error);
-        leveldb_readoptions_destroy(c_readoptions);
-
-        if error == ptr::null() {
-          if result == ptr::null() {
-            Ok(None)
-          } else {
-            let vec: Vec<u8> = Vec::from_raw_buf(result, length as usize);
-            Ok(Some(vec))
-          }
-        } else {
-          Err(to_error(error))
-        }
-      })
-    }
-  }
-}
-
-fn to_error(leveldb_error: *const i8) -> Error {
-  use std::str::from_utf8;
-  use std::ffi::CStr;
-
-  let err_string = unsafe { from_utf8( CStr::from_ptr(leveldb_error).to_bytes()).unwrap().to_string() };
-  unsafe { free(leveldb_error as *mut c_void) };
-  Error::new(err_string)
 }

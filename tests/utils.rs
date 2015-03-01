@@ -1,4 +1,5 @@
 use leveldb::database::Database;
+use leveldb::database::kv::{KV};
 use leveldb::options::{Options,WriteOptions};
 use std::path::Path;
 use std::fs::TempDir;

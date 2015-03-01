@@ -1,5 +1,6 @@
 use utils::{open_database,tmpdir,db_put_simple};
 use leveldb::options::{ReadOptions,WriteOptions};
+use leveldb::database::kv::{KV};
 
 #[test]
 fn test_write_to_database() {

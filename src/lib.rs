@@ -7,6 +7,7 @@
 //!
 //! use std::fs::TempDir;
 //! use leveldb::database::Database;
+//! use leveldb::kv::KV;
 //! use leveldb::options::{Options,WriteOptions,ReadOptions};
 //!
 //! let tempdir = TempDir::new("demo").unwrap();
@@ -55,6 +56,7 @@ pub use database::error as error;
 pub use database::iterator as iterator;
 pub use database::snapshots as snapshots;
 pub use database::comparator as comparator;
+pub use database::kv as kv;
 
 use core::marker::PhantomFn;
 

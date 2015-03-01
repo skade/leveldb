@@ -77,6 +77,8 @@ pub mod leveldb {
                         name: *const c_char,
                         errptr: &mut *const c_char) -> *mut leveldb_t;
     pub fn leveldb_close(database: *mut leveldb_t);
+
+    // KV access
     pub fn leveldb_put(database: *mut leveldb_t,
                        options: *mut leveldb_writeoptions_t,
                        key: *mut c_char,
@@ -98,6 +100,7 @@ pub mod leveldb {
                        vallen: *const size_t,
                        errptr: &mut *const c_char) -> *const u8;
 
+    // Options
     pub fn leveldb_options_create() -> *mut leveldb_options_t;
     pub fn leveldb_options_destroy(options: *mut leveldb_options_t);
     pub fn leveldb_options_set_comparator(options: *mut leveldb_options_t,

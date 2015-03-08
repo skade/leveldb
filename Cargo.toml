@@ -22,5 +22,8 @@ name = "leveldb"
 db_key = "0.0.4"
 libc = "*"
 
+[dev-dependencies]
+tempdir = "*"
+
 [[test]]
 name = "tests"

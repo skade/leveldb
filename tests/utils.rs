@@ -2,7 +2,7 @@ use leveldb::database::Database;
 use leveldb::database::kv::{KV};
 use leveldb::options::{Options,WriteOptions};
 use std::path::Path;
-use std::fs::TempDir;
+use tempdir::TempDir;
 use db_key::Key;
 
 pub fn open_database<K: Key + Ord>(path: &Path, create_if_missing: bool) -> Database<K> {

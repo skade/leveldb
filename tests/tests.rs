@@ -1,10 +1,10 @@
-#![feature(tempdir)]
 #![feature(path)]
 #![feature(core)]
 
 extern crate db_key;
 extern crate leveldb;
 extern crate core;
+extern crate tempdir;
 
 mod utils;
 mod database;

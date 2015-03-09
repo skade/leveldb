@@ -60,6 +60,7 @@ pub mod leveldb {
     Snappy = 1
   }
 
+  /// comparator fns
   pub type destructor_fn = extern "C" fn(obj: *mut c_void);
   pub type comparator_fn = extern "C" fn(
     state: *mut c_void,
@@ -68,6 +69,20 @@ pub mod leveldb {
   pub type name_fn = extern "C" fn(
     state: *mut c_void
   ) -> *const u8;
+
+  /// writebatch fns
+  pub type put_fn = extern "C" fn(
+    state: *mut c_void,
+    key: *const u8,
+    keylen: size_t,
+    val: *const u8,
+    vallen: size_t
+  );
+  pub type deleted_fn = extern "C" fn(
+    state: *mut c_void,
+    key: *const u8,
+    keylen: size_t
+  );
 
   #[link(name = "leveldb")]
   #[link(name = "snappy")]
@@ -172,6 +187,27 @@ pub mod leveldb {
     // snapshots
     pub fn leveldb_create_snapshot(database: *mut leveldb_t) -> *mut leveldb_snapshot_t;
     pub fn leveldb_release_snapshot(database: *mut leveldb_t, snapshot: *mut leveldb_snapshot_t);
+
+    // write batches
+    pub fn leveldb_writebatch_create() -> *mut leveldb_writebatch_t;
+    pub fn leveldb_writebatch_destroy(writebatch: *mut leveldb_writebatch_t);
+    pub fn leveldb_writebatch_clear(writebatch: *mut leveldb_writebatch_t);
+    pub fn leveldb_writebatch_put(writebatch: *mut leveldb_writebatch_t,
+                                  key: *mut c_char,
+                                  keylen: size_t,
+                                  val: *mut c_char,
+                                  vallen: size_t);
+    pub fn leveldb_writebatch_delete(writebatch: *mut leveldb_writebatch_t,
+                                     key: *mut c_char,
+                                     keylen: size_t);
+    pub fn leveldb_writebatch_iterate(writebatch: *mut leveldb_writebatch_t,
+                                      state: *mut c_void,
+                                      put_callback: put_fn,
+                                      deleted_callback: deleted_fn);
+    pub fn leveldb_write(db: *mut leveldb_t,
+                         options: *mut leveldb_writeoptions_t,
+                         writebatch: *mut leveldb_writebatch_t,
+                         errptr: &mut *const c_char);
 
     // caches
     pub fn leveldb_cache_create_lru(capacity: size_t) -> *mut leveldb_cache_t;

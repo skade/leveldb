@@ -13,3 +13,4 @@ mod binary;
 mod iterator;
 mod snapshots;
 mod cache;
+mod writebatch;

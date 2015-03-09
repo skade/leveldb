@@ -23,6 +23,7 @@ pub mod comparator;
 pub mod snapshots;
 pub mod cache;
 pub mod kv;
+pub mod batch;
 
 #[allow(missing_docs)]
 struct RawDB {

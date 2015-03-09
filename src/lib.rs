@@ -56,6 +56,7 @@ pub use database::iterator as iterator;
 pub use database::snapshots as snapshots;
 pub use database::comparator as comparator;
 pub use database::kv as kv;
+pub use database::batch as batch;
 
 use core::marker::PhantomFn;
 

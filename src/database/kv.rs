@@ -11,7 +11,7 @@ use cbits::leveldb::*;
 
 /// Key-Value-Access to the leveldb database, providing
 /// a basic interface.
-pub trait KV<K> {
+pub trait KV<K: Key> {
     /// get a value from the database.
     ///
     /// The passed key will be compared using the comparator.

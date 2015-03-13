@@ -34,13 +34,13 @@ pub trait Batch<K: Key> {
     /// Write a batch to the database, ensuring success for all items or an error
     fn write(&self,
              options: WriteOptions,
-             batch: Writebatch<K>) -> Result<(), Error>;
+             batch: &Writebatch<K>) -> Result<(), Error>;
 }
 
 impl<K: Key> Batch<K> for Database<K> {
     fn write(&self,
              options: WriteOptions,
-             batch: Writebatch<K>) -> Result<(), Error> {
+             batch: &Writebatch<K>) -> Result<(), Error> {
         unsafe {
             let mut error = ptr::null();
             let c_writeoptions = c_writeoptions(options);
@@ -100,16 +100,18 @@ impl<K: Key> Writebatch<K> {
         }
     }
 
-    /// Iterate over the writebatch
+    /// Iterate over the writebatch, returning the resulting iterator
     pub fn iterate<T: WritebatchIterator<K = K>>(&mut self,
-                   iterator: Box<T>) {
+                   iterator: Box<T>) -> Box<T>{
         use std::mem;
 
         unsafe {
+            let mem = mem::transmute(iterator);
             leveldb_writebatch_iterate(self.writebatch.ptr,
-                                       mem::transmute(iterator),
+                                       mem,
                                        put_callback::<K,T>,
                                        deleted_callback::<K,T>);
+            mem::transmute(mem)
         }
     }
 }

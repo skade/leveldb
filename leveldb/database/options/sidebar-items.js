@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Options","Options to consider when opening a new or pre-existing database."],["ReadOptions","The read options to use for any read operation."],["WriteOptions","The write options to use for a write operation."]],"fn":[["c_options",""],["c_readoptions",""],["c_writeoptions",""]]});

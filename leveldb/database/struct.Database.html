@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Database` struct in crate `leveldb`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Database">
+
+    <title>leveldb::database::Database - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'><a href='../index.html'>leveldb</a>::<wbr><a href='index.html'>database</a></p><script>window.sidebarCurrent = {name: 'Database', ty: 'struct', relpath: ''};</script><script async src="sidebar-items.js"></script>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>leveldb</a>::<wbr><a href='index.html'>database</a>::<wbr><a class='struct' href=''>Database</a><wbr></span><span class='out-of-band'><span id='render-detail'>
+            <a id="collapse-all" href="#">[-]</a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-3582' href='../../src/leveldb/database/mod.rs.html#67-78'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Database&lt;K: <a class='trait' href='../../db_key/trait.Key.html' title='db_key::Key'>Key</a>&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>The main database object.</p>
+
+<p>leveldb databases are based on ordered keys. By default, leveldb orders
+by the binary value of the key. Additionally, a custom <code>Comparator</code> can
+be passed when opening the database. This library ships with an Comparator
+implementation for keys that are <code>Ord</code>.</p>
+
+<p>When re-opening a database, you must use the same key type <code>K</code> and
+comparator type <code>C</code>.</p>
+
+<p>Multiple Database objects can be kept around, as leveldb synchronises
+internally.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;K: <a class='trait' href='../../db_key/trait.Key.html' title='db_key::Key'>Key</a>&gt; <a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;</code></h3><div class='impl-items'><h4 id='method.open' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.open' class='fnname'>open</a>(name: &amp;<a class='struct' href='http://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>, options: <a class='struct' href='../../leveldb/database/options/struct.Options.html' title='leveldb::database::options::Options'>Options</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;, <a class='struct' href='../../leveldb/database/error/struct.Error.html' title='leveldb::database::error::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Open a new database</p>
+
+<p>If the database is missing, the behaviour depends on <code>options.create_if_missing</code>.
+The database will be created using the settings given in <code>options</code>.</p>
+</div><h4 id='method.open_with_comparator' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.open_with_comparator' class='fnname'>open_with_comparator</a>&lt;C: <a class='trait' href='../../leveldb/database/comparator/trait.Comparator.html' title='leveldb::database::comparator::Comparator'>Comparator</a>&lt;K=K&gt;&gt;(name: &amp;<a class='struct' href='http://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>, options: <a class='struct' href='../../leveldb/database/options/struct.Options.html' title='leveldb::database::options::Options'>Options</a>, comparator: C) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;, <a class='struct' href='../../leveldb/database/error/struct.Error.html' title='leveldb::database::error::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Open a new database with a custom comparator</p>
+
+<p>If the database is missing, the behaviour depends on <code>options.create_if_missing</code>.
+The database will be created using the settings given in <code>options</code>.</p>
+
+<p>The comparator must implement a total ordering over the keyspace.</p>
+
+<p>For keys that implement Ord, consider the <code>OrdComparator</code>.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;'a, K: <a class='trait' href='../../db_key/trait.Key.html' title='db_key::Key'>Key</a> + 'a&gt; <a class='trait' href='../../leveldb/database/iterator/trait.Iterable.html' title='leveldb::database::iterator::Iterable'>Iterable</a>&lt;'a, K&gt; for <a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;</code></h3><div class='impl-items'><h4 id='method.iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iter' class='fnname'>iter</a>(&amp;'a self, options: <a class='struct' href='../../leveldb/database/options/struct.ReadOptions.html' title='leveldb::database::options::ReadOptions'>ReadOptions</a>&lt;'a, K&gt;) -&gt; <a class='struct' href='../../leveldb/database/iterator/struct.Iterator.html' title='leveldb::database::iterator::Iterator'>Iterator</a>&lt;K&gt;</code></h4>
+<h4 id='method.keys_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.keys_iter' class='fnname'>keys_iter</a>(&amp;'a self, options: <a class='struct' href='../../leveldb/database/options/struct.ReadOptions.html' title='leveldb::database::options::ReadOptions'>ReadOptions</a>&lt;'a, K&gt;) -&gt; <a class='struct' href='../../leveldb/database/iterator/struct.KeyIterator.html' title='leveldb::database::iterator::KeyIterator'>KeyIterator</a>&lt;K&gt;</code></h4>
+<h4 id='method.value_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.value_iter' class='fnname'>value_iter</a>(&amp;'a self, options: <a class='struct' href='../../leveldb/database/options/struct.ReadOptions.html' title='leveldb::database::options::ReadOptions'>ReadOptions</a>&lt;'a, K&gt;) -&gt; <a class='struct' href='../../leveldb/database/iterator/struct.ValueIterator.html' title='leveldb::database::iterator::ValueIterator'>ValueIterator</a>&lt;K&gt;</code></h4>
+</div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;K: <a class='trait' href='../../db_key/trait.Key.html' title='db_key::Key'>Key</a>&gt; <a class='trait' href='../../leveldb/database/snapshots/trait.Snapshots.html' title='leveldb::database::snapshots::Snapshots'>Snapshots</a>&lt;K&gt; for <a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;</code></h3><div class='impl-items'><h4 id='method.snapshot' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.snapshot' class='fnname'>snapshot</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='struct' href='../../leveldb/database/snapshots/struct.Snapshot.html' title='leveldb::database::snapshots::Snapshot'>Snapshot</a>&lt;'a, K&gt;</code></h4>
+</div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;K: <a class='trait' href='../../db_key/trait.Key.html' title='db_key::Key'>Key</a>&gt; <a class='trait' href='../../leveldb/database/kv/trait.KV.html' title='leveldb::database::kv::KV'>KV</a>&lt;K&gt; for <a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;</code></h3><div class='impl-items'><h4 id='method.put' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.put' class='fnname'>put</a>(&amp;self, options: <a class='struct' href='../../leveldb/database/options/struct.WriteOptions.html' title='leveldb::database::options::WriteOptions'>WriteOptions</a>, key: K, value: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a href='http://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../leveldb/database/error/struct.Error.html' title='leveldb::database::error::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>put a binary value into the database.</p>
+
+<p>If the key is already present in the database, it will be overwritten.</p>
+
+<p>The passed key will be compared using the comparator.</p>
+
+<p>The database will be synced to disc if <code>options.sync == true</code>. This is
+NOT the default.</p>
+</div><h4 id='method.delete' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.delete' class='fnname'>delete</a>(&amp;self, options: <a class='struct' href='../../leveldb/database/options/struct.WriteOptions.html' title='leveldb::database::options::WriteOptions'>WriteOptions</a>, key: K) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../leveldb/database/error/struct.Error.html' title='leveldb::database::error::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>delete a value from the database.</p>
+
+<p>The passed key will be compared using the comparator.</p>
+
+<p>The database will be synced to disc if <code>options.sync == true</code>. This is
+NOT the default.</p>
+</div><h4 id='method.get' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.get' class='fnname'>get</a>&lt;'a&gt;(&amp;self, options: <a class='struct' href='../../leveldb/database/options/struct.ReadOptions.html' title='leveldb::database::options::ReadOptions'>ReadOptions</a>&lt;'a, K&gt;, key: K) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt;, <a class='struct' href='../../leveldb/database/error/struct.Error.html' title='leveldb::database::error::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>get a value from the database.</p>
+
+<p>The passed key will be compared using the comparator.</p>
+</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;K: <a class='trait' href='../../db_key/trait.Key.html' title='db_key::Key'>Key</a>&gt; <a class='trait' href='../../leveldb/database/batch/trait.Batch.html' title='leveldb::database::batch::Batch'>Batch</a>&lt;K&gt; for <a class='struct' href='../../leveldb/database/struct.Database.html' title='leveldb::database::Database'>Database</a>&lt;K&gt;</code></h3><div class='impl-items'><h4 id='method.write' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.write' class='fnname'>write</a>(&amp;self, options: <a class='struct' href='../../leveldb/database/options/struct.WriteOptions.html' title='leveldb::database::options::WriteOptions'>WriteOptions</a>, batch: &amp;<a class='struct' href='../../leveldb/database/batch/struct.Writebatch.html' title='leveldb::database::batch::Writebatch'>Writebatch</a>&lt;K&gt;) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../leveldb/database/error/struct.Error.html' title='leveldb::database::error::Error'>Error</a>&gt;</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "leveldb";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Iterator","An iterator over the leveldb keyspace."],["KeyIterator","An iterator over the leveldb keyspace."],["ValueIterator","An iterator over the leveldb keyspace."]],"trait":[["Iterable","A trait to allow access to the three main iteration styles of leveldb."],["LevelDBIterator",""],["LevelDBIteratorExt",""]]});

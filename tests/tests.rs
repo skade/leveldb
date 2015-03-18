@@ -1,4 +1,3 @@
-#![feature(path)]
 #![feature(core)]
 
 extern crate db_key;

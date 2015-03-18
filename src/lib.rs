@@ -44,7 +44,6 @@
 #![deny(missing_docs)]
 #![feature(core)]
 #![feature(collections)]
-#![feature(path)]
 
 extern crate libc;
 extern crate core;

@@ -115,6 +115,14 @@ pub mod leveldb {
                        vallen: *const size_t,
                        errptr: &mut *const c_char) -> *const u8;
 
+    // Management
+    pub fn leveldb_destroy_db(options: *mut leveldb_options_t,
+                              name: *const c_char,
+                              errptr: &mut *const c_char);
+    pub fn leveldb_repair_db(options: *mut leveldb_options_t,
+                             name: *const c_char,
+                             errptr: &mut *const c_char);
+
     // Options
     pub fn leveldb_options_create() -> *mut leveldb_options_t;
     pub fn leveldb_options_destroy(options: *mut leveldb_options_t);

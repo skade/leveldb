@@ -13,3 +13,4 @@ mod iterator;
 mod snapshots;
 mod cache;
 mod writebatch;
+mod management;

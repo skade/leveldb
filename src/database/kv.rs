@@ -4,7 +4,7 @@ use super::Database;
 
 use options::{WriteOptions,ReadOptions,c_writeoptions,c_readoptions};
 use super::error::Error;
-use database::db_key::Key;
+use database::key::Key;
 use std::ptr;
 use libc::{c_char,size_t};
 use cbits::leveldb::*;

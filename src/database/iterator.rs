@@ -8,7 +8,7 @@ use libc::{size_t,c_char};
 use std::iter;
 use super::Database;
 use super::options::{ReadOptions,c_readoptions};
-use super::db_key::{Key,from_u8};
+use super::key::{Key,from_u8};
 
 #[allow(missing_docs)]
 struct RawIterator {

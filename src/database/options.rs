@@ -8,7 +8,7 @@ use cbits::leveldb::*;
 
 use libc::{size_t};
 use database::snapshots::{Snapshot};
-use database::db_key::{Key};
+use database::key::{Key};
 use database::cache::{Cache};
 
 /// Options to consider when opening a new or pre-existing database.

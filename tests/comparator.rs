@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod comparator {
-  use db_key::Key;
+  use key::Key;
   use utils::{tmpdir, db_put_simple};
   use leveldb::database::{Database};
   use leveldb::iterator::Iterable;

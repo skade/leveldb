@@ -3,9 +3,9 @@
 use cbits::leveldb::*;
 use libc::{c_char,size_t,c_void};
 use core::marker::PhantomData;
-use database::db_key::Key;
+use database::key::Key;
+use database::key::from_u8;
 use std::slice;
-use database::db_key::from_u8;
 use options::{WriteOptions,c_writeoptions};
 use super::error::Error;
 use std::ptr;

@@ -10,8 +10,8 @@ use libc;
 use std::mem;
 use std::slice;
 use std::cmp::Ordering;
-use database::db_key::Key;
-use database::db_key::from_u8;
+use database::key::Key;
+use database::key::from_u8;
 use core::marker::PhantomData;
 
 /// A comparator has two important functions:
@@ -90,10 +90,10 @@ impl<K: Key + Ord> Comparator for OrdComparator<K> {
   type K = K;
 
   fn name(&self) -> *const u8 {
-    use std::intrinsics::get_tydesc;
+    use std::intrinsics::type_name;
 
-    let tydesc = unsafe { *get_tydesc::<K>() };
-    tydesc.name.as_ptr()
+    let tydesc = unsafe { type_name::<K>() };
+    tydesc.as_ptr()
   }
   
   fn compare(&self, a: &K, b: &K) -> Ordering {

@@ -5,7 +5,7 @@
 use cbits::leveldb::{leveldb_t, leveldb_snapshot_t};
 use cbits::leveldb::{leveldb_release_snapshot,leveldb_create_snapshot};
 
-use database::db_key::Key;
+use database::key::Key;
 use database::Database;
 use database::kv::KV;
 

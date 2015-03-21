@@ -1,6 +1,6 @@
 //! The main database module, allowing to interface with leveldb on
 //! a key-value basis.
-extern crate db_key;
+extern crate "db-key" as key;
 
 use cbits::leveldb::*;
 
@@ -12,7 +12,7 @@ use std::path::Path;
 
 use std::ptr;
 use comparator::{Comparator,create_comparator};
-use self::db_key::Key;
+use self::key::Key;
 
 use core::marker::PhantomData;
 

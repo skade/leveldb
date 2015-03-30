@@ -114,7 +114,7 @@ pub trait LevelDBIterator<K: Key> {
       let length: size_t = 0;
       let value = leveldb_iter_key(self.raw_iterator(),
                                    &length) as *const u8;
-      from_u8(Vec::from_raw_buf(value, length as usize).as_slice())
+      from_u8(Vec::from_raw_buf(value, length as usize).as_ref())
     }
   }
 

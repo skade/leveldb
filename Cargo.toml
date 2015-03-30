@@ -23,7 +23,7 @@ db-key = "0.0.5"
 libc = "*"
 
 [dev-dependencies]
-tempdir = "*"
+tempdir = "0.3.0"
 
 [[test]]
 name = "tests"

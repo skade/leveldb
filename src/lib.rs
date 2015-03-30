@@ -2,10 +2,11 @@
 //!
 //! Usage:
 //!
-//! ```rust
-//! #![allow(unstable)]
+//! ```rust,ignore
+//! extern crate tempdir;
+//! extern crate leveldb;
 //!
-//! use std::fs::TempDir;
+//! use tempdir::TempDir;
 //! use leveldb::database::Database;
 //! use leveldb::kv::KV;
 //! use leveldb::options::{Options,WriteOptions,ReadOptions};
@@ -43,6 +44,7 @@
 #![deny(warnings)]
 #![deny(missing_docs)]
 #![feature(core)]
+#![feature(convert)]
 #![feature(collections)]
 
 extern crate libc;

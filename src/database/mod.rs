@@ -1,6 +1,6 @@
 //! The main database module, allowing to interface with leveldb on
 //! a key-value basis.
-extern crate "db-key" as key;
+extern crate db_key as key;
 
 use cbits::leveldb::*;
 

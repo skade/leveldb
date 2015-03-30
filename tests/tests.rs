@@ -1,6 +1,6 @@
 #![feature(core)]
 
-extern crate "db-key" as key;
+extern crate db_key as key;
 extern crate leveldb;
 extern crate core;
 extern crate tempdir;

@@ -5,56 +5,56 @@ pub mod leveldb {
   use libc::{c_int,c_char,size_t,c_void};
 
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_cache_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_comparator_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_env_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_filelock_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_filterpolicy_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_iterator_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_logger_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_options_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_randomfile_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_readoptions_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_seqfile_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_snapshot_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_writablefile_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_writebatch_t;
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub struct leveldb_writeoptions_t;
 
   #[repr(C)]
-  #[derive(Copy)]
+  #[derive(Copy,Clone)]
   pub enum Compression {
     No = 0,
     Snappy = 1

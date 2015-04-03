@@ -76,7 +76,7 @@ impl Options {
 }
 
 /// The write options to use for a write operation.
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub struct WriteOptions {
   /// `fsync` before acknowledging a write operation.
   ///

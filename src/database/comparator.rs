@@ -46,7 +46,7 @@ impl<K> OrdComparator<K> {
     }
 }
 /// DefaultComparator is the a stand in for "no comparator set"
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub struct DefaultComparator;
 
 extern "C" fn name<K: Key, T: Comparator>(state: *mut libc::c_void) -> *const u8 {

@@ -2,7 +2,7 @@
 
 use cbits::leveldb::*;
 use libc::{c_char,size_t,c_void};
-use core::marker::PhantomData;
+use std::marker::PhantomData;
 use database::key::Key;
 use database::key::from_u8;
 use std::slice;

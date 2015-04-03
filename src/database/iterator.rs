@@ -9,6 +9,7 @@ use std::iter;
 use super::Database;
 use super::options::{ReadOptions,c_readoptions};
 use super::key::{Key,from_u8};
+use std::slice::from_raw_parts;
 
 #[allow(missing_docs)]
 struct RawIterator {
@@ -114,7 +115,7 @@ pub trait LevelDBIterator<K: Key> {
       let length: size_t = 0;
       let value = leveldb_iter_key(self.raw_iterator(),
                                    &length) as *const u8;
-      from_u8(Vec::from_raw_buf(value, length as usize).as_ref())
+      from_u8(from_raw_parts(value, length as usize))
     }
   }
 
@@ -123,7 +124,7 @@ pub trait LevelDBIterator<K: Key> {
       let length: size_t = 0;
       let value = leveldb_iter_value(self.raw_iterator(),
                                      &length) as *const u8;
-      Vec::from_raw_buf(value, length as usize)
+      from_raw_parts(value, length as usize).to_vec()
     }
   }
 }

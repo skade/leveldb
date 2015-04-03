@@ -43,12 +43,8 @@
 #![crate_name = "leveldb"]
 #![deny(warnings)]
 #![deny(missing_docs)]
-#![feature(core)]
-#![feature(convert)]
-#![feature(collections)]
 
 extern crate libc;
-extern crate core;
 
 use cbits::leveldb::{leveldb_major_version,leveldb_minor_version};
 pub use database::options as options;
@@ -60,7 +56,7 @@ pub use database::kv as kv;
 pub use database::batch as batch;
 pub use database::management as management;
 
-use core::marker::PhantomFn;
+use std::marker::PhantomFn;
 
 #[allow(missing_docs)]
 pub mod cbits;

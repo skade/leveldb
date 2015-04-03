@@ -12,7 +12,7 @@ use std::slice;
 use std::cmp::Ordering;
 use database::key::Key;
 use database::key::from_u8;
-use core::marker::PhantomData;
+use std::marker::PhantomData;
 
 /// A comparator has two important functions:
 ///
@@ -34,15 +34,15 @@ pub trait Comparator {
 }
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`
-#[derive(Copy)]
 pub struct OrdComparator<K> {
+    name: String,
     marker: PhantomData<K>,
 }
 
 impl<K> OrdComparator<K> {
     /// Create a new OrdComparator
-    pub fn new() -> OrdComparator<K> {
-        OrdComparator { marker: PhantomData }
+    pub fn new(name: &str) -> OrdComparator<K> {
+        OrdComparator { marker: PhantomData, name: name.to_string() }
     }
 }
 /// DefaultComparator is the a stand in for "no comparator set"
@@ -90,10 +90,8 @@ impl<K: Key + Ord> Comparator for OrdComparator<K> {
   type K = K;
 
   fn name(&self) -> *const u8 {
-    use std::intrinsics::type_name;
-
-    let tydesc = unsafe { type_name::<K>() };
-    tydesc.as_ptr()
+    let slice: &str = self.name.as_ref();
+    slice.as_ptr()
   }
   
   fn compare(&self, a: &K, b: &K) -> Ordering {

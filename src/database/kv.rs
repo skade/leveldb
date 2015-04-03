@@ -6,6 +6,7 @@ use options::{WriteOptions,ReadOptions,c_writeoptions,c_readoptions};
 use super::error::Error;
 use database::key::Key;
 use std::ptr;
+use std::slice::from_raw_parts;
 use libc::{c_char,size_t};
 use cbits::leveldb::*;
 
@@ -127,7 +128,7 @@ impl<K: Key> KV<K> for Database<K> {
           if result == ptr::null() {
             Ok(None)
           } else {
-            let vec: Vec<u8> = Vec::from_raw_buf(result, length as usize);
+            let vec: Vec<u8> = from_raw_parts(result, length as usize).to_vec();
             Ok(Some(vec))
           }
         } else {

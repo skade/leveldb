@@ -14,7 +14,7 @@ use std::ptr;
 use comparator::{Comparator,create_comparator};
 use self::key::Key;
 
-use core::marker::PhantomData;
+use std::marker::PhantomData;
 
 pub mod options;
 pub mod error;

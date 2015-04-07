@@ -1,8 +1,5 @@
-#![feature(core)]
-
 extern crate db_key as key;
 extern crate leveldb;
-extern crate core;
 extern crate tempdir;
 
 mod utils;

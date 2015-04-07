@@ -7,7 +7,7 @@ mod comparator {
   use leveldb::options::{Options,ReadOptions};
   use leveldb::comparator::{Comparator,OrdComparator};
   use std::cmp::Ordering;
-  use core::marker::PhantomData;
+  use std::marker::PhantomData;
   
   struct ReverseComparator<K> {
       marker: PhantomData<K>

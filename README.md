@@ -4,7 +4,7 @@ Incomplete bindings for leveldb for Rust.
 
 ## Rust version policy
 
-`leveldb` is built and tested stable releases of Rust. This is currently `1.0.0-beta`. Nightlies
+`leveldb` is built and tested on stable releases of Rust. This is currently `1.0.0-beta`. Nightlies
 might not build at any point and failures are allowed.
 
 ## Prerequisites

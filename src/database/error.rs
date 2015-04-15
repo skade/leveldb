@@ -1,6 +1,7 @@
 //! The module defining custom leveldb error type.
 
 use libc::{c_void,free};
+use std;
 
 /// A leveldb error, just containing the error string
 /// provided by leveldb.
@@ -24,4 +25,19 @@ impl Error {
      unsafe { free(message as *mut c_void) };
      Error::new(err_string)
   }
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "LevelDB error: {}", self.message)
+    }
+}
+
+impl std::error::Error for Error {
+    fn description(&self) -> &str {
+        &self.message
+    }
+    fn cause(&self) -> Option<&std::error::Error> {
+        None
+    }
 }

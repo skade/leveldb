@@ -8,7 +8,7 @@ install:
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
 rust:
-  - 1.0.0-beta2
+  - 1.0.0-beta.2
   - nightly
 matrix:
   allow_failures:

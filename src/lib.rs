@@ -56,8 +56,6 @@ pub use database::kv as kv;
 pub use database::batch as batch;
 pub use database::management as management;
 
-use std::marker::PhantomFn;
-
 #[allow(missing_docs)]
 pub mod cbits;
 pub mod database;
@@ -66,7 +64,7 @@ pub mod database;
 ///
 /// Need a recent version of leveldb to be used.
 
-pub trait Version : PhantomFn<Self, ()> {
+pub trait Version {
     /// The major version.
     fn major() -> isize {
         unsafe { leveldb_major_version() as isize }

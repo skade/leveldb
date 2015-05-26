@@ -1,6 +1,6 @@
-# Rust leveldb bindings
+# Rust level db bindings
 
-Incomplete bindings for leveldb for Rust.
+Incomplete bindings for level db for Rust.
 
 ## Rust version policy
 

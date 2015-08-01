@@ -32,7 +32,9 @@ pub struct Iterator<'a, K: Key + 'a> {
   // but needs to hold the reference for lifetime tracking
   #[allow(dead_code)]
   database: &'a Database<K>,
-  iter: RawIterator
+  iter: RawIterator,
+  from: Option<&'a K>,
+  to: Option<&'a K>,
 }
 
 /// An iterator over the leveldb keyspace.
@@ -44,7 +46,9 @@ pub struct KeyIterator<'a, K: Key + 'a> {
   // but needs to hold the reference for lifetime tracking
   #[allow(dead_code)]
   database: &'a Database<K>,
-  iter: RawIterator
+  iter: RawIterator,
+  from: Option<&'a K>,
+  to: Option<&'a K>,
 }
 
 /// An iterator over the leveldb keyspace.
@@ -56,7 +60,9 @@ pub struct ValueIterator<'a,K: Key + 'a> {
   // but needs to hold the reference for lifetime tracking
   #[allow(dead_code)]
   database: &'a Database<K>,
-  iter: RawIterator
+  iter: RawIterator,
+  from: Option<&'a K>,
+  to: Option<&'a K>,
 }
 
 
@@ -85,15 +91,21 @@ impl<'a, K: Key + 'a> Iterable<'a, K> for Database<K> {
 }
 
 #[allow(missing_docs)]
-pub trait LevelDBIterator<K: Key> {
+pub trait LevelDBIterator<'a, K: Key> {
   #[inline]
   fn raw_iterator(&self) -> *mut leveldb_iterator_t;
-  
+
   #[inline]
   fn start(&self) -> bool;
 
   #[inline]
   fn started(&mut self);
+
+  fn from(mut self, key: &'a K) -> Self;
+  fn to(mut self, key: &'a K) -> Self;
+
+  fn from_key(&self) -> Option<&K>;
+  fn to_key(&self) -> Option<&K>;
 
   fn valid(&self) -> bool {
     unsafe { leveldb_iter_valid(self.raw_iterator()) != 0 }
@@ -102,8 +114,12 @@ pub trait LevelDBIterator<K: Key> {
   fn advance(&mut self) -> bool {
     unsafe {
       if !self.start() {
+
         leveldb_iter_next(self.raw_iterator());
       } else {
+        if let Some(k) = self.from_key() {
+          self.seek(k)
+        }
         self.started();
       }
     }
@@ -127,20 +143,21 @@ pub trait LevelDBIterator<K: Key> {
       from_raw_parts(value, length as usize).to_vec()
     }
   }
-}
 
-#[allow(missing_docs)]
-pub trait LevelDBIteratorExt<K: Key> : LevelDBIterator<K> {
   fn seek_to_first(&self) {
     unsafe { leveldb_iter_seek_to_first(self.raw_iterator()) }
   }
-  
+
   fn seek_to_last(&self) {
-    unsafe { leveldb_iter_seek_to_last(self.raw_iterator()); }
+    if let Some(k) = self.to_key() {
+      self.seek(k);
+    } else {
+      unsafe { leveldb_iter_seek_to_last(self.raw_iterator()); }
+    }
   }
 
-  fn seek(&self, key: K) {
-    unsafe { 
+  fn seek(&self, key: &K) {
+    unsafe {
       key.as_slice(|k| {
         leveldb_iter_seek(self.raw_iterator(),
                           k.as_ptr() as *mut c_char,
@@ -160,7 +177,7 @@ impl<'a, K: Key> Iterator<'a, K> {
                                         c_readoptions);
       leveldb_readoptions_destroy(c_readoptions);
       leveldb_iter_seek_to_first(ptr);
-      Iterator { start: true, iter: RawIterator { ptr: ptr }, database: database }
+      Iterator { start: true, iter: RawIterator { ptr: ptr }, database: database, from: None, to: None }
     }
   }
 
@@ -171,7 +188,7 @@ impl<'a, K: Key> Iterator<'a, K> {
   }
 }
 
-impl<'a, K: Key> LevelDBIterator<K> for Iterator<'a,K> {
+impl<'a, K: Key> LevelDBIterator<'a, K> for Iterator<'a,K> {
   #[inline]
   fn raw_iterator(&self) -> *mut leveldb_iterator_t {
     self.iter.ptr
@@ -186,9 +203,25 @@ impl<'a, K: Key> LevelDBIterator<K> for Iterator<'a,K> {
   fn started(&mut self) {
     self.start = false
   }
-}
 
-impl<'a, K: Key> LevelDBIteratorExt<K> for Iterator<'a,K> { }
+  fn from(mut self, key:&'a K) -> Self {
+    self.from = Some(key);
+    self
+  }
+
+  fn to(mut self, key: &'a K) -> Self {
+    self.to = Some(key);
+    self
+  }
+
+  fn from_key(&self) -> Option<&K> {
+    self.from
+  }
+
+  fn to_key(&self) -> Option<&K> {
+    self.to
+  }
+}
 
 impl<'a,K: Key> KeyIterator<'a,K> {
   fn new(database: &'a Database<K>,
@@ -199,7 +232,7 @@ impl<'a,K: Key> KeyIterator<'a,K> {
                                         c_readoptions);
       leveldb_readoptions_destroy(c_readoptions);
       leveldb_iter_seek_to_first(ptr);
-      KeyIterator { start: true, iter: RawIterator { ptr: ptr }, database: database }
+      KeyIterator { start: true, iter: RawIterator { ptr: ptr }, database: database, from: None, to: None }
     }
   }
 
@@ -210,12 +243,12 @@ impl<'a,K: Key> KeyIterator<'a,K> {
   }
 }
 
-impl<'a,K: Key> LevelDBIterator<K> for KeyIterator<'a,K> {
+impl<'a,K: Key> LevelDBIterator<'a, K> for KeyIterator<'a,K> {
   #[inline]
   fn raw_iterator(&self) -> *mut leveldb_iterator_t {
     self.iter.ptr
   }
-  
+
   #[inline]
   fn start(&self) -> bool {
     self.start
@@ -225,9 +258,25 @@ impl<'a,K: Key> LevelDBIterator<K> for KeyIterator<'a,K> {
   fn started(&mut self) {
     self.start = false
   }
-}
 
-impl<'a, K: Key> LevelDBIteratorExt<K> for KeyIterator<'a,K> { }
+  fn from(mut self, key: &'a K) -> Self {
+    self.from = Some(key);
+    self
+  }
+
+  fn to(mut self, key: &'a K) -> Self {
+    self.to = Some(key);
+    self
+  }
+
+  fn from_key(&self) -> Option<&K> {
+    self.from
+  }
+
+  fn to_key(&self) -> Option<&K> {
+    self.to
+  }
+}
 
 impl<'a,K: Key> ValueIterator<'a,K> {
   fn new(database: &'a Database<K>,
@@ -238,7 +287,7 @@ impl<'a,K: Key> ValueIterator<'a,K> {
                                         c_readoptions);
       leveldb_readoptions_destroy(c_readoptions);
       leveldb_iter_seek_to_first(ptr);
-      ValueIterator { start: true, iter: RawIterator { ptr: ptr }, database: database }
+      ValueIterator { start: true, iter: RawIterator { ptr: ptr }, database: database, from: None, to: None }
     }
   }
 
@@ -249,12 +298,12 @@ impl<'a,K: Key> ValueIterator<'a,K> {
   }
 }
 
-impl<'a,K: Key> LevelDBIterator<K> for ValueIterator<'a,K> {
+impl<'a,K: Key> LevelDBIterator<'a, K> for ValueIterator<'a,K> {
   #[inline]
   fn raw_iterator(&self) -> *mut leveldb_iterator_t {
     self.iter.ptr
   }
-  
+
   #[inline]
   fn start(&self) -> bool {
     self.start
@@ -264,9 +313,25 @@ impl<'a,K: Key> LevelDBIterator<K> for ValueIterator<'a,K> {
   fn started(&mut self) {
     self.start = false
   }
-}
 
-impl<'a, K: Key> LevelDBIteratorExt<K> for ValueIterator<'a,K> { }
+  fn from(mut self, key: &'a K) -> Self {
+    self.from = Some(key);
+    self
+  }
+
+  fn to(mut self, key: &'a K) -> Self {
+    self.to = Some(key);
+    self
+  }
+
+  fn from_key(&self) -> Option<&K> {
+    self.from
+  }
+
+  fn to_key(&self) -> Option<&K> {
+    self.to
+  }
+}
 
 impl<'a,K: Key> iter::Iterator for Iterator<'a,K> {
   type Item = (K,Vec<u8>);

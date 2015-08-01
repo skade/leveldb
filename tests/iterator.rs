@@ -1,5 +1,6 @@
 use utils::{open_database,tmpdir,db_put_simple};
 use leveldb::iterator::Iterable;
+use leveldb::iterator::LevelDBIterator;
 use leveldb::options::{ReadOptions};
 
 #[test]
@@ -33,6 +34,26 @@ fn test_iterator_last() {
 
   assert!(iter.last().is_some());
 }
+
+#[test]
+fn test_iterator_from_to() {
+  let tmp = tmpdir("from_to");
+  let database = &mut open_database(tmp.path(), true);
+  db_put_simple(database, 1, &[1]);
+  db_put_simple(database, 2, &[2]);
+  db_put_simple(database, 3, &[3]);
+  db_put_simple(database, 4, &[4]);
+  db_put_simple(database, 5, &[5]);
+
+  let from = 2;
+  let to = 4;
+  let read_opts = ReadOptions::new();
+  let mut iter = database.iter(read_opts).from(&from).to(&to);
+
+  assert_eq!(iter.next().unwrap(), (2,vec![2]));
+  assert_eq!(iter.last().unwrap(), (4,vec![4]));
+}
+
 
 #[test]
 fn test_key_iterator() {

@@ -12,3 +12,4 @@ mod snapshots;
 mod cache;
 mod writebatch;
 mod management;
+mod compaction;

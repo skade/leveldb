@@ -4,7 +4,7 @@
 //! Comparators allow to override this comparison.
 //! The ordering of keys introduced by the compartor influences iteration order.
 //! Databases written with one Comparator cannot be opened with another.
-use database::leveldb_sys::*;
+use leveldb_sys::*;
 use libc::{size_t,c_void,c_char};
 use libc;
 use std::mem;

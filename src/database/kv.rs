@@ -8,7 +8,7 @@ use database::key::Key;
 use std::ptr;
 use std::slice::from_raw_parts;
 use libc::{c_char,size_t};
-use database::leveldb_sys::*;
+use leveldb_sys::*;
 
 /// Key-Value-Access to the leveldb database, providing
 /// a basic interface.

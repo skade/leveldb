@@ -2,8 +2,8 @@
 //!
 //! Snapshots give you a reference to the database at a certain
 //! point in time and won't change while you work with them.
-use database::leveldb_sys::{leveldb_t, leveldb_snapshot_t};
-use database::leveldb_sys::{leveldb_release_snapshot,leveldb_create_snapshot};
+use leveldb_sys::{leveldb_t, leveldb_snapshot_t};
+use leveldb_sys::{leveldb_release_snapshot,leveldb_create_snapshot};
 
 use database::key::Key;
 use database::Database;

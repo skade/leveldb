@@ -4,7 +4,7 @@
 //! * `Options`: used when opening a database
 //! * `ReadOptions`: used when reading from leveldb
 //! * `WriteOptions`: used when writng to leveldb
-use database::leveldb_sys::*;
+use leveldb_sys::*;
 
 use libc::{size_t};
 use database::snapshots::{Snapshot};

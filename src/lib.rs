@@ -13,7 +13,7 @@
 //!
 //! let tempdir = TempDir::new("demo").unwrap();
 //! let path = tempdir.path();
-//! 
+//!
 //! let mut options = Options::new();
 //! options.create_if_missing = true;
 //! let mut database = match Database::open(path, options) {
@@ -38,14 +38,15 @@
 //!   Err(e) => { panic!("failed reading data: {:?}", e) }
 //! }
 //! ```
- 
+
 #![crate_type = "lib"]
 #![crate_name = "leveldb"]
 #![deny(missing_docs)]
 
 extern crate libc;
+extern crate leveldb_sys;
 
-use cbits::leveldb::{leveldb_major_version,leveldb_minor_version};
+use leveldb_sys::{leveldb_major_version,leveldb_minor_version};
 pub use database::options as options;
 pub use database::error as error;
 pub use database::iterator as iterator;
@@ -56,7 +57,6 @@ pub use database::batch as batch;
 pub use database::management as management;
 
 #[allow(missing_docs)]
-pub mod cbits;
 pub mod database;
 
 /// Library version information

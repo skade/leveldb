@@ -1,6 +1,6 @@
 //! Module providing write batches
 
-use cbits::leveldb::*;
+use database::leveldb_sys::*;
 use libc::{c_char,size_t,c_void};
 use std::marker::PhantomData;
 use database::key::Key;
@@ -42,7 +42,7 @@ impl<K: Key> Batch<K> for Database<K> {
              options: WriteOptions,
              batch: &Writebatch<K>) -> Result<(), Error> {
         unsafe {
-            let mut error = ptr::null();
+            let mut error = ptr::null_mut();
             let c_writeoptions = c_writeoptions(options);
 
             leveldb_write(self.database.ptr,
@@ -51,7 +51,7 @@ impl<K: Key> Batch<K> for Database<K> {
                           &mut error);
             leveldb_writeoptions_destroy(c_writeoptions);
 
-            if error == ptr::null() {
+            if error == ptr::null_mut() {
               Ok(())
             } else {
               Err(Error::new_from_i8(error))
@@ -133,15 +133,15 @@ pub trait WritebatchIterator {
 
 extern "C" fn put_callback<K: Key, T: WritebatchIterator<K = K>>(
   state: *mut c_void,
-  key: *const u8,
+  key: *const i8,
   keylen: size_t,
-  val: *const u8,
+  val: *const i8,
   vallen: size_t
 ) {
     unsafe {
         let iter: &mut T = &mut *(state as *mut T);
-        let key_slice = slice::from_raw_parts::<u8>(key, keylen as usize);
-        let val_slice = slice::from_raw_parts::<u8>(val, vallen as usize);
+        let key_slice = slice::from_raw_parts::<u8>(key as *const u8, keylen as usize);
+        let val_slice = slice::from_raw_parts::<u8>(val as *const u8, vallen as usize);
         let k = from_u8::<<T as WritebatchIterator>::K>(key_slice);
         iter.put(k, val_slice);
     }
@@ -149,12 +149,12 @@ extern "C" fn put_callback<K: Key, T: WritebatchIterator<K = K>>(
 
 extern "C" fn deleted_callback<K: Key, T: WritebatchIterator<K = K>>(
   state: *mut c_void,
-  key: *const u8,
+  key: *const i8,
   keylen: size_t
 ) {
     unsafe {
         let iter: &mut T = &mut *(state as *mut T);
-        let key_slice = slice::from_raw_parts::<u8>(key, keylen as usize);
+        let key_slice = slice::from_raw_parts::<u8>(key as *const u8, keylen as usize);
         let k = from_u8::<<T as WritebatchIterator>::K>(key_slice);
         iter.deleted(k);
     }

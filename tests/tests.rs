@@ -1,6 +1,7 @@
 extern crate db_key as key;
 extern crate leveldb;
 extern crate tempdir;
+extern crate libc;
 
 mod utils;
 mod database;

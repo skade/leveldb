@@ -1,7 +1,7 @@
 [package]
 
 name = "leveldb"
-version = "0.7.1"
+version = "0.8.0"
 authors = [ "Florian Gilcher <florian.gilcher@asquera.de>" ]
 
 description = "An interface for leveldb"
@@ -21,6 +21,10 @@ name = "leveldb"
 
 db-key = "0.0.5"
 libc = "*"
+
+[dependencies.leveldb-sys]
+version = "1.0.0"
+features = ["snappy"]
 
 [dev-dependencies]
 tempdir = "0.3.0"

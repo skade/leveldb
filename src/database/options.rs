@@ -4,7 +4,7 @@
 //! * `Options`: used when opening a database
 //! * `ReadOptions`: used when reading from leveldb
 //! * `WriteOptions`: used when writng to leveldb
-use cbits::leveldb::*;
+use database::leveldb_sys::*;
 
 use libc::{size_t};
 use database::snapshots::{Snapshot};
@@ -124,9 +124,9 @@ impl<'a, K: Key + 'a> ReadOptions<'a, K> {
 #[allow(missing_docs)]
 pub unsafe fn c_options(options: &Options, comparator: Option<*mut leveldb_comparator_t>) -> *mut leveldb_options_t {
   let c_options = leveldb_options_create();
-  leveldb_options_set_create_if_missing(c_options, options.create_if_missing as i8);
-  leveldb_options_set_error_if_exists(c_options, options.error_if_exists as i8);
-  leveldb_options_set_paranoid_checks(c_options, options.paranoid_checks as i8);
+  leveldb_options_set_create_if_missing(c_options, options.create_if_missing as u8);
+  leveldb_options_set_error_if_exists(c_options, options.error_if_exists as u8);
+  leveldb_options_set_paranoid_checks(c_options, options.paranoid_checks as u8);
   if let Some(wbs) = options.write_buffer_size {
     leveldb_options_set_write_buffer_size(c_options, wbs);
   }
@@ -152,15 +152,15 @@ pub unsafe fn c_options(options: &Options, comparator: Option<*mut leveldb_compa
 #[allow(missing_docs)]
 pub unsafe fn c_writeoptions(options: WriteOptions) -> *mut leveldb_writeoptions_t {
   let c_writeoptions = leveldb_writeoptions_create();
-  leveldb_writeoptions_set_sync(c_writeoptions, options.sync as i8);
+  leveldb_writeoptions_set_sync(c_writeoptions, options.sync as u8);
   c_writeoptions
 }
 
 #[allow(missing_docs)]
 pub unsafe fn c_readoptions<'a, K: Key>(options: &ReadOptions<'a, K>) -> *mut leveldb_readoptions_t {
   let c_readoptions = leveldb_readoptions_create();
-  leveldb_readoptions_set_verify_checksums(c_readoptions, options.verify_checksums as i8);
-  leveldb_readoptions_set_fill_cache(c_readoptions, options.fill_cache as i8);
+  leveldb_readoptions_set_verify_checksums(c_readoptions, options.verify_checksums as u8);
+  leveldb_readoptions_set_fill_cache(c_readoptions, options.fill_cache as u8);
 
   if let Some(ref snapshot) = options.snapshot {
     leveldb_readoptions_set_snapshot(c_readoptions, snapshot.raw_ptr());

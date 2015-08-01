@@ -4,8 +4,8 @@
 //! Comparators allow to override this comparison.
 //! The ordering of keys introduced by the compartor influences iteration order.
 //! Databases written with one Comparator cannot be opened with another.
-use cbits::leveldb::*;
-use libc::{size_t,c_void};
+use database::leveldb_sys::*;
+use libc::{size_t,c_void,c_char};
 use libc;
 use std::mem;
 use std::slice;
@@ -24,7 +24,7 @@ pub trait Comparator {
     type K: Key;
 
     /// Return the name of the Comparator
-    fn name(&self) -> *const u8;
+    fn name(&self) -> *const c_char;
     /// compare two keys. This must implement a total ordering.
     fn compare(&self, a: &Self::K, b: &Self::K) -> Ordering;
     /// whether the comparator is the `DefaultComparator`
@@ -49,17 +49,17 @@ impl<K> OrdComparator<K> {
 #[derive(Copy,Clone)]
 pub struct DefaultComparator;
 
-extern "C" fn name<K: Key, T: Comparator>(state: *mut libc::c_void) -> *const u8 {
+extern "C" fn name<K: Key, T: Comparator>(state: *mut libc::c_void) -> *const c_char {
      let x: &T = unsafe { &*(state as *mut T) };
      x.name()
 }
 
 extern "C" fn compare<K: Key, T: Comparator>(state: *mut libc::c_void,
-                                     a: *const u8, a_len: size_t,
-                                     b: *const u8, b_len: size_t) -> i32 {
+                                     a: *const i8, a_len: size_t,
+                                     b: *const i8, b_len: size_t) -> i32 {
      unsafe {
-          let a_slice = slice::from_raw_parts::<u8>(a, a_len as usize);
-          let b_slice = slice::from_raw_parts::<u8>(b, b_len as usize);
+          let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
+          let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
           let x: &T = &*(state as *mut T);
           let a_key = from_u8::<<T as Comparator>::K>(a_slice);
           let b_key = from_u8::<<T as Comparator>::K>(b_slice);
@@ -89,11 +89,11 @@ pub fn create_comparator<K: Key, T: Comparator<K = K>>(x: Box<T>) -> *mut leveld
 impl<K: Key + Ord> Comparator for OrdComparator<K> {
   type K = K;
 
-  fn name(&self) -> *const u8 {
+  fn name(&self) -> *const c_char {
     let slice: &str = self.name.as_ref();
-    slice.as_ptr()
+    slice.as_ptr() as *const c_char
   }
-  
+
   fn compare(&self, a: &K, b: &K) -> Ordering {
     a.cmp(b)
   }
@@ -102,10 +102,10 @@ impl<K: Key + Ord> Comparator for OrdComparator<K> {
 impl Comparator for DefaultComparator {
   type K = i32;
 
-  fn name(&self) -> *const u8 {
-    "default_comparator".as_ptr()
+  fn name(&self) -> *const c_char {
+    "default_comparator".as_ptr() as *const c_char
   }
-  
+
   fn compare(&self, _a: &i32, _b: &i32) -> Ordering {
     Ordering::Equal
   }

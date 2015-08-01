@@ -1,8 +1,9 @@
 //! The main database module, allowing to interface with leveldb on
 //! a key-value basis.
 extern crate db_key as key;
+extern crate leveldb_sys;
 
-use cbits::leveldb::*;
+use self::leveldb_sys::*;
 
 use self::options::{Options,c_options};
 use self::error::Error;
@@ -60,7 +61,7 @@ impl Drop for RawComparator {
 /// be passed when opening the database. This library ships with an Comparator
 /// implementation for keys that are `Ord`.
 ///
-/// When re-opening a database, you must use the same key type `K` and
+/// When re-CString a database, you must use the same key type `K` and
 /// comparator type `C`.
 ///
 /// Multiple Database objects can be kept around, as leveldb synchronises
@@ -92,7 +93,7 @@ impl<K: Key> Database<K> {
   /// If the database is missing, the behaviour depends on `options.create_if_missing`.
   /// The database will be created using the settings given in `options`.
   pub fn open(name: &Path, options: Options) -> Result<Database<K>,Error> {
-    let mut error = ptr::null();
+    let mut error = ptr::null_mut();
     let res = unsafe {
       let c_string = CString::new(name.to_str().unwrap()).unwrap();
       let c_options = c_options(&options, None);
@@ -101,7 +102,7 @@ impl<K: Key> Database<K> {
       db
     };
 
-    if error == ptr::null() {
+    if error == ptr::null_mut() {
       Ok(Database::new(res, options, None))
     } else {
       Err(Error::new_from_i8(error))
@@ -117,7 +118,7 @@ impl<K: Key> Database<K> {
   ///
   /// For keys that implement Ord, consider the `OrdComparator`.
   pub fn open_with_comparator<C: Comparator<K = K>>(name: &Path, options: Options, comparator: C) -> Result<Database<K>,Error> {
-    let mut error = ptr::null();
+    let mut error = ptr::null_mut();
     let comp_ptr = create_comparator(Box::new(comparator));
     let res = unsafe {
       let c_string = CString::new(name.to_str().unwrap()).unwrap();
@@ -127,7 +128,7 @@ impl<K: Key> Database<K> {
       db
     };
 
-    if error == ptr::null() {
+    if error == ptr::null_mut() {
       Ok(Database::new(res, options, Some(comp_ptr)))
     } else {
       Err(Error::new_from_i8(error))

@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod comparator {
+  use libc::c_char;
   use key::Key;
   use utils::{tmpdir, db_put_simple};
   use leveldb::database::{Database};
@@ -16,8 +17,8 @@ mod comparator {
   impl<K: Key + Ord> Comparator for ReverseComparator<K> {
     type K = K;
 
-    fn name(&self) -> *const u8 {
-      "reverse".as_ptr()
+    fn name(&self) -> *const c_char {
+      "reverse".as_ptr() as *const c_char
     }
   
     fn compare(&self, a: &K, b: &K) -> Ordering {

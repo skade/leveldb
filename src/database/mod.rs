@@ -79,6 +79,9 @@ pub struct Database<K: Key> {
   marker: PhantomData<K>
 }
 
+unsafe impl<K> Sync for Database<K> {}
+unsafe impl<K> Send for Database<K> {}
+
 impl<K: Key> Database<K> {
   fn new(database: *mut leveldb_t, options: Options, comparator: Option<*mut leveldb_comparator_t>) -> Database<K> {
     let raw_comp = match comparator {

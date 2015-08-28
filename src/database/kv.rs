@@ -7,7 +7,7 @@ use super::error::Error;
 use database::key::Key;
 use std::ptr;
 use std::slice::from_raw_parts;
-use libc::{c_char,size_t};
+use libc::{c_char,size_t,c_void};
 use leveldb_sys::*;
 
 /// Key-Value-Access to the leveldb database, providing
@@ -129,6 +129,7 @@ impl<K: Key> KV<K> for Database<K> {
             Ok(None)
           } else {
             let vec = from_raw_parts(result as *mut u8, length as usize).to_vec();
+            leveldb_free(result as *mut c_void);
             Ok(Some(vec))
           }
         } else {

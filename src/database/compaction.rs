@@ -1,8 +1,8 @@
 //! Compaction
 use super::Database;
 use super::key::Key;
-use leveldb_sys::{leveldb_compact_range};
-use libc::{c_char,size_t};
+use leveldb_sys::leveldb_compact_range;
+use libc::{c_char, size_t};
 
 pub trait Compaction<'a, K: Key + 'a> {
     fn compact(&self, start: &'a K, limit: &'a K);

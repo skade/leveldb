@@ -46,16 +46,16 @@
 extern crate libc;
 extern crate leveldb_sys;
 
-use leveldb_sys::{leveldb_major_version,leveldb_minor_version};
-pub use database::options as options;
-pub use database::error as error;
-pub use database::iterator as iterator;
-pub use database::snapshots as snapshots;
-pub use database::comparator as comparator;
-pub use database::kv as kv;
-pub use database::batch as batch;
-pub use database::management as management;
-pub use database::compaction as compaction;
+use leveldb_sys::{leveldb_major_version, leveldb_minor_version};
+pub use database::options;
+pub use database::error;
+pub use database::iterator;
+pub use database::snapshots;
+pub use database::comparator;
+pub use database::kv;
+pub use database::batch;
+pub use database::management;
+pub use database::compaction;
 
 #[allow(missing_docs)]
 pub mod database;

@@ -5,7 +5,7 @@
 //! The ordering of keys introduced by the compartor influences iteration order.
 //! Databases written with one Comparator cannot be opened with another.
 use leveldb_sys::*;
-use libc::{size_t,c_void,c_char};
+use libc::{size_t, c_void, c_char};
 use libc;
 use std::mem;
 use std::slice;
@@ -42,7 +42,10 @@ pub struct OrdComparator<K> {
 impl<K> OrdComparator<K> {
     /// Create a new OrdComparator
     pub fn new(name: &str) -> OrdComparator<K> {
-        OrdComparator { marker: PhantomData, name: name.to_string() }
+        OrdComparator {
+            marker: PhantomData,
+            name: name.to_string(),
+        }
     }
 }
 /// DefaultComparator is the a stand in for "no comparator set"
@@ -50,67 +53,70 @@ impl<K> OrdComparator<K> {
 pub struct DefaultComparator;
 
 extern "C" fn name<K: Key, T: Comparator>(state: *mut libc::c_void) -> *const c_char {
-     let x: &T = unsafe { &*(state as *mut T) };
-     x.name()
+    let x: &T = unsafe { &*(state as *mut T) };
+    x.name()
 }
 
 extern "C" fn compare<K: Key, T: Comparator>(state: *mut libc::c_void,
-                                     a: *const i8, a_len: size_t,
-                                     b: *const i8, b_len: size_t) -> i32 {
-     unsafe {
-          let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
-          let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
-          let x: &T = &*(state as *mut T);
-          let a_key = from_u8::<<T as Comparator>::K>(a_slice);
-          let b_key = from_u8::<<T as Comparator>::K>(b_slice);
-          match x.compare(&a_key, &b_key) {
-              Ordering::Less => -1,
-              Ordering::Equal => 0,
-              Ordering::Greater => 1
-          }
-     }
+                                             a: *const i8,
+                                             a_len: size_t,
+                                             b: *const i8,
+                                             b_len: size_t)
+                                             -> i32 {
+    unsafe {
+        let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
+        let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
+        let x: &T = &*(state as *mut T);
+        let a_key = from_u8::<<T as Comparator>::K>(a_slice);
+        let b_key = from_u8::<<T as Comparator>::K>(b_slice);
+        match x.compare(&a_key, &b_key) {
+            Ordering::Less => -1,
+            Ordering::Equal => 0,
+            Ordering::Greater => 1,
+        }
+    }
 }
 
 extern "C" fn destructor<T>(state: *mut libc::c_void) {
-     let _x: Box<T> = unsafe {mem::transmute(state)};
+    let _x: Box<T> = unsafe { mem::transmute(state) };
      // let the Box fall out of scope and run the T's destructor
 }
 
 #[allow(missing_docs)]
 pub fn create_comparator<K: Key, T: Comparator<K = K>>(x: Box<T>) -> *mut leveldb_comparator_t {
-     unsafe {
-          leveldb_comparator_create(mem::transmute(x),
-                                    destructor::<T>,
-                                    compare::<K, T>,
-                                    name::<K, T>)
-     }
+    unsafe {
+        leveldb_comparator_create(mem::transmute(x),
+                                  destructor::<T>,
+                                  compare::<K, T>,
+                                  name::<K, T>)
+    }
 }
 
 impl<K: Key + Ord> Comparator for OrdComparator<K> {
   type K = K;
 
-  fn name(&self) -> *const c_char {
-    let slice: &str = self.name.as_ref();
-    slice.as_ptr() as *const c_char
-  }
+    fn name(&self) -> *const c_char {
+        let slice: &str = self.name.as_ref();
+        slice.as_ptr() as *const c_char
+    }
 
-  fn compare(&self, a: &K, b: &K) -> Ordering {
-    a.cmp(b)
-  }
+    fn compare(&self, a: &K, b: &K) -> Ordering {
+        a.cmp(b)
+    }
 }
 
 impl Comparator for DefaultComparator {
   type K = i32;
 
-  fn name(&self) -> *const c_char {
-    "default_comparator".as_ptr() as *const c_char
-  }
+    fn name(&self) -> *const c_char {
+        "default_comparator".as_ptr() as *const c_char
+    }
 
-  fn compare(&self, _a: &i32, _b: &i32) -> Ordering {
-    Ordering::Equal
-  }
+    fn compare(&self, _a: &i32, _b: &i32) -> Ordering {
+        Ordering::Equal
+    }
 
-  fn null() -> bool {
-    true
-  }
+    fn null() -> bool {
+        true
+    }
 }

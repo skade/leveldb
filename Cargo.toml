@@ -20,14 +20,14 @@ name = "leveldb"
 [dependencies]
 
 db-key = "0.0.5"
-libc = "*"
+libc = "0.2.4"
 
 [dependencies.leveldb-sys]
-version = "1.0.0"
+version = "2.0.0"
 features = ["snappy"]
 
 [dev-dependencies]
-tempdir = "0.3.0"
+tempdir = "0.3.4"
 
 [[test]]
 name = "tests"

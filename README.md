@@ -2,6 +2,8 @@
 
 Incomplete bindings for leveldb for Rust.
 
+[Documentation](http://skade.github.io/leveldb/leveldb/)
+
 ## Rust version policy
 
 `leveldb` is built and tested on stable releases of Rust. This is currently `1.0.0-beta`. Nightlies

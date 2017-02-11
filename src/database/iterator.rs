@@ -12,6 +12,7 @@ use super::Database;
 use super::options::{ReadOptions, c_readoptions};
 use super::key::{Key, from_u8};
 use std::slice::from_raw_parts;
+use std::marker::PhantomData;
 
 #[allow(missing_docs)]
 struct RawIterator {
@@ -33,7 +34,7 @@ pub struct Iterator<'a, K: Key + 'a> {
     // Iterator accesses the Database through a leveldb_iter_t pointer
     // but needs to hold the reference for lifetime tracking
     #[allow(dead_code)]
-    database: &'a Database<K>,
+    database: PhantomData<&'a Database<K>>,
     iter: RawIterator,
     from: Option<&'a K>,
     to: Option<&'a K>,
@@ -47,7 +48,7 @@ pub struct KeyIterator<'a, K: Key + 'a> {
     // Iterator accesses the Database through a leveldb_iter_t pointer
     // but needs to hold the reference for lifetime tracking
     #[allow(dead_code)]
-    database: &'a Database<K>,
+    database: PhantomData<&'a Database<K>>,
     iter: RawIterator,
     from: Option<&'a K>,
     to: Option<&'a K>,
@@ -61,7 +62,7 @@ pub struct ValueIterator<'a, K: Key + 'a> {
     // Iterator accesses the Database through a leveldb_iter_t pointer
     // but needs to hold the reference for lifetime tracking
     #[allow(dead_code)]
-    database: &'a Database<K>,
+    database: PhantomData<&'a Database<K>>,
     iter: RawIterator,
     from: Option<&'a K>,
     to: Option<&'a K>,
@@ -180,7 +181,7 @@ impl<'a, K: Key> Iterator<'a, K> {
             Iterator {
                 start: true,
                 iter: RawIterator { ptr: ptr },
-                database: database,
+                database: PhantomData,
                 from: None,
                 to: None,
             }
@@ -239,7 +240,7 @@ impl<'a,K: Key> KeyIterator<'a,K> {
             KeyIterator {
                 start: true,
                 iter: RawIterator { ptr: ptr },
-                database: database,
+                database: PhantomData,
                 from: None,
                 to: None,
             }
@@ -298,7 +299,7 @@ impl<'a,K: Key> ValueIterator<'a,K> {
             ValueIterator {
                 start: true,
                 iter: RawIterator { ptr: ptr },
-                database: database,
+                database: PhantomData,
                 from: None,
                 to: None,
             }

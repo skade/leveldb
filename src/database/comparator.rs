@@ -53,7 +53,7 @@ impl<K: Key + Ord> OrdComparator<K> {
 #[derive(Copy,Clone)]
 pub struct DefaultComparator;
 
-trait InternalComparator : Comparator where Self: Sized {
+unsafe trait InternalComparator : Comparator where Self: Sized {
 
     extern "C" fn name(state: *mut c_void) -> *const c_char {
         let x: &Self = unsafe { &*(state as *mut Self) };
@@ -86,7 +86,7 @@ trait InternalComparator : Comparator where Self: Sized {
     }
 }
 
-impl<C: Comparator> InternalComparator for C {}
+unsafe impl<C: Comparator> InternalComparator for C {}
 
 #[allow(missing_docs)]
 pub fn create_comparator<K: Key, T: Comparator<K = K>>(x: Box<T>) -> *mut leveldb_comparator_t {

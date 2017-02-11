@@ -88,7 +88,7 @@ unsafe trait InternalComparator : Comparator where Self: Sized {
 unsafe impl<C: Comparator> InternalComparator for C {}
 
 #[allow(missing_docs)]
-pub fn create_comparator<K: Key, T: Comparator<K = K>>(x: Box<T>) -> *mut leveldb_comparator_t {
+pub fn create_comparator<T: Comparator>(x: Box<T>) -> *mut leveldb_comparator_t {
     unsafe {
         leveldb_comparator_create(mem::transmute(x),
                                   <T as InternalComparator>::destructor,

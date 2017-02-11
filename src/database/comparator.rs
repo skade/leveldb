@@ -34,12 +34,12 @@ pub trait Comparator {
 }
 
 /// OrdComparator is a comparator comparing Keys that implement `Ord`
-pub struct OrdComparator<K> {
+pub struct OrdComparator<K: Key + Ord> {
     name: String,
     marker: PhantomData<K>,
 }
 
-impl<K> OrdComparator<K> {
+impl<K: Key + Ord> OrdComparator<K> {
     /// Create a new OrdComparator
     pub fn new(name: &str) -> OrdComparator<K> {
         OrdComparator {
@@ -48,47 +48,53 @@ impl<K> OrdComparator<K> {
         }
     }
 }
+
 /// DefaultComparator is the a stand in for "no comparator set"
 #[derive(Copy,Clone)]
 pub struct DefaultComparator;
 
-extern "C" fn name<K: Key, T: Comparator>(state: *mut libc::c_void) -> *const c_char {
-    let x: &T = unsafe { &*(state as *mut T) };
-    x.name()
-}
+trait InternalComparator<C: Comparator> {
 
-extern "C" fn compare<K: Key, T: Comparator>(state: *mut libc::c_void,
-                                             a: *const i8,
-                                             a_len: size_t,
-                                             b: *const i8,
-                                             b_len: size_t)
-                                             -> i32 {
-    unsafe {
-        let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
-        let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
-        let x: &T = &*(state as *mut T);
-        let a_key = from_u8::<<T as Comparator>::K>(a_slice);
-        let b_key = from_u8::<<T as Comparator>::K>(b_slice);
-        match x.compare(&a_key, &b_key) {
-            Ordering::Less => -1,
-            Ordering::Equal => 0,
-            Ordering::Greater => 1,
+    extern "C" fn name(state: *mut c_void) -> *const c_char {
+        let x: &C = unsafe { &*(state as *mut C) };
+        x.name()
+    }
+
+    extern "C" fn compare(state: *mut c_void,
+                          a: *const i8,
+                          a_len: size_t,
+                          b: *const i8,
+                          b_len: size_t)
+                          -> i32 {
+        unsafe {
+            let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
+            let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
+            let x: &C = &*(state as *mut C);
+            let a_key = from_u8::<<C as Comparator>::K>(a_slice);
+            let b_key = from_u8::<<C as Comparator>::K>(b_slice);
+            match x.compare(&a_key, &b_key) {
+                Ordering::Less => -1,
+                Ordering::Equal => 0,
+                Ordering::Greater => 1,
+            }
         }
+    }
+
+    extern "C" fn destructor(state: *mut c_void) {
+        let _x: Box<C> = unsafe { mem::transmute(state) };
+         // let the Box fall out of scope and run the T's destructor
     }
 }
 
-extern "C" fn destructor<T>(state: *mut libc::c_void) {
-    let _x: Box<T> = unsafe { mem::transmute(state) };
-     // let the Box fall out of scope and run the T's destructor
-}
+impl<C: Comparator> InternalComparator<C> for C {}
 
 #[allow(missing_docs)]
 pub fn create_comparator<K: Key, T: Comparator<K = K>>(x: Box<T>) -> *mut leveldb_comparator_t {
     unsafe {
         leveldb_comparator_create(mem::transmute(x),
-                                  destructor::<T>,
-                                  compare::<K, T>,
-                                  name::<K, T>)
+                                  <T as InternalComparator<T>>::destructor,
+                                  <T as InternalComparator<T>>::compare,
+                                  <T as InternalComparator<T>>::name)
     }
 }
 

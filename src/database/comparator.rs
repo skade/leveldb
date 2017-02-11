@@ -53,10 +53,10 @@ impl<K: Key + Ord> OrdComparator<K> {
 #[derive(Copy,Clone)]
 pub struct DefaultComparator;
 
-trait InternalComparator<C: Comparator> {
+trait InternalComparator : Comparator where Self: Sized {
 
     extern "C" fn name(state: *mut c_void) -> *const c_char {
-        let x: &C = unsafe { &*(state as *mut C) };
+        let x: &Self = unsafe { &*(state as *mut Self) };
         x.name()
     }
 
@@ -69,9 +69,9 @@ trait InternalComparator<C: Comparator> {
         unsafe {
             let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
             let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
-            let x: &C = &*(state as *mut C);
-            let a_key = from_u8::<<C as Comparator>::K>(a_slice);
-            let b_key = from_u8::<<C as Comparator>::K>(b_slice);
+            let x: &Self = &*(state as *mut Self);
+            let a_key = from_u8::<<Self as Comparator>::K>(a_slice);
+            let b_key = from_u8::<<Self as Comparator>::K>(b_slice);
             match x.compare(&a_key, &b_key) {
                 Ordering::Less => -1,
                 Ordering::Equal => 0,
@@ -81,20 +81,20 @@ trait InternalComparator<C: Comparator> {
     }
 
     extern "C" fn destructor(state: *mut c_void) {
-        let _x: Box<C> = unsafe { mem::transmute(state) };
+        let _x: Box<Self> = unsafe { mem::transmute(state) };
          // let the Box fall out of scope and run the T's destructor
     }
 }
 
-impl<C: Comparator> InternalComparator<C> for C {}
+impl<C: Comparator> InternalComparator for C {}
 
 #[allow(missing_docs)]
 pub fn create_comparator<K: Key, T: Comparator<K = K>>(x: Box<T>) -> *mut leveldb_comparator_t {
     unsafe {
         leveldb_comparator_create(mem::transmute(x),
-                                  <T as InternalComparator<T>>::destructor,
-                                  <T as InternalComparator<T>>::compare,
-                                  <T as InternalComparator<T>>::name)
+                                  <T as InternalComparator>::destructor,
+                                  <T as InternalComparator>::compare,
+                                  <T as InternalComparator>::name)
     }
 }
 

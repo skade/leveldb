@@ -6,7 +6,6 @@
 //! Databases written with one Comparator cannot be opened with another.
 use leveldb_sys::*;
 use libc::{size_t, c_void, c_char};
-use libc;
 use std::mem;
 use std::slice;
 use std::cmp::Ordering;
@@ -56,7 +55,7 @@ pub struct DefaultComparator;
 unsafe trait InternalComparator : Comparator where Self: Sized {
 
     extern "C" fn name(state: *mut c_void) -> *const c_char {
-        let x: &Self = unsafe { &*(state as *mut Self) };
+        let x = unsafe { &*(state as *mut Self) };
         x.name()
     }
 
@@ -69,7 +68,7 @@ unsafe trait InternalComparator : Comparator where Self: Sized {
         unsafe {
             let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
             let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
-            let x: &Self = &*(state as *mut Self);
+            let x = &*(state as *mut Self);
             let a_key = from_u8::<<Self as Comparator>::K>(a_slice);
             let b_key = from_u8::<<Self as Comparator>::K>(b_slice);
             match x.compare(&a_key, &b_key) {

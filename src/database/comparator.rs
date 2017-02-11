@@ -6,7 +6,6 @@
 //! Databases written with one Comparator cannot be opened with another.
 use leveldb_sys::*;
 use libc::{size_t, c_void, c_char};
-use std::mem;
 use std::slice;
 use std::cmp::Ordering;
 use database::key::Key;
@@ -80,7 +79,7 @@ unsafe trait InternalComparator : Comparator where Self: Sized {
     }
 
     extern "C" fn destructor(state: *mut c_void) {
-        let _x: Box<Self> = unsafe { mem::transmute(state) };
+        let _x: Box<Self> = unsafe { Box::from_raw(state as *mut Self) };
          // let the Box fall out of scope and run the T's destructor
     }
 }
@@ -90,7 +89,7 @@ unsafe impl<C: Comparator> InternalComparator for C {}
 #[allow(missing_docs)]
 pub fn create_comparator<T: Comparator>(x: Box<T>) -> *mut leveldb_comparator_t {
     unsafe {
-        leveldb_comparator_create(mem::transmute(x),
+        leveldb_comparator_create(Box::into_raw(x) as *mut c_void,
                                   <T as InternalComparator>::destructor,
                                   <T as InternalComparator>::compare,
                                   <T as InternalComparator>::name)

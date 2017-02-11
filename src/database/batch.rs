@@ -100,15 +100,13 @@ impl<K: Key> Writebatch<K> {
 
     /// Iterate over the writebatch, returning the resulting iterator
     pub fn iterate<T: WritebatchIterator<K = K>>(&mut self, iterator: Box<T>) -> Box<T> {
-        use std::mem;
-
         unsafe {
-            let mem = mem::transmute(iterator);
+            let iter = Box::into_raw(iterator);
             leveldb_writebatch_iterate(self.writebatch.ptr,
-                                       mem,
+                                       iter as *mut c_void,
                                        put_callback::<K, T>,
                                        deleted_callback::<K, T>);
-            mem::transmute(mem)
+            Box::from_raw(iter)
         }
     }
 }

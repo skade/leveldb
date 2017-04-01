@@ -45,7 +45,7 @@ to run the test suite.
 
 ## Examples
 
-```{.rust}
+```rust
 #[allow(unstable)]
 
 extern crate leveldb;

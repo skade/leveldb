@@ -28,8 +28,8 @@
 //! };
 //!
 //! let read_opts = ReadOptions::new();
-//! let res = database.get(read_opts,
-//!                        1);
+//! let res = database.get(read_opts, 1);
+//!
 //! match res {
 //!   Ok(data) => {
 //!     assert!(data.is_some());

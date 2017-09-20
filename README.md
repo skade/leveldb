@@ -2,7 +2,7 @@
 
 Almost-complete bindings for leveldb for Rust.
 
-[Documentation](http://skade.github.io/leveldb/leveldb/)
+[Documentation](https://docs.rs/leveldb/0.8.4/leveldb/)
 
 ## Rust version policy
 

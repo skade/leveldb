@@ -2,7 +2,6 @@ use utils::{open_database,tmpdir,db_put_simple};
 use leveldb::snapshots::Snapshots;
 use leveldb::options::{ReadOptions};
 use leveldb::iterator::{Iterable};
-use leveldb::database::kv::{KV};
 
 #[test]
 fn test_snapshots() {

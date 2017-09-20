@@ -13,6 +13,8 @@ use database::error::Error;
 use database::options::ReadOptions;
 use database::iterator::{Iterable, Iterator, KeyIterator, ValueIterator};
 
+use std::borrow::Borrow;
+
 #[allow(missing_docs)]
 struct RawSnapshot {
     db_ptr: *mut leveldb_t,
@@ -62,9 +64,9 @@ impl<'a, K: Key> Snapshot<'a, K> {
     /// fetches a key from the database
     ///
     /// Inserts this snapshot into ReadOptions before reading
-    pub fn get(&'a self,
+    pub fn get<BK: Borrow<K>>(&'a self,
                mut options: ReadOptions<'a, K>,
-               key: K)
+               key: BK)
                -> Result<Option<Vec<u8>>, Error> {
         options.snapshot = Some(self);
         self.database.get(options, key)

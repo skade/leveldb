@@ -7,6 +7,7 @@ use super::error::Error;
 use database::key::Key;
 use std::ptr;
 use std::slice::from_raw_parts;
+use std::borrow::Borrow;
 use libc::{c_char, size_t, c_void};
 use leveldb_sys::*;
 
@@ -16,7 +17,7 @@ pub trait KV<K: Key> {
     /// get a value from the database.
     ///
     /// The passed key will be compared using the comparator.
-    fn get<'a>(&self, options: ReadOptions<'a, K>, key: K) -> Result<Option<Vec<u8>>, Error>;
+    fn get<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Vec<u8>>, Error>;
     /// put a binary value into the database.
     ///
     /// If the key is already present in the database, it will be overwritten.
@@ -25,14 +26,14 @@ pub trait KV<K: Key> {
     ///
     /// The database will be synced to disc if `options.sync == true`. This is
     /// NOT the default.
-    fn put(&self, options: WriteOptions, key: K, value: &[u8]) -> Result<(), Error>;
+    fn put<BK: Borrow<K>>(&self, options: WriteOptions, key: BK, value: &[u8]) -> Result<(), Error>;
     /// delete a value from the database.
     ///
     /// The passed key will be compared using the comparator.
     ///
     /// The database will be synced to disc if `options.sync == true`. This is
     /// NOT the default.
-    fn delete(&self, options: WriteOptions, key: K) -> Result<(), Error>;
+    fn delete<BK: Borrow<K>>(&self, options: WriteOptions, key: BK) -> Result<(), Error>;
 }
 
 impl<K: Key> KV<K> for Database<K> {
@@ -44,9 +45,9 @@ impl<K: Key> KV<K> for Database<K> {
     ///
     /// The database will be synced to disc if `options.sync == true`. This is
     /// NOT the default.
-    fn put(&self, options: WriteOptions, key: K, value: &[u8]) -> Result<(), Error> {
+    fn put<BK: Borrow<K>>(&self, options: WriteOptions, key: BK, value: &[u8]) -> Result<(), Error> {
         unsafe {
-            key.as_slice(|k| {
+            key.borrow().as_slice(|k| {
                 let mut error = ptr::null_mut();
                 let c_writeoptions = c_writeoptions(options);
                 leveldb_put(self.database.ptr,
@@ -73,9 +74,9 @@ impl<K: Key> KV<K> for Database<K> {
     ///
     /// The database will be synced to disc if `options.sync == true`. This is
     /// NOT the default.
-    fn delete(&self, options: WriteOptions, key: K) -> Result<(), Error> {
+    fn delete<BK: Borrow<K>>(&self, options: WriteOptions, key: BK) -> Result<(), Error> {
         unsafe {
-            key.as_slice(|k| {
+            key.borrow().as_slice(|k| {
                 let mut error = ptr::null_mut();
                 let c_writeoptions = c_writeoptions(options);
                 leveldb_delete(self.database.ptr,
@@ -96,9 +97,9 @@ impl<K: Key> KV<K> for Database<K> {
     /// get a value from the database.
     ///
     /// The passed key will be compared using the comparator.
-    fn get<'a>(&self, options: ReadOptions<'a, K>, key: K) -> Result<Option<Vec<u8>>, Error> {
+    fn get<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Vec<u8>>, Error> {
         unsafe {
-            key.as_slice(|k| {
+            key.borrow().as_slice(|k| {
                 let mut error = ptr::null_mut();
                 let mut length: size_t = 0;
                 let c_readoptions = c_readoptions(&options);

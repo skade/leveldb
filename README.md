@@ -1,6 +1,6 @@
 # Rust leveldb bindings
 
-Incomplete bindings for leveldb for Rust.
+Almost-complete bindings for leveldb for Rust.
 
 [Documentation](http://skade.github.io/leveldb/leveldb/)
 
@@ -11,7 +11,7 @@ might not build at any point and failures are allowed.
 
 ## Prerequisites
 
-`snappy` and `leveldb` need to be installed. On Ubuntu, I recommend.
+`snappy` and `leveldb` need to be installed. On Ubuntu, I recommend:
 
 ```sh
 sudo apt-get install libleveldb-dev libsnappy-dev
@@ -24,7 +24,7 @@ If your project is using [Cargo](http://crates.io), drop the following lines in 
 ```text
 [dependencies]
 
-leveldb = "*"
+leveldb = "0.8"
 ```
 
 ## Development

@@ -105,20 +105,19 @@ impl<K: Key> Database<K> {
     /// The database will be created using the settings given in `options`.
     pub fn open(name: &Path, options: Options) -> Result<Database<K>, Error> {
         let mut error = ptr::null_mut();
-        let res = unsafe {
+        unsafe {
             let c_string = CString::new(name.to_str().unwrap()).unwrap();
             let c_options = c_options(&options, None);
             let db = leveldb_open(c_options as *const leveldb_options_t,
                                   c_string.as_bytes_with_nul().as_ptr() as *const i8,
                                   &mut error);
             leveldb_options_destroy(c_options);
-            db
-        };
 
-        if error == ptr::null_mut() {
-            Ok(Database::new(res, options, None))
-        } else {
-            Err(Error::new_from_i8(error))
+            if error == ptr::null_mut() {
+                Ok(Database::new(db, options, None))
+            } else {
+                Err(Error::new_from_i8(error))
+            }
         }
     }
 
@@ -136,20 +135,19 @@ impl<K: Key> Database<K> {
                                                       -> Result<Database<K>, Error> {
         let mut error = ptr::null_mut();
         let comp_ptr = create_comparator(Box::new(comparator));
-        let res = unsafe {
+        unsafe {
             let c_string = CString::new(name.to_str().unwrap()).unwrap();
             let c_options = c_options(&options, Some(comp_ptr));
             let db = leveldb_open(c_options as *const leveldb_options_t,
                                   c_string.as_bytes_with_nul().as_ptr() as *const i8,
                                   &mut error);
             leveldb_options_destroy(c_options);
-            db
-        };
 
-        if error == ptr::null_mut() {
-            Ok(Database::new(res, options, Some(comp_ptr)))
-        } else {
-            Err(Error::new_from_i8(error))
+            if error == ptr::null_mut() {
+                Ok(Database::new(db, options, Some(comp_ptr)))
+            } else {
+                Err(Error::new_from_i8(error))
+            }
         }
     }
 }

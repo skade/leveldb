@@ -16,12 +16,12 @@ pub fn destroy(name: &Path, options: Options) -> Result<(), Error> {
         leveldb_destroy_db(c_options,
                            c_string.as_bytes_with_nul().as_ptr() as *const i8,
                            &mut error);
-    };
 
-    if error == ptr::null_mut() {
-        Ok(())
-    } else {
-        Err(Error::new_from_i8(error))
+        if error == ptr::null_mut() {
+            Ok(())
+        } else {
+            Err(Error::new_from_i8(error))
+        }
     }
 }
 
@@ -34,11 +34,11 @@ pub fn repair(name: &Path, options: Options) -> Result<(), Error> {
         leveldb_repair_db(c_options,
                           c_string.as_bytes_with_nul().as_ptr() as *const i8,
                           &mut error);
-    };
 
-    if error == ptr::null_mut() {
-        Ok(())
-    } else {
-        Err(Error::new_from_i8(error))
+        if error == ptr::null_mut() {
+            Ok(())
+        } else {
+            Err(Error::new_from_i8(error))
+        }
     }
 }

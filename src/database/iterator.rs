@@ -44,28 +44,14 @@ pub struct Iterator<'a, K: Key + 'a> {
 ///
 /// Returns just the keys.
 pub struct KeyIterator<'a, K: Key + 'a> {
-    start: bool,
-    // Iterator accesses the Database through a leveldb_iter_t pointer
-    // but needs to hold the reference for lifetime tracking
-    #[allow(dead_code)]
-    database: PhantomData<&'a Database<K>>,
-    iter: RawIterator,
-    from: Option<&'a K>,
-    to: Option<&'a K>,
+    inner: Iterator<'a, K>,
 }
 
 /// An iterator over the leveldb keyspace.
 ///
 /// Returns just the value.
 pub struct ValueIterator<'a, K: Key + 'a> {
-    start: bool,
-    // Iterator accesses the Database through a leveldb_iter_t pointer
-    // but needs to hold the reference for lifetime tracking
-    #[allow(dead_code)]
-    database: PhantomData<&'a Database<K>>,
-    iter: RawIterator,
-    from: Option<&'a K>,
-    to: Option<&'a K>,
+    inner: Iterator<'a, K>,
 }
 
 
@@ -232,19 +218,7 @@ impl<'a, K: Key> LevelDBIterator<'a, K> for Iterator<'a,K> {
 
 impl<'a,K: Key> KeyIterator<'a,K> {
     fn new(database: &'a Database<K>, options: ReadOptions<'a, K>) -> KeyIterator<'a, K> {
-        unsafe {
-            let c_readoptions = c_readoptions(&options);
-            let ptr = leveldb_create_iterator(database.database.ptr, c_readoptions);
-            leveldb_readoptions_destroy(c_readoptions);
-            leveldb_iter_seek_to_first(ptr);
-            KeyIterator {
-                start: true,
-                iter: RawIterator { ptr: ptr },
-                database: PhantomData,
-                from: None,
-                to: None,
-            }
-        }
+        KeyIterator { inner: Iterator::new(database, options) }
     }
 
     /// return the last element of the iterator
@@ -257,53 +231,41 @@ impl<'a,K: Key> KeyIterator<'a,K> {
 impl<'a,K: Key> LevelDBIterator<'a, K> for KeyIterator<'a,K> {
     #[inline]
     fn raw_iterator(&self) -> *mut leveldb_iterator_t {
-        self.iter.ptr
+        self.inner.iter.ptr
     }
 
     #[inline]
     fn start(&self) -> bool {
-        self.start
+        self.inner.start
     }
 
     #[inline]
     fn started(&mut self) {
-        self.start = false
+        self.inner.start = false
     }
 
     fn from(mut self, key: &'a K) -> Self {
-        self.from = Some(key);
+        self.inner.from = Some(key);
         self
     }
 
     fn to(mut self, key: &'a K) -> Self {
-        self.to = Some(key);
+        self.inner.to = Some(key);
         self
     }
 
     fn from_key(&self) -> Option<&K> {
-        self.from
+        self.inner.from
     }
 
     fn to_key(&self) -> Option<&K> {
-        self.to
+        self.inner.to
     }
 }
 
 impl<'a,K: Key> ValueIterator<'a,K> {
     fn new(database: &'a Database<K>, options: ReadOptions<'a, K>) -> ValueIterator<'a, K> {
-        unsafe {
-            let c_readoptions = c_readoptions(&options);
-            let ptr = leveldb_create_iterator(database.database.ptr, c_readoptions);
-            leveldb_readoptions_destroy(c_readoptions);
-            leveldb_iter_seek_to_first(ptr);
-            ValueIterator {
-                start: true,
-                iter: RawIterator { ptr: ptr },
-                database: PhantomData,
-                from: None,
-                to: None,
-            }
-        }
+        ValueIterator { inner: Iterator::new(database, options) }
     }
 
     /// return the last element of the iterator
@@ -316,35 +278,35 @@ impl<'a,K: Key> ValueIterator<'a,K> {
 impl<'a,K: Key> LevelDBIterator<'a, K> for ValueIterator<'a,K> {
     #[inline]
     fn raw_iterator(&self) -> *mut leveldb_iterator_t {
-        self.iter.ptr
+        self.inner.iter.ptr
     }
 
     #[inline]
     fn start(&self) -> bool {
-        self.start
+        self.inner.start
     }
 
     #[inline]
     fn started(&mut self) {
-        self.start = false
+        self.inner.start = false
     }
 
     fn from(mut self, key: &'a K) -> Self {
-        self.from = Some(key);
+        self.inner.from = Some(key);
         self
     }
 
     fn to(mut self, key: &'a K) -> Self {
-        self.to = Some(key);
+        self.inner.to = Some(key);
         self
     }
 
     fn from_key(&self) -> Option<&K> {
-        self.from
+        self.inner.from
     }
 
     fn to_key(&self) -> Option<&K> {
-        self.to
+        self.inner.to
     }
 }
 

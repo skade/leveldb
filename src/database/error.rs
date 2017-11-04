@@ -1,6 +1,7 @@
 //! The module defining custom leveldb error type.
 
-use libc::{c_void, free};
+use libc::c_void;
+use leveldb_sys::leveldb_free;
 use std;
 
 /// A leveldb error, just containing the error string
@@ -25,7 +26,7 @@ impl Error {
         use std::ffi::CStr;
 
         let err_string = from_utf8(CStr::from_ptr(message).to_bytes()).unwrap().to_string();
-        free(message as *mut c_void);
+        leveldb_free(message as *mut c_void);
         Error::new(err_string)
     }
 }

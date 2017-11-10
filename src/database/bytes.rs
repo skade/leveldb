@@ -93,12 +93,12 @@ impl AsMut<[u8]> for Bytes {
 
 impl From<Bytes> for Vec<u8> {
     fn from(bytes: Bytes) -> Self {
-        bytes.as_ref().into()
+        bytes.as_ref().to_owned()
     }
 }
 
 impl From<Bytes> for Box<[u8]> {
     fn from(bytes: Bytes) -> Self {
-        bytes.as_ref().into()
+        bytes.as_ref().to_owned().into_boxed_slice()
     }
 }

@@ -6,10 +6,10 @@ use options::{WriteOptions, ReadOptions, c_writeoptions, c_readoptions};
 use super::error::Error;
 use database::key::Key;
 use std::ptr;
-use std::slice::from_raw_parts;
 use std::borrow::Borrow;
-use libc::{c_char, size_t, c_void};
+use libc::{c_char, size_t};
 use leveldb_sys::*;
+use super::bytes::Bytes;
 
 /// Key-Value-Access to the leveldb database, providing
 /// a basic interface.
@@ -18,6 +18,14 @@ pub trait KV<K: Key> {
     ///
     /// The passed key will be compared using the comparator.
     fn get<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Vec<u8>>, Error>;
+
+    /// get a value from the database.
+    ///
+    /// The passed key will be compared using the comparator.
+    ///
+    /// This version returns bytes allocated by leveldb without converting to `Vec<u8>`, which may
+    /// lead to better performance.
+    fn get_bytes<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Bytes>, Error>;
     /// put a binary value into the database.
     ///
     /// If the key is already present in the database, it will be overwritten.
@@ -94,10 +102,7 @@ impl<K: Key> KV<K> for Database<K> {
         }
     }
 
-    /// get a value from the database.
-    ///
-    /// The passed key will be compared using the comparator.
-    fn get<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Vec<u8>>, Error> {
+    fn get_bytes<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Bytes>, Error> {
         unsafe {
             key.borrow().as_slice(|k| {
                 let mut error = ptr::null_mut();
@@ -112,17 +117,15 @@ impl<K: Key> KV<K> for Database<K> {
                 leveldb_readoptions_destroy(c_readoptions);
 
                 if error == ptr::null_mut() {
-                    if result == ptr::null_mut() {
-                        Ok(None)
-                    } else {
-                        let vec = from_raw_parts(result as *mut u8, length as usize).to_vec();
-                        leveldb_free(result as *mut c_void);
-                        Ok(Some(vec))
-                    }
+                    Ok(Bytes::from_raw(result as *mut u8, length))
                 } else {
                     Err(Error::new_from_i8(error))
                 }
             })
         }
+    }
+
+    fn get<'a, BK: Borrow<K>>(&self, options: ReadOptions<'a, K>, key: BK) -> Result<Option<Vec<u8>>, Error> {
+        self.get_bytes(options, key).map(|val| val.map(Into::into))
     }
 }

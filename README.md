@@ -51,6 +51,7 @@ extern crate leveldb;
 
 use tempdir::TempDir;
 use leveldb::database::Database;
+use leveldb::iterator::Iterable;
 use leveldb::kv::KV;
 use leveldb::options::{Options,WriteOptions,ReadOptions};
 

@@ -1,6 +1,6 @@
 //! The module defining custom leveldb error type.
 
-use libc::c_void;
+use libc::{c_char, c_void};
 use leveldb_sys::leveldb_free;
 use std;
 
@@ -21,7 +21,7 @@ impl Error {
     ///
     /// This method is `unsafe` because the pointer must be valid and point to heap.
     /// The pointer will be passed to `free`!
-    pub unsafe fn new_from_i8(message: *const i8) -> Error {
+    pub unsafe fn new_from_char(message: *const c_char) -> Error {
         use std::str::from_utf8;
         use std::ffi::CStr;
 

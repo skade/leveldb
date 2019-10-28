@@ -59,14 +59,14 @@ unsafe trait InternalComparator : Comparator where Self: Sized {
     }
 
     extern "C" fn compare(state: *mut c_void,
-                          a: *const i8,
+                          a: *const libc::c_char,
                           a_len: size_t,
-                          b: *const i8,
+                          b: *const libc::c_char,
                           b_len: size_t)
                           -> i32 {
         unsafe {
-            let a_slice = slice::from_raw_parts::<u8>(a as *const u8, a_len as usize);
-            let b_slice = slice::from_raw_parts::<u8>(b as *const u8, b_len as usize);
+            let a_slice = slice::from_raw_parts::<u8>(a as *const _, a_len as usize);
+            let b_slice = slice::from_raw_parts::<u8>(b as *const _, b_len as usize);
             let x = &*(state as *mut Self);
             let a_key = from_u8::<<Self as Comparator>::K>(a_slice);
             let b_key = from_u8::<<Self as Comparator>::K>(b_slice);

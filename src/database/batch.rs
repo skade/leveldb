@@ -124,25 +124,25 @@ pub trait WritebatchIterator {
 }
 
 extern "C" fn put_callback<K: Key, T: WritebatchIterator<K = K>>(state: *mut c_void,
-                                                                 key: *const i8,
+                                                                 key: *const libc::c_char,
                                                                  keylen: size_t,
-                                                                 val: *const i8,
+                                                                 val: *const libc::c_char,
                                                                  vallen: size_t) {
     unsafe {
         let iter: &mut T = &mut *(state as *mut T);
-        let key_slice = slice::from_raw_parts::<u8>(key as *const u8, keylen as usize);
-        let val_slice = slice::from_raw_parts::<u8>(val as *const u8, vallen as usize);
+        let key_slice = slice::from_raw_parts::<u8>(key as *const _, keylen as usize);
+        let val_slice = slice::from_raw_parts::<u8>(val as *const _, vallen as usize);
         let k = from_u8::<<T as WritebatchIterator>::K>(key_slice);
         iter.put(k, val_slice);
     }
 }
 
 extern "C" fn deleted_callback<K: Key, T: WritebatchIterator<K = K>>(state: *mut c_void,
-                                                                     key: *const i8,
+                                                                     key: *const libc::c_char,
                                                                      keylen: size_t) {
     unsafe {
         let iter: &mut T = &mut *(state as *mut T);
-        let key_slice = slice::from_raw_parts::<u8>(key as *const u8, keylen as usize);
+        let key_slice = slice::from_raw_parts::<u8>(key as *const _, keylen as usize);
         let k = from_u8::<<T as WritebatchIterator>::K>(key_slice);
         iter.deleted(k);
     }

@@ -16,6 +16,8 @@ use self::key::Key;
 
 use std::marker::PhantomData;
 
+use libc::c_char;
+
 pub mod options;
 pub mod error;
 pub mod iterator;
@@ -110,7 +112,7 @@ impl<K: Key> Database<K> {
             let c_string = CString::new(name.to_str().unwrap()).unwrap();
             let c_options = c_options(&options, None);
             let db = leveldb_open(c_options as *const leveldb_options_t,
-                                  c_string.as_bytes_with_nul().as_ptr() as *const libc::c_char,
+                                  c_string.as_bytes_with_nul().as_ptr() as *const c_char,
                                   &mut error);
             leveldb_options_destroy(c_options);
 
@@ -140,7 +142,7 @@ impl<K: Key> Database<K> {
             let c_string = CString::new(name.to_str().unwrap()).unwrap();
             let c_options = c_options(&options, Some(comp_ptr));
             let db = leveldb_open(c_options as *const leveldb_options_t,
-                                  c_string.as_bytes_with_nul().as_ptr() as *const libc::c_char,
+                                  c_string.as_bytes_with_nul().as_ptr() as *const c_char,
                                   &mut error);
             leveldb_options_destroy(c_options);
 

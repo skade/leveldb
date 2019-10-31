@@ -8,6 +8,8 @@ use self::options::{Options, c_options};
 use self::error::Error;
 use std::ffi::CString;
 use libc::c_char;
+#[cfg(unix)]
+use std::os::unix::ffi::OsStrExt;
 
 use std::path::Path;
 
@@ -108,7 +110,14 @@ impl<K: Key> Database<K> {
     pub fn open(name: &Path, options: Options) -> Result<Database<K>, Error> {
         let mut error = ptr::null_mut();
         unsafe {
-            let c_string = CString::new(name.to_str().unwrap()).unwrap();
+            #[cfg(unix)]
+            let c_string = CString::new(name.as_os_str().as_bytes()).unwrap();
+            #[cfg(not(unix))]
+            let c_string = CString::new(
+                name.to_str()
+                    .ok_or_else(|| Error::new("Path is not valid Unicode".into()))?,
+            )
+            .unwrap();
             let c_options = c_options(&options, None);
             let db = leveldb_open(c_options as *const leveldb_options_t,
                                   c_string.as_bytes_with_nul().as_ptr() as *const c_char,

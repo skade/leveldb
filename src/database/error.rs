@@ -25,9 +25,14 @@ impl Error {
         use std::str::from_utf8;
         use std::ffi::CStr;
 
-        let err_string = from_utf8(CStr::from_ptr(message).to_bytes()).unwrap().to_string();
+        let err_string = from_utf8(CStr::from_ptr(message).to_bytes())
+            .map(|s| s.to_string());
         leveldb_free(message as *mut c_void);
-        Error::new(err_string)
+
+        match err_string {
+            Ok(err_string) => Error::new(err_string),
+            Err(_) => Error::new("The error returned by LevelDB is not valid UTF-8".into())
+        }
     }
 }
 

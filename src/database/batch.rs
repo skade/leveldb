@@ -52,7 +52,7 @@ impl<K: Key> Batch<K> for Database<K> {
             if error == ptr::null_mut() {
                 Ok(())
             } else {
-                Err(Error::new_from_c_char(error))
+                Err(Error::new_from_char(error))
             }
         }
     }

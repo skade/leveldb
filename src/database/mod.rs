@@ -118,7 +118,7 @@ impl<K: Key> Database<K> {
             if error == ptr::null_mut() {
                 Ok(Database::new(db, options, None))
             } else {
-                Err(Error::new_from_c_char(error))
+                Err(Error::new_from_char(error))
             }
         }
     }
@@ -148,7 +148,7 @@ impl<K: Key> Database<K> {
             if error == ptr::null_mut() {
                 Ok(Database::new(db, options, Some(comp_ptr)))
             } else {
-                Err(Error::new_from_c_char(error))
+                Err(Error::new_from_char(error))
             }
         }
     }

@@ -21,7 +21,7 @@ pub fn destroy(name: &Path, options: Options) -> Result<(), Error> {
         if error == ptr::null_mut() {
             Ok(())
         } else {
-            Err(Error::new_from_c_char(error))
+            Err(Error::new_from_char(error))
         }
     }
 }
@@ -39,7 +39,7 @@ pub fn repair(name: &Path, options: Options) -> Result<(), Error> {
         if error == ptr::null_mut() {
             Ok(())
         } else {
-            Err(Error::new_from_c_char(error))
+            Err(Error::new_from_char(error))
         }
     }
 }

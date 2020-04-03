@@ -15,6 +15,7 @@ use comparator::{Comparator, create_comparator};
 use self::key::Key;
 
 use std::marker::PhantomData;
+use libc::c_char;
 
 pub mod options;
 pub mod error;
@@ -110,14 +111,14 @@ impl<K: Key> Database<K> {
             let c_string = CString::new(name.to_str().unwrap()).unwrap();
             let c_options = c_options(&options, None);
             let db = leveldb_open(c_options as *const leveldb_options_t,
-                                  c_string.as_bytes_with_nul().as_ptr() as *const i8,
+                                  c_string.as_bytes_with_nul().as_ptr() as *const c_char,
                                   &mut error);
             leveldb_options_destroy(c_options);
 
             if error == ptr::null_mut() {
                 Ok(Database::new(db, options, None))
             } else {
-                Err(Error::new_from_i8(error))
+                Err(Error::new_from_char(error))
             }
         }
     }
@@ -140,14 +141,14 @@ impl<K: Key> Database<K> {
             let c_string = CString::new(name.to_str().unwrap()).unwrap();
             let c_options = c_options(&options, Some(comp_ptr));
             let db = leveldb_open(c_options as *const leveldb_options_t,
-                                  c_string.as_bytes_with_nul().as_ptr() as *const i8,
+                                  c_string.as_bytes_with_nul().as_ptr() as *const c_char,
                                   &mut error);
             leveldb_options_destroy(c_options);
 
             if error == ptr::null_mut() {
                 Ok(Database::new(db, options, Some(comp_ptr)))
             } else {
-                Err(Error::new_from_i8(error))
+                Err(Error::new_from_char(error))
             }
         }
     }

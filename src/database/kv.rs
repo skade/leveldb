@@ -70,7 +70,7 @@ impl<K: Key> KV<K> for Database<K> {
                 if error == ptr::null_mut() {
                     Ok(())
                 } else {
-                    Err(Error::new_from_i8(error))
+                    Err(Error::new_from_char(error))
                 }
             })
         }
@@ -96,7 +96,7 @@ impl<K: Key> KV<K> for Database<K> {
                 if error == ptr::null_mut() {
                     Ok(())
                 } else {
-                    Err(Error::new_from_i8(error))
+                    Err(Error::new_from_char(error))
                 }
             })
         }
@@ -119,7 +119,7 @@ impl<K: Key> KV<K> for Database<K> {
                 if error == ptr::null_mut() {
                     Ok(Bytes::from_raw(result as *mut u8, length))
                 } else {
-                    Err(Error::new_from_i8(error))
+                    Err(Error::new_from_char(error))
                 }
             })
         }

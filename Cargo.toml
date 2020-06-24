@@ -15,6 +15,9 @@ repository = "https://github.com/skade/leveldb"
 
 autotests = false
 
+[features]
+default = ["leveldb-sys/snappy"]
+
 [lib]
 
 name = "leveldb"
@@ -26,7 +29,6 @@ libc = "0.2.4"
 
 [dependencies.leveldb-sys]
 version = "2.0.0"
-features = ["snappy"]
 
 [dev-dependencies]
 tempdir = "0.3.4"

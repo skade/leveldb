@@ -6,7 +6,8 @@ use super::key::{from_u8, Key};
 use super::options::{c_readoptions, ReadOptions};
 use super::Database;
 use leveldb_sys::{
-    leveldb_create_iterator, leveldb_iter_destroy, leveldb_iter_key, leveldb_iter_next, leveldb_iter_seek, leveldb_iter_seek_to_first, leveldb_iter_seek_to_last,
+    leveldb_create_iterator, leveldb_iter_destroy, leveldb_iter_key, leveldb_iter_next,
+    leveldb_iter_prev, leveldb_iter_seek, leveldb_iter_seek_to_first, leveldb_iter_seek_to_last,
     leveldb_iter_valid, leveldb_iter_value, leveldb_iterator_t, leveldb_readoptions_destroy,
 };
 use libc::{c_char, size_t};
@@ -104,6 +105,21 @@ pub trait LevelDBIterator<'a, K: Key> {
             if !self.start() {
                 leveldb_iter_next(self.raw_iterator());
             } else {
+                if let Some(k) = self.from_key() {
+                    self.seek(k)
+                }
+                self.started();
+            }
+        }
+        self.valid()
+    }
+
+    fn step_back(&mut self) -> bool {
+        unsafe {
+            if !self.start() {
+                leveldb_iter_prev(self.raw_iterator());
+            } else {
+                leveldb_iter_seek_to_last(self.raw_iterator());
                 if let Some(k) = self.from_key() {
                     self.seek(k)
                 }
@@ -325,8 +341,18 @@ impl<'a, K: Key> iter::Iterator for Iterator<'a, K> {
     }
 }
 
-impl<'a, K: Key> iter::Iterator for KeyIterator<'a,K> {
-  type Item = K;
+impl<'a, K: Key> iter::DoubleEndedIterator for Iterator<'a, K> {
+    fn next_back(&mut self) -> Option<(K, Vec<u8>)> {
+        if self.step_back() {
+            Some((self.key(), self.value()))
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, K: Key> iter::Iterator for KeyIterator<'a, K> {
+    type Item = K;
 
     fn next(&mut self) -> Option<K> {
         if self.advance() {
@@ -337,11 +363,31 @@ impl<'a, K: Key> iter::Iterator for KeyIterator<'a,K> {
     }
 }
 
-impl<'a, K: Key> iter::Iterator for ValueIterator<'a,K> {
-  type Item = Vec<u8>;
+impl<'a, K: Key> iter::DoubleEndedIterator for KeyIterator<'a, K> {
+    fn next_back(&mut self) -> Option<K> {
+        if self.step_back() {
+            Some(self.key())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, K: Key> iter::Iterator for ValueIterator<'a, K> {
+    type Item = Vec<u8>;
 
     fn next(&mut self) -> Option<Vec<u8>> {
         if self.advance() {
+            Some(self.value())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, K: Key> iter::DoubleEndedIterator for ValueIterator<'a, K> {
+    fn next_back(&mut self) -> Option<Vec<u8>> {
+        if self.step_back() {
             Some(self.value())
         } else {
             None

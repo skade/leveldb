@@ -23,6 +23,25 @@ fn test_iterator() {
 }
 
 #[test]
+fn test_iterator_reverse() {
+    let tmp = tmpdir("iter");
+    let database = &mut open_database(tmp.path(), true);
+    db_put_simple(database, 1, &[1]);
+    db_put_simple(database, 2, &[2]);
+
+    let read_opts = ReadOptions::new();
+    let mut iter = database.iter(read_opts).rev();
+
+    let entry = iter.next();
+    assert!(entry.is_some());
+    assert_eq!(entry.unwrap(), (2, vec![2]));
+    let entry2 = iter.next();
+    assert!(entry2.is_some());
+    assert_eq!(entry2.unwrap(), (1, vec![1]));
+    assert!(iter.next().is_none());
+}
+
+#[test]
 fn test_iterator_last() {
     let tmp = tmpdir("iter_last");
     let database = &mut open_database(tmp.path(), true);

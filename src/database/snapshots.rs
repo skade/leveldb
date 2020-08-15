@@ -2,16 +2,16 @@
 //!
 //! Snapshots give you a reference to the database at a certain
 //! point in time and won't change while you work with them.
-use leveldb_sys::{leveldb_t, leveldb_snapshot_t};
-use leveldb_sys::{leveldb_release_snapshot, leveldb_create_snapshot};
+use leveldb_sys::{leveldb_create_snapshot, leveldb_release_snapshot};
+use leveldb_sys::{leveldb_snapshot_t, leveldb_t};
 
 use database::key::Key;
-use database::Database;
 use database::kv::KV;
+use database::Database;
 
 use database::error::Error;
-use database::options::ReadOptions;
 use database::iterator::{Iterable, Iterator, KeyIterator, ValueIterator};
+use database::options::ReadOptions;
 
 use std::borrow::Borrow;
 
@@ -64,10 +64,11 @@ impl<'a, K: Key> Snapshot<'a, K> {
     /// fetches a key from the database
     ///
     /// Inserts this snapshot into ReadOptions before reading
-    pub fn get<BK: Borrow<K>>(&'a self,
-               mut options: ReadOptions<'a, K>,
-               key: BK)
-               -> Result<Option<Vec<u8>>, Error> {
+    pub fn get<BK: Borrow<K>>(
+        &'a self,
+        mut options: ReadOptions<'a, K>,
+        key: BK,
+    ) -> Result<Option<Vec<u8>>, Error> {
         options.snapshot = Some(self);
         self.database.get(options, key)
     }

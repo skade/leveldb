@@ -6,10 +6,10 @@
 //! * `WriteOptions`: used when writng to leveldb
 use leveldb_sys::*;
 
-use libc::size_t;
-use database::snapshots::Snapshot;
-use database::key::Key;
 use database::cache::Cache;
+use database::key::Key;
+use database::snapshots::Snapshot;
+use libc::size_t;
 
 /// Options to consider when opening a new or pre-existing database.
 ///
@@ -76,7 +76,7 @@ impl Options {
 }
 
 /// The write options to use for a write operation.
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct WriteOptions {
     /// `fsync` before acknowledging a write operation.
     ///
@@ -124,9 +124,10 @@ impl<'a, K: Key + 'a> ReadOptions<'a, K> {
 }
 
 #[allow(missing_docs)]
-pub unsafe fn c_options(options: &Options,
-                        comparator: Option<*mut leveldb_comparator_t>)
-                        -> *mut leveldb_options_t {
+pub unsafe fn c_options(
+    options: &Options,
+    comparator: Option<*mut leveldb_comparator_t>,
+) -> *mut leveldb_options_t {
     let c_options = leveldb_options_create();
     leveldb_options_set_create_if_missing(c_options, options.create_if_missing as u8);
     leveldb_options_set_error_if_exists(c_options, options.error_if_exists as u8);
@@ -162,7 +163,8 @@ pub unsafe fn c_writeoptions(options: WriteOptions) -> *mut leveldb_writeoptions
 
 #[allow(missing_docs)]
 pub unsafe fn c_readoptions<'a, K>(options: &ReadOptions<'a, K>) -> *mut leveldb_readoptions_t
-    where K: Key
+where
+    K: Key,
 {
     let c_readoptions = leveldb_readoptions_create();
     leveldb_readoptions_set_verify_checksums(c_readoptions, options.verify_checksums as u8);

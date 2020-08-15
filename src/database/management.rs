@@ -1,10 +1,10 @@
 //! Management functions, e.g. for destroying and reparing a database.
-use options::{Options, c_options};
 use error::Error;
-use std::ffi::CString;
-use std::ptr;
-use std::path::Path;
 use libc::c_char;
+use options::{c_options, Options};
+use std::ffi::CString;
+use std::path::Path;
+use std::ptr;
 
 use leveldb_sys::{leveldb_destroy_db, leveldb_repair_db};
 
@@ -14,9 +14,11 @@ pub fn destroy(name: &Path, options: Options) -> Result<(), Error> {
     unsafe {
         let c_string = CString::new(name.to_str().unwrap()).unwrap();
         let c_options = c_options(&options, None);
-        leveldb_destroy_db(c_options,
-                           c_string.as_bytes_with_nul().as_ptr() as *const c_char,
-                           &mut error);
+        leveldb_destroy_db(
+            c_options,
+            c_string.as_bytes_with_nul().as_ptr() as *const c_char,
+            &mut error,
+        );
 
         if error == ptr::null_mut() {
             Ok(())
@@ -32,9 +34,11 @@ pub fn repair(name: &Path, options: Options) -> Result<(), Error> {
     unsafe {
         let c_string = CString::new(name.to_str().unwrap()).unwrap();
         let c_options = c_options(&options, None);
-        leveldb_repair_db(c_options,
-                          c_string.as_bytes_with_nul().as_ptr() as *const c_char,
-                          &mut error);
+        leveldb_repair_db(
+            c_options,
+            c_string.as_bytes_with_nul().as_ptr() as *const c_char,
+            &mut error,
+        );
 
         if error == ptr::null_mut() {
             Ok(())

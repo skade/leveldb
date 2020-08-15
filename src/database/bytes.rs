@@ -1,4 +1,4 @@
-use ::std::slice;
+use std::slice;
 
 /// Bytes allocated by leveldb
 ///
@@ -53,17 +53,13 @@ impl ::std::ops::Deref for Bytes {
     type Target = [u8];
 
     fn deref(&self) -> &Self::Target {
-        unsafe {
-            slice::from_raw_parts(self.bytes, self.size)
-        }
+        unsafe { slice::from_raw_parts(self.bytes, self.size) }
     }
 }
 
 impl ::std::ops::DerefMut for Bytes {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe {
-            slice::from_raw_parts_mut(self.bytes as *mut u8, self.size)
-        }
+        unsafe { slice::from_raw_parts_mut(self.bytes as *mut u8, self.size) }
     }
 }
 

@@ -1,8 +1,8 @@
-use utils::{tmpdir};
-use leveldb::database::{Database};
-use leveldb::options::{Options,ReadOptions,WriteOptions};
-use leveldb::database::kv::{KV};
-use leveldb::database::batch::{Batch,Writebatch,WritebatchIterator};
+use leveldb::database::batch::{Batch, Writebatch, WritebatchIterator};
+use leveldb::database::kv::KV;
+use leveldb::database::Database;
+use leveldb::options::{Options, ReadOptions, WriteOptions};
+use utils::tmpdir;
 
 #[test]
 fn test_writebatch() {
@@ -26,15 +26,15 @@ fn test_writebatch() {
             assert!(data.is_some());
             let data = data.unwrap();
             assert_eq!(data, vec!(2));
-        },
-        Err(_) => { panic!("failed reading data") }
+        }
+        Err(_) => panic!("failed reading data"),
     }
 
     let read_opts2 = ReadOptions::new();
     let res2 = database.get(read_opts2, 1);
     match res2 {
-        Ok(data) => { assert!(data.is_none()) },
-        Err(_) => { panic!("failed reading data") }
+        Ok(data) => assert!(data.is_none()),
+        Err(_) => panic!("failed reading data"),
     }
 }
 
@@ -46,14 +46,11 @@ struct Iter {
 impl WritebatchIterator for Iter {
     type K = i32;
 
-    fn put(&mut self,
-           _key: i32,
-           _value: &[u8]) {
+    fn put(&mut self, _key: i32, _value: &[u8]) {
         self.put = self.put + 1;
     }
 
-    fn deleted(&mut self,
-               _key: i32) {
+    fn deleted(&mut self, _key: i32) {
         self.deleted = self.deleted + 1;
     }
 }

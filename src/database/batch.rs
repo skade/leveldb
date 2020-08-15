@@ -1,15 +1,15 @@
 //! Module providing write batches
 
-use leveldb_sys::*;
-use libc::{c_char, size_t, c_void};
-use std::marker::PhantomData;
-use database::key::Key;
-use database::key::from_u8;
-use std::slice;
-use options::{WriteOptions, c_writeoptions};
 use super::error::Error;
-use std::ptr;
 use super::Database;
+use database::key::from_u8;
+use database::key::Key;
+use leveldb_sys::*;
+use libc::{c_char, c_void, size_t};
+use options::{c_writeoptions, WriteOptions};
+use std::marker::PhantomData;
+use std::ptr;
+use std::slice;
 
 #[allow(missing_docs)]
 struct RawWritebatch {
@@ -43,10 +43,12 @@ impl<K: Key> Batch<K> for Database<K> {
             let mut error = ptr::null_mut();
             let c_writeoptions = c_writeoptions(options);
 
-            leveldb_write(self.database.ptr,
-                          c_writeoptions,
-                          batch.writebatch.ptr,
-                          &mut error);
+            leveldb_write(
+                self.database.ptr,
+                c_writeoptions,
+                batch.writebatch.ptr,
+                &mut error,
+            );
             leveldb_writeoptions_destroy(c_writeoptions);
 
             if error == ptr::null_mut() {
@@ -78,11 +80,13 @@ impl<K: Key> Writebatch<K> {
     pub fn put(&mut self, key: K, value: &[u8]) {
         unsafe {
             key.as_slice(|k| {
-                leveldb_writebatch_put(self.writebatch.ptr,
-                                       k.as_ptr() as *mut c_char,
-                                       k.len() as size_t,
-                                       value.as_ptr() as *mut c_char,
-                                       value.len() as size_t);
+                leveldb_writebatch_put(
+                    self.writebatch.ptr,
+                    k.as_ptr() as *mut c_char,
+                    k.len() as size_t,
+                    value.as_ptr() as *mut c_char,
+                    value.len() as size_t,
+                );
             })
         }
     }
@@ -91,9 +95,11 @@ impl<K: Key> Writebatch<K> {
     pub fn delete(&mut self, key: K) {
         unsafe {
             key.as_slice(|k| {
-                leveldb_writebatch_delete(self.writebatch.ptr,
-                                          k.as_ptr() as *mut c_char,
-                                          k.len() as size_t);
+                leveldb_writebatch_delete(
+                    self.writebatch.ptr,
+                    k.as_ptr() as *mut c_char,
+                    k.len() as size_t,
+                );
             })
         }
     }
@@ -102,10 +108,12 @@ impl<K: Key> Writebatch<K> {
     pub fn iterate<T: WritebatchIterator<K = K>>(&mut self, iterator: Box<T>) -> Box<T> {
         unsafe {
             let iter = Box::into_raw(iterator);
-            leveldb_writebatch_iterate(self.writebatch.ptr,
-                                       iter as *mut c_void,
-                                       put_callback::<K, T>,
-                                       deleted_callback::<K, T>);
+            leveldb_writebatch_iterate(
+                self.writebatch.ptr,
+                iter as *mut c_void,
+                put_callback::<K, T>,
+                deleted_callback::<K, T>,
+            );
             Box::from_raw(iter)
         }
     }
@@ -123,11 +131,13 @@ pub trait WritebatchIterator {
     fn deleted(&mut self, key: Self::K);
 }
 
-extern "C" fn put_callback<K: Key, T: WritebatchIterator<K = K>>(state: *mut c_void,
-                                                                 key: *const c_char,
-                                                                 keylen: size_t,
-                                                                 val: *const c_char,
-                                                                 vallen: size_t) {
+extern "C" fn put_callback<K: Key, T: WritebatchIterator<K = K>>(
+    state: *mut c_void,
+    key: *const c_char,
+    keylen: size_t,
+    val: *const c_char,
+    vallen: size_t,
+) {
     unsafe {
         let iter: &mut T = &mut *(state as *mut T);
         let key_slice = slice::from_raw_parts::<u8>(key as *const u8, keylen as usize);
@@ -137,9 +147,11 @@ extern "C" fn put_callback<K: Key, T: WritebatchIterator<K = K>>(state: *mut c_v
     }
 }
 
-extern "C" fn deleted_callback<K: Key, T: WritebatchIterator<K = K>>(state: *mut c_void,
-                                                                     key: *const c_char,
-                                                                     keylen: size_t) {
+extern "C" fn deleted_callback<K: Key, T: WritebatchIterator<K = K>>(
+    state: *mut c_void,
+    key: *const c_char,
+    keylen: size_t,
+) {
     unsafe {
         let iter: &mut T = &mut *(state as *mut T);
         let key_slice = slice::from_raw_parts::<u8>(key as *const u8, keylen as usize);

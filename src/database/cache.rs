@@ -1,5 +1,5 @@
 //! Structs and traits to work with the leveldb cache.
-use leveldb_sys::{leveldb_cache_t, leveldb_cache_create_lru, leveldb_cache_destroy};
+use leveldb_sys::{leveldb_cache_create_lru, leveldb_cache_destroy, leveldb_cache_t};
 use libc::size_t;
 
 #[allow(missing_docs)]
@@ -24,7 +24,9 @@ impl Cache {
     /// Create a leveldb LRU cache of a given size
     pub fn new(size: size_t) -> Cache {
         let cache = unsafe { leveldb_cache_create_lru(size) };
-        Cache { raw: RawCache { ptr: cache } }
+        Cache {
+            raw: RawCache { ptr: cache },
+        }
     }
 
     #[allow(missing_docs)]

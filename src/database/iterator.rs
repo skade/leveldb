@@ -4,13 +4,13 @@
 //! Iterators to iterate over key, values and pairs of both.
 use leveldb_sys::{leveldb_iterator_t, leveldb_iter_seek_to_first, leveldb_iter_destroy,
                   leveldb_iter_seek_to_last, leveldb_create_iterator, leveldb_iter_valid,
-                  leveldb_iter_next, leveldb_iter_key, leveldb_iter_value,
+                  leveldb_iter_next, leveldb_iter_prev, leveldb_iter_key, leveldb_iter_value,
                   leveldb_readoptions_destroy, leveldb_iter_seek};
 use libc::{size_t, c_char};
-use std::iter;
+use super::key::{from_u8, Key};
+use super::options::{c_readoptions, ReadOptions};
 use super::Database;
-use super::options::{ReadOptions, c_readoptions};
-use super::key::{Key, from_u8};
+use std::iter;
 use std::slice::from_raw_parts;
 use std::marker::PhantomData;
 
@@ -38,6 +38,7 @@ pub struct Iterator<'a, K: Key + 'a> {
     iter: RawIterator,
     from: Option<&'a K>,
     to: Option<&'a K>,
+    reverse: bool,
 }
 
 /// An iterator over the leveldb keyspace.
@@ -90,6 +91,8 @@ pub trait LevelDBIterator<'a, K: Key> {
     #[inline]
     fn started(&mut self);
 
+    fn reverse(self) -> Self;
+
     fn from(self, key: &'a K) -> Self;
     fn to(self, key: &'a K) -> Self;
 
@@ -106,6 +109,21 @@ pub trait LevelDBIterator<'a, K: Key> {
 
                 leveldb_iter_next(self.raw_iterator());
             } else {
+                if let Some(k) = self.from_key() {
+                    self.seek(k)
+                }
+                self.started();
+            }
+        }
+        self.valid()
+    }
+
+    fn step_back(&mut self) -> bool {
+        unsafe {
+            if !self.start() {
+                leveldb_iter_prev(self.raw_iterator());
+            } else {
+                leveldb_iter_seek_to_last(self.raw_iterator());
                 if let Some(k) = self.from_key() {
                     self.seek(k)
                 }
@@ -170,6 +188,7 @@ impl<'a, K: Key> Iterator<'a, K> {
                 database: PhantomData,
                 from: None,
                 to: None,
+                reverse: false,
             }
         }
     }
@@ -195,6 +214,12 @@ impl<'a, K: Key> LevelDBIterator<'a, K> for Iterator<'a,K> {
     #[inline]
     fn started(&mut self) {
         self.start = false
+    }
+
+    #[inline]
+    fn reverse(mut self) -> Self {
+        self.reverse = true;
+        self
     }
 
     fn from(mut self, key: &'a K) -> Self {
@@ -244,6 +269,12 @@ impl<'a,K: Key> LevelDBIterator<'a, K> for KeyIterator<'a,K> {
         self.inner.start = false
     }
 
+    #[inline]
+    fn reverse(mut self) -> Self {
+        self.inner.reverse = true;
+        self
+    }
+
     fn from(mut self, key: &'a K) -> Self {
         self.inner.from = Some(key);
         self
@@ -291,6 +322,12 @@ impl<'a,K: Key> LevelDBIterator<'a, K> for ValueIterator<'a,K> {
         self.inner.start = false
     }
 
+    #[inline]
+    fn reverse(mut self) -> Self {
+        self.inner.reverse = true;
+        self
+    }
+
     fn from(mut self, key: &'a K) -> Self {
         self.inner.from = Some(key);
         self
@@ -314,7 +351,13 @@ impl<'a,K: Key> iter::Iterator for Iterator<'a,K> {
   type Item = (K,Vec<u8>);
 
     fn next(&mut self) -> Option<(K, Vec<u8>)> {
-        if self.advance() {
+        if self.reverse {
+            if self.step_back() {
+                Some((self.key(), self.value()))
+            } else {
+                None
+            }
+        } else if self.advance() {
             Some((self.key(), self.value()))
         } else {
             None
@@ -322,8 +365,8 @@ impl<'a,K: Key> iter::Iterator for Iterator<'a,K> {
     }
 }
 
-impl<'a, K: Key> iter::Iterator for KeyIterator<'a,K> {
-  type Item = K;
+impl<'a, K: Key> iter::Iterator for KeyIterator<'a, K> {
+    type Item = K;
 
     fn next(&mut self) -> Option<K> {
         if self.advance() {
@@ -334,11 +377,31 @@ impl<'a, K: Key> iter::Iterator for KeyIterator<'a,K> {
     }
 }
 
-impl<'a, K: Key> iter::Iterator for ValueIterator<'a,K> {
-  type Item = Vec<u8>;
+impl<'a, K: Key> iter::DoubleEndedIterator for KeyIterator<'a, K> {
+    fn next_back(&mut self) -> Option<K> {
+        if self.step_back() {
+            Some(self.key())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, K: Key> iter::Iterator for ValueIterator<'a, K> {
+    type Item = Vec<u8>;
 
     fn next(&mut self) -> Option<Vec<u8>> {
         if self.advance() {
+            Some(self.value())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, K: Key> iter::DoubleEndedIterator for ValueIterator<'a, K> {
+    fn next_back(&mut self) -> Option<Vec<u8>> {
+        if self.step_back() {
             Some(self.value())
         } else {
             None

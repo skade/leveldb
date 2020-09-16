@@ -1,0 +1,46 @@
+on: [push, pull_request]
+
+name: Continuous integration
+
+jobs:
+  test-x86_64-unknown-linux-gnu:
+    name: Test Suite (x86_64-unknown-linux-gnu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  test-x86_64-unknown-windows-msvc:
+    name: Test Suite (x86_64-unknown-windows-msvc)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  test-x86_64-unknown-darwin:
+    name: Test Suite (x86_64-unknown-darwin)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test

@@ -1,6 +1,6 @@
 //! Compaction
-use super::Database;
 use super::key::Key;
+use super::Database;
 use leveldb_sys::leveldb_compact_range;
 use libc::{c_char, size_t};
 
@@ -13,11 +13,13 @@ impl<'a, K: Key + 'a> Compaction<'a, K> for Database<K> {
         unsafe {
             start.as_slice(|s| {
                 limit.as_slice(|l| {
-                    leveldb_compact_range(self.database.ptr,
-                                          s.as_ptr() as *mut c_char,
-                                          s.len() as size_t,
-                                          l.as_ptr() as *mut c_char,
-                                          l.len() as size_t);
+                    leveldb_compact_range(
+                        self.database.ptr,
+                        s.as_ptr() as *mut c_char,
+                        s.len() as size_t,
+                        l.as_ptr() as *mut c_char,
+                        l.len() as size_t,
+                    );
                 });
             });
         }

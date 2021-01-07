@@ -56,6 +56,7 @@ pub use database::kv;
 pub use database::batch;
 pub use database::management;
 pub use database::compaction;
+pub use database::size;
 
 #[allow(missing_docs)]
 pub mod database;

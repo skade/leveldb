@@ -14,3 +14,4 @@ mod writebatch;
 mod management;
 mod compaction;
 mod concurrent_access;
+mod size;

@@ -39,8 +39,6 @@
 //! }
 //! ```
 
-#![crate_type = "lib"]
-#![crate_name = "leveldb"]
 #![deny(missing_docs)]
 
 extern crate libc;

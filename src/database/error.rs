@@ -15,7 +15,7 @@ pub struct Error {
 impl Error {
     /// create a new Error, using the String provided
     pub fn new(message: String) -> Error {
-        Error { message: message }
+        Error { message }
     }
 
     /// create an error from a c-string buffer.
@@ -42,7 +42,7 @@ impl std::error::Error for Error {
     fn description(&self) -> &str {
         &self.message
     }
-    fn cause(&self) -> Option<&std::error::Error> {
+    fn cause(&self) -> Option<&dyn std::error::Error> {
         None
     }
 }

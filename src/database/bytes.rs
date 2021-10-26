@@ -23,7 +23,7 @@ impl Bytes {
         } else {
             Some(Bytes {
                 bytes: &mut *ptr,
-                size: size,
+                size,
                 _marker: Default::default(),
             })
         }
@@ -33,7 +33,7 @@ impl Bytes {
     pub unsafe fn from_raw_unchecked(ptr: *mut u8, size: usize) -> Self {
         Bytes {
             bytes: &mut *ptr,
-            size: size,
+            size,
             _marker: Default::default(),
         }
     }

@@ -24,7 +24,7 @@ name = "leveldb"
 
 [dependencies]
 
-db-key = "0.0.5"
+db-key = "0.1"
 libc = "0.2.4"
 
 [dependencies.leveldb-sys]

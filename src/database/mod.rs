@@ -1,7 +1,5 @@
 //! The main database module, allowing to interface with leveldb on
 //! a key-value basis.
-extern crate db_key as key;
-
 use leveldb_sys::*;
 
 use self::options::{Options, c_options};
@@ -28,6 +26,7 @@ pub mod batch;
 pub mod management;
 pub mod compaction;
 pub mod bytes;
+pub mod key;
 
 #[allow(missing_docs)]
 struct RawDB {

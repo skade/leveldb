@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod comparator {
   use libc::c_char;
-  use key::Key;
+  use leveldb::database::key::Key;
   use utils::{tmpdir, db_put_simple};
   use leveldb::database::{Database};
   use leveldb::iterator::Iterable;

@@ -110,13 +110,10 @@ impl<'a, K: Key + 'a> Iterable<'a, K> for Database<K> {
 pub trait LevelDBIterator<'a, K: Key> {
     type RevIter: LevelDBIterator<'a, K>;
 
-    #[inline]
     fn raw_iterator(&self) -> *mut leveldb_iterator_t;
 
-    #[inline]
     fn start(&self) -> bool;
 
-    #[inline]
     fn started(&mut self);
 
     fn reverse(self) -> Self::RevIter;
